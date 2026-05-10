@@ -1,6 +1,5 @@
 fastapi
 uvicorn[standard]
-pandas==2.1.4
+pandas==3.0.2
 pydantic==2.5.3
 python-multipart
-numpy==1.26.4
