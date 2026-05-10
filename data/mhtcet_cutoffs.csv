@@ -1,0 +1,133 @@
+college_name,branch,category,cutoff_percentile,college_type,district,fees,college_code
+"Veermata Jijabai Technological Institute (VJTI)",Computer Engineering,OPEN,99.54,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Computer Engineering,OBC,99.21,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Computer Engineering,SC,98.10,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Computer Engineering,ST,95.50,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Computer Engineering,EWS,99.10,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Computer Engineering,TFWS,99.30,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Electronics Engineering,OPEN,99.10,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Electronics Engineering,OBC,98.80,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Electronics Engineering,SC,97.20,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Electronics Engineering,ST,93.00,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Electronics Engineering,EWS,98.90,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Mechanical Engineering,OPEN,98.50,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Mechanical Engineering,OBC,97.80,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Mechanical Engineering,SC,95.00,Autonomous,Mumbai,89000,3001
+"Veermata Jijabai Technological Institute (VJTI)",Mechanical Engineering,ST,90.00,Autonomous,Mumbai,89000,3001
+"College of Engineering Pune (COEP)",Computer Engineering,OPEN,99.40,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Computer Engineering,OBC,99.00,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Computer Engineering,SC,97.50,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Computer Engineering,ST,94.00,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Computer Engineering,EWS,99.10,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Computer Engineering,TFWS,99.20,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Electronics Engineering,OPEN,98.90,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Electronics Engineering,OBC,98.40,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Electronics Engineering,SC,96.50,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Mechanical Engineering,OPEN,98.00,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Mechanical Engineering,OBC,97.20,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Mechanical Engineering,SC,94.50,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Civil Engineering,OPEN,97.00,Autonomous,Pune,65000,4001
+"College of Engineering Pune (COEP)",Civil Engineering,OBC,96.00,Autonomous,Pune,65000,4001
+"Government College of Engineering Aurangabad (GECA)",Computer Engineering,OPEN,97.20,Government,Aurangabad,25000,5001
+"Government College of Engineering Aurangabad (GECA)",Computer Engineering,OBC,96.50,Government,Aurangabad,25000,5001
+"Government College of Engineering Aurangabad (GECA)",Computer Engineering,SC,93.00,Government,Aurangabad,25000,5001
+"Government College of Engineering Aurangabad (GECA)",Computer Engineering,ST,88.00,Government,Aurangabad,25000,5001
+"Government College of Engineering Aurangabad (GECA)",Computer Engineering,EWS,96.80,Government,Aurangabad,25000,5001
+"Government College of Engineering Aurangabad (GECA)",Mechanical Engineering,OPEN,95.50,Government,Aurangabad,25000,5001
+"Government College of Engineering Aurangabad (GECA)",Mechanical Engineering,OBC,94.00,Government,Aurangabad,25000,5001
+"Government College of Engineering Aurangabad (GECA)",Electronics Engineering,OPEN,95.00,Government,Aurangabad,25000,5001
+"Government College of Engineering Aurangabad (GECA)",Civil Engineering,OPEN,92.00,Government,Aurangabad,25000,5001
+"Walchand College of Engineering Sangli",Computer Engineering,OPEN,97.80,Autonomous,Sangli,48000,6001
+"Walchand College of Engineering Sangli",Computer Engineering,OBC,97.10,Autonomous,Sangli,48000,6001
+"Walchand College of Engineering Sangli",Computer Engineering,SC,94.50,Autonomous,Sangli,48000,6001
+"Walchand College of Engineering Sangli",Computer Engineering,ST,90.00,Autonomous,Sangli,48000,6001
+"Walchand College of Engineering Sangli",Computer Engineering,EWS,97.50,Autonomous,Sangli,48000,6001
+"Walchand College of Engineering Sangli",Electronics Engineering,OPEN,96.50,Autonomous,Sangli,48000,6001
+"Walchand College of Engineering Sangli",Mechanical Engineering,OPEN,95.80,Autonomous,Sangli,48000,6001
+"Walchand College of Engineering Sangli",Civil Engineering,OPEN,93.00,Autonomous,Sangli,48000,6001
+"Institute of Chemical Technology (ICT) Mumbai",Chemical Engineering,OPEN,98.50,Autonomous,Mumbai,120000,7001
+"Institute of Chemical Technology (ICT) Mumbai",Chemical Engineering,OBC,97.80,Autonomous,Mumbai,120000,7001
+"Institute of Chemical Technology (ICT) Mumbai",Chemical Engineering,SC,95.00,Autonomous,Mumbai,120000,7001
+"Government College of Engineering Nagpur (GCOEN)",Computer Engineering,OPEN,96.50,Government,Nagpur,22000,8001
+"Government College of Engineering Nagpur (GCOEN)",Computer Engineering,OBC,95.80,Government,Nagpur,22000,8001
+"Government College of Engineering Nagpur (GCOEN)",Computer Engineering,SC,92.00,Government,Nagpur,22000,8001
+"Government College of Engineering Nagpur (GCOEN)",Computer Engineering,ST,86.00,Government,Nagpur,22000,8001
+"Government College of Engineering Nagpur (GCOEN)",Computer Engineering,EWS,96.00,Government,Nagpur,22000,8001
+"Government College of Engineering Nagpur (GCOEN)",Mechanical Engineering,OPEN,94.00,Government,Nagpur,22000,8001
+"Government College of Engineering Nagpur (GCOEN)",Electronics Engineering,OPEN,93.50,Government,Nagpur,22000,8001
+"Government College of Engineering Nagpur (GCOEN)",Civil Engineering,OPEN,90.00,Government,Nagpur,22000,8001
+"PICT Pune (Pune Institute of Computer Technology)",Computer Engineering,OPEN,98.80,Private-Aided,Pune,95000,9001
+"PICT Pune (Pune Institute of Computer Technology)",Computer Engineering,OBC,98.20,Private-Aided,Pune,95000,9001
+"PICT Pune (Pune Institute of Computer Technology)",Computer Engineering,SC,96.00,Private-Aided,Pune,95000,9001
+"PICT Pune (Pune Institute of Computer Technology)",Computer Engineering,EWS,98.50,Private-Aided,Pune,95000,9001
+"PICT Pune (Pune Institute of Computer Technology)",Computer Engineering,TFWS,98.60,Private-Aided,Pune,95000,9001
+"PICT Pune (Pune Institute of Computer Technology)",Information Technology,OPEN,98.50,Private-Aided,Pune,95000,9001
+"PICT Pune (Pune Institute of Computer Technology)",Information Technology,OBC,97.90,Private-Aided,Pune,95000,9001
+"MIT College of Engineering Pune",Computer Engineering,OPEN,97.50,Private,Pune,185000,10001
+"MIT College of Engineering Pune",Computer Engineering,OBC,96.80,Private,Pune,185000,10001
+"MIT College of Engineering Pune",Computer Engineering,SC,93.50,Private,Pune,185000,10001
+"MIT College of Engineering Pune",Computer Engineering,EWS,97.00,Private,Pune,185000,10001
+"MIT College of Engineering Pune",Computer Engineering,TFWS,97.20,Private,Pune,185000,10001
+"MIT College of Engineering Pune",Information Technology,OPEN,97.00,Private,Pune,185000,10001
+"MIT College of Engineering Pune",Electronics Engineering,OPEN,95.50,Private,Pune,185000,10001
+"MIT College of Engineering Pune",Mechanical Engineering,OPEN,93.00,Private,Pune,185000,10001
+"Vishwakarma Institute of Technology (VIT) Pune",Computer Engineering,OPEN,97.20,Private,Pune,175000,11001
+"Vishwakarma Institute of Technology (VIT) Pune",Computer Engineering,OBC,96.50,Private,Pune,175000,11001
+"Vishwakarma Institute of Technology (VIT) Pune",Computer Engineering,SC,93.00,Private,Pune,175000,11001
+"Vishwakarma Institute of Technology (VIT) Pune",Information Technology,OPEN,96.80,Private,Pune,175000,11001
+"Vishwakarma Institute of Technology (VIT) Pune",Electronics Engineering,OPEN,94.50,Private,Pune,175000,11001
+"Ramrao Adik Institute of Technology (RAIT) Nerul",Computer Engineering,OPEN,95.50,Private,Navi Mumbai,165000,12001
+"Ramrao Adik Institute of Technology (RAIT) Nerul",Computer Engineering,OBC,94.80,Private,Navi Mumbai,165000,12001
+"Ramrao Adik Institute of Technology (RAIT) Nerul",Computer Engineering,SC,91.00,Private,Navi Mumbai,165000,12001
+"Ramrao Adik Institute of Technology (RAIT) Nerul",Information Technology,OPEN,95.00,Private,Navi Mumbai,165000,12001
+"Thadomal Shahani Engineering College (TSEC) Mumbai",Computer Engineering,OPEN,96.00,Private-Aided,Mumbai,105000,13001
+"Thadomal Shahani Engineering College (TSEC) Mumbai",Computer Engineering,OBC,95.20,Private-Aided,Mumbai,105000,13001
+"Thadomal Shahani Engineering College (TSEC) Mumbai",Computer Engineering,SC,92.00,Private-Aided,Mumbai,105000,13001
+"Thadomal Shahani Engineering College (TSEC) Mumbai",Electronics Engineering,OPEN,94.00,Private-Aided,Mumbai,105000,13001
+"Sardar Patel College of Engineering (SPCE) Mumbai",Computer Engineering,OPEN,95.80,Private-Aided,Mumbai,110000,14001
+"Sardar Patel College of Engineering (SPCE) Mumbai",Computer Engineering,OBC,95.00,Private-Aided,Mumbai,110000,14001
+"Sardar Patel College of Engineering (SPCE) Mumbai",Electronics Engineering,OPEN,93.50,Private-Aided,Mumbai,110000,14001
+"Sardar Patel College of Engineering (SPCE) Mumbai",Mechanical Engineering,OPEN,91.00,Private-Aided,Mumbai,110000,14001
+"K.J. Somaiya College of Engineering Mumbai",Computer Engineering,OPEN,96.20,Private,Mumbai,190000,15001
+"K.J. Somaiya College of Engineering Mumbai",Computer Engineering,OBC,95.50,Private,Mumbai,190000,15001
+"K.J. Somaiya College of Engineering Mumbai",Computer Engineering,SC,92.50,Private,Mumbai,190000,15001
+"K.J. Somaiya College of Engineering Mumbai",Information Technology,OPEN,95.80,Private,Mumbai,190000,15001
+"K.J. Somaiya College of Engineering Mumbai",Electronics Engineering,OPEN,93.80,Private,Mumbai,190000,15001
+"Government College of Engineering Karad",Computer Engineering,OPEN,94.50,Government,Satara,22000,16001
+"Government College of Engineering Karad",Computer Engineering,OBC,93.50,Government,Satara,22000,16001
+"Government College of Engineering Karad",Computer Engineering,SC,89.00,Government,Satara,22000,16001
+"Government College of Engineering Karad",Mechanical Engineering,OPEN,91.00,Government,Satara,22000,16001
+"Government College of Engineering Karad",Civil Engineering,OPEN,88.00,Government,Satara,22000,16001
+"Yeshwantrao Chavan College of Engineering (YCCE) Nagpur",Computer Engineering,OPEN,93.00,Private,Nagpur,155000,17001
+"Yeshwantrao Chavan College of Engineering (YCCE) Nagpur",Computer Engineering,OBC,92.00,Private,Nagpur,155000,17001
+"Yeshwantrao Chavan College of Engineering (YCCE) Nagpur",Computer Engineering,SC,87.00,Private,Nagpur,155000,17001
+"Yeshwantrao Chavan College of Engineering (YCCE) Nagpur",Information Technology,OPEN,92.50,Private,Nagpur,155000,17001
+"Priyadarshini College of Engineering Nagpur",Computer Engineering,OPEN,90.00,Private,Nagpur,145000,18001
+"Priyadarshini College of Engineering Nagpur",Computer Engineering,OBC,88.50,Private,Nagpur,145000,18001
+"Priyadarshini College of Engineering Nagpur",Mechanical Engineering,OPEN,86.00,Private,Nagpur,145000,18001
+"Sinhgad College of Engineering Pune",Computer Engineering,OPEN,92.00,Private,Pune,165000,19001
+"Sinhgad College of Engineering Pune",Computer Engineering,OBC,90.50,Private,Pune,165000,19001
+"Sinhgad College of Engineering Pune",Computer Engineering,SC,86.00,Private,Pune,165000,19001
+"Sinhgad College of Engineering Pune",Information Technology,OPEN,91.50,Private,Pune,165000,19001
+"Sinhgad College of Engineering Pune",Electronics Engineering,OPEN,89.00,Private,Pune,165000,19001
+"Sinhgad College of Engineering Pune",Mechanical Engineering,OPEN,87.00,Private,Pune,165000,19001
+"Bharati Vidyapeeth College of Engineering Pune",Computer Engineering,OPEN,91.00,Private,Pune,160000,20001
+"Bharati Vidyapeeth College of Engineering Pune",Computer Engineering,OBC,89.50,Private,Pune,160000,20001
+"Bharati Vidyapeeth College of Engineering Pune",Information Technology,OPEN,90.50,Private,Pune,160000,20001
+"Atharva College of Engineering Mumbai",Computer Engineering,OPEN,89.50,Private,Mumbai,170000,21001
+"Atharva College of Engineering Mumbai",Computer Engineering,OBC,88.00,Private,Mumbai,170000,21001
+"Atharva College of Engineering Mumbai",Information Technology,OPEN,88.50,Private,Mumbai,170000,21001
+"Pillai College of Engineering Navi Mumbai",Computer Engineering,OPEN,88.00,Private,Navi Mumbai,155000,22001
+"Pillai College of Engineering Navi Mumbai",Computer Engineering,OBC,86.50,Private,Navi Mumbai,155000,22001
+"Pillai College of Engineering Navi Mumbai",Information Technology,OPEN,87.50,Private,Navi Mumbai,155000,22001
+"Don Bosco Institute of Technology Mumbai",Computer Engineering,OPEN,87.00,Private,Mumbai,160000,23001
+"Don Bosco Institute of Technology Mumbai",Information Technology,OPEN,86.00,Private,Mumbai,160000,23001
+"Finolex Academy of Management and Technology Ratnagiri",Computer Engineering,OPEN,85.00,Private-Aided,Ratnagiri,60000,24001
+"Finolex Academy of Management and Technology Ratnagiri",Computer Engineering,OBC,83.00,Private-Aided,Ratnagiri,60000,24001
+"Finolex Academy of Management and Technology Ratnagiri",Computer Engineering,SC,78.00,Private-Aided,Ratnagiri,60000,24001
+"Finolex Academy of Management and Technology Ratnagiri",Electronics Engineering,OPEN,82.00,Private-Aided,Ratnagiri,60000,24001
+"Government College of Engineering Amravati",Computer Engineering,OPEN,92.50,Government,Amravati,22000,25001
+"Government College of Engineering Amravati",Computer Engineering,OBC,91.00,Government,Amravati,22000,25001
+"Government College of Engineering Amravati",Computer Engineering,SC,87.00,Government,Amravati,22000,25001
+"Government College of Engineering Amravati",Mechanical Engineering,OPEN,89.00,Government,Amravati,22000,25001
+"Government College of Engineering Amravati",Civil Engineering,OPEN,85.00,Government,Amravati,22000,25001
