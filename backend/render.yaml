@@ -6,4 +6,4 @@ services:
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: CSV_PATH
-        value: ../data/mhtcet_cutoffs.csv
+        value: ../data/mhtcet_complete.csv

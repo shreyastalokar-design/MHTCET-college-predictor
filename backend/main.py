@@ -1,184 +1,213 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, List
 import pandas as pd
 import os
+from typing import Optional
 
-app = FastAPI(title="MHT-CET College Predictor API", version="1.0.0")
+app = FastAPI()
 
-# ─── CORS (allows React frontend to call this API) ──────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your frontend URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ─── Load CSV ────────────────────────────────────────────────────────────────
-CSV_PATH = os.getenv("CSV_PATH", "../data/mhtcet_cutoffs.csv")
+# ── Load CSV ──────────────────────────────────────────────────────────────────
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_PATH = os.environ.get("CSV_PATH", os.path.join(BASE_DIR, "../data/mhtcet_complete.csv"))
 
-def load_data():
-    try:
-        df = pd.read_csv(CSV_PATH)
-        df.columns = df.columns.str.strip()
-        df["cutoff_percentile"] = pd.to_numeric(df["cutoff_percentile"], errors="coerce")
-        df["fees"] = pd.to_numeric(df["fees"], errors="coerce").fillna(0)
-        return df
-    except Exception as e:
-        raise RuntimeError(f"Failed to load CSV: {e}")
+df = pd.read_csv(CSV_PATH)
+df['Category'] = df['Category'].str.strip()
+df['Percentile'] = pd.to_numeric(df['Percentile'], errors='coerce')
+df['Cutoff Rank'] = pd.to_numeric(df['Cutoff Rank'], errors='coerce')
+df['Total Fee'] = pd.to_numeric(df['Total Fee'], errors='coerce')
+df['CAP Round'] = df['CAP Round'].fillna('Unknown')
 
-df = load_data()
+print(f"✅ Loaded {len(df)} rows from CSV")
 
-# ─── Request / Response Models ───────────────────────────────────────────────
-class PredictRequest(BaseModel):
-    percentile: float
-    category: str                        # e.g. "OPEN", "OBC", "SC", "ST", "EWS", "TFWS", "PWD"
-    branches: Optional[List[str]] = []   # e.g. ["Computer Engineering", "IT"] — empty = all
-    districts: Optional[List[str]] = []  # e.g. ["Pune", "Mumbai"] — empty = all
-    college_type: Optional[str] = ""     # "Government", "Private", etc — empty = all
+# ── Category Mapping ──────────────────────────────────────────────────────────
+# Logic: prefix (G=Male, L=Female) + caste + suffix (H=Home, O=Other, S=State)
+# Special quotas: PWD, DEF, EWS, TFWS, MI, ORPHAN, AI have their own codes
 
-class CollegeResult(BaseModel):
-    college_name: str
-    branch: str
-    category: str
-    cutoff_percentile: float
-    college_type: str
-    district: str
-    fees: int
-    chance: str          # "Safe" | "Moderate" | "Reach"
-    gap: float           # user_percentile - cutoff (positive = above cutoff)
+CASTE_MAP = {
+    "OPEN": "OPEN",
+    "OBC":  "OBC",
+    "SC":   "SC",
+    "ST":   "ST",
+    "SEBC": "SEBC",
+    "VJ":   "VJ",
+    "NT1":  "NT1",
+    "NT2":  "NT2",
+    "NT3":  "NT3",
+}
 
-class PredictResponse(BaseModel):
-    percentile: float
-    category: str
-    safe: List[CollegeResult]
-    moderate: List[CollegeResult]
-    reach: List[CollegeResult]
-    total_eligible: int
+SUFFIX_MAP = {
+    "Home University":  "H",
+    "Other University": "O",
+    "State Level":      "S",
+}
 
-# ─── Helper ──────────────────────────────────────────────────────────────────
-CATEGORY_PRIORITY = ["OPEN", "OBC", "EWS", "SC", "ST", "TFWS", "PWD", "Defence"]
-
-def classify_chance(gap: float) -> str:
+def build_category_code(gender: str, caste: str, quota: str, uni_type: str) -> list:
     """
-    gap = user_percentile - cutoff_percentile
-    Positive gap → user is above cutoff → Safe
-    Near zero    → Moderate
-    Negative     → Reach (but not too far off)
+    Returns a list of possible category codes for the given combination.
+    quota: NONE | PWD | DEF | EWS | TFWS | MI | ORPHAN | AI
     """
-    if gap >= 1.0:
-        return "Safe"
-    elif gap >= -1.0:
-        return "Moderate"
+    # Special standalone quotas
+    if quota == "AI":
+        return ["AI"]
+    if quota == "MI":
+        return ["MI"]
+    if quota == "ORPHAN":
+        return ["ORPHAN"]
+    if quota == "EWS":
+        return ["EWS"]
+    if quota == "TFWS":
+        return ["TFWS"]
+
+    suffix = SUFFIX_MAP.get(uni_type, "S")
+    prefix = "G" if gender == "Male" else "L"
+
+    if quota == "PWD":
+        # PWD uses its own prefix
+        if caste == "OPEN":
+            return [f"PWDOPEN{suffix}"]
+        else:
+            return [f"PWD{caste}{suffix}", f"PWDR{caste}{suffix}"]
+
+    if quota == "DEF":
+        # Defence uses DEF prefix
+        if caste == "OPEN":
+            return [f"DEFOPEN{suffix}"]
+        else:
+            return [f"DEF{caste}{suffix}", f"DEFR{caste}{suffix}"]
+
+    # Normal category
+    if caste == "OPEN":
+        return [f"{prefix}OPEN{suffix}"]
+    elif caste == "VJ":
+        return [f"{prefix}VJ{suffix}"]
+    elif caste in ["NT1", "NT2", "NT3"]:
+        return [f"{prefix}{caste}{suffix}"]
     else:
-        return "Reach"
+        return [f"{prefix}{caste}{suffix}"]
 
-# ─── Routes ──────────────────────────────────────────────────────────────────
+
+# ── Endpoints ─────────────────────────────────────────────────────────────────
+
 @app.get("/")
 def root():
-    return {"message": "MHT-CET College Predictor API is running ✅"}
+    return {"status": "MHT-CET Predictor API is running"}
+
 
 @app.get("/branches")
 def get_branches():
-    """Return unique branches available in the dataset."""
-    branches = sorted(df["branch"].dropna().unique().tolist())
+    branches = sorted(df['Branch'].dropna().unique().tolist())
     return {"branches": branches}
+
 
 @app.get("/districts")
 def get_districts():
-    """Return unique districts available in the dataset."""
-    districts = sorted(df["district"].dropna().unique().tolist())
+    districts = sorted(df['District'].dropna().unique().tolist())
     return {"districts": districts}
+
 
 @app.get("/college-types")
 def get_college_types():
-    """Return unique college types."""
-    types = sorted(df["college_type"].dropna().unique().tolist())
+    types = sorted(df['Status'].dropna().unique().tolist())
     return {"college_types": types}
 
-@app.get("/categories")
-def get_categories():
+
+@app.get("/predict")
+def predict(
+    percentile: float = Query(...),
+    gender: str = Query(...),           # Male | Female
+    caste: str = Query(...),            # OPEN | OBC | SC | ST | SEBC | VJ | NT1 | NT2 | NT3
+    quota: str = Query("NONE"),         # NONE | PWD | DEF | EWS | TFWS | MI | ORPHAN | AI
+    uni_type: str = Query("State Level"),  # Home University | Other University | State Level
+    cap_round: str = Query("CAP Round 1"),
+    branches: Optional[str] = Query(None),
+    districts: Optional[str] = Query(None),
+    college_type: Optional[str] = Query(None),
+):
+    # Build category codes
+    category_codes = build_category_code(gender, caste, quota, uni_type)
+
+    # Filter by CAP Round (AI has no fixed round in some cases)
+    if quota == "AI":
+        filtered = df[df['Category'] == 'AI'].copy()
+    else:
+        filtered = df[
+            (df['Category'].isin(category_codes)) &
+            (df['CAP Round'] == cap_round)
+        ].copy()
+
+    # Filter by percentile — show colleges where cutoff percentile <= user percentile
+    filtered = filtered[filtered['Percentile'] <= percentile]
+
+    # Optional filters
+    if branches:
+        branch_list = [b.strip() for b in branches.split(",")]
+        filtered = filtered[filtered['Branch'].isin(branch_list)]
+
+    if districts:
+        district_list = [d.strip() for d in districts.split(",")]
+        filtered = filtered[filtered['District'].isin(district_list)]
+
+    if college_type:
+        filtered = filtered[filtered['Status'].str.contains(college_type, na=False)]
+
+    # Sort by percentile descending (highest cutoff first = most competitive)
+    filtered = filtered.sort_values('Percentile', ascending=False)
+
+    # Drop duplicates keeping best cutoff per college+branch
+    filtered = filtered.drop_duplicates(subset=['College Name', 'Branch'])
+
+    # Classify into Safe / Moderate / Reach
+    def classify(row):
+        diff = percentile - row['Percentile']
+        if diff >= 5:
+            return 'Safe'
+        elif diff >= 2:
+            return 'Moderate'
+        else:
+            return 'Reach'
+
+    filtered['Admission Chance'] = filtered.apply(classify, axis=1)
+
+    # Prepare response
+    results = filtered[[
+        'Institution Code', 'College Name', 'University', 'Status',
+        'District', 'Region', 'Branch', 'CAP Round', 'Category',
+        'Cutoff Rank', 'Percentile', 'Total Fee', 'Admission Chance'
+    ]].fillna('N/A')
+
+    # Convert to list of dicts
+    colleges = results.rename(columns={
+        'Institution Code': 'institution_code',
+        'College Name': 'college_name',
+        'University': 'university',
+        'Status': 'college_type',
+        'District': 'district',
+        'Region': 'region',
+        'Branch': 'branch',
+        'CAP Round': 'cap_round',
+        'Category': 'category',
+        'Cutoff Rank': 'cutoff_rank',
+        'Percentile': 'cutoff_percentile',
+        'Total Fee': 'total_fee',
+        'Admission Chance': 'admission_chance',
+    }).to_dict(orient='records')
+
     return {
-        "categories": ["OPEN", "OBC", "SC", "ST", "EWS", "TFWS", "PWD", "Defence"]
+        "percentile": percentile,
+        "gender": gender,
+        "caste": caste,
+        "quota": quota,
+        "uni_type": uni_type,
+        "cap_round": cap_round,
+        "category_codes": category_codes,
+        "total_results": len(colleges),
+        "colleges": colleges
     }
-
-@app.post("/predict", response_model=PredictResponse)
-def predict(req: PredictRequest):
-    if req.percentile < 0 or req.percentile > 100:
-        raise HTTPException(status_code=400, detail="Percentile must be between 0 and 100.")
-
-    category = req.category.strip().upper()
-
-    # ── Filter by category ──
-    filtered = df[df["category"].str.upper() == category].copy()
-
-    if filtered.empty:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No data found for category '{category}'. Check the category name."
-        )
-
-    # ── Optional: filter by branches ──
-    if req.branches:
-        filtered = filtered[filtered["branch"].isin(req.branches)]
-
-    # ── Optional: filter by districts ──
-    if req.districts:
-        filtered = filtered[filtered["district"].isin(req.districts)]
-
-    # ── Optional: filter by college type ──
-    if req.college_type:
-        filtered = filtered[filtered["college_type"] == req.college_type]
-
-    if filtered.empty:
-        raise HTTPException(
-            status_code=404,
-            detail="No colleges found for the selected filters. Try broadening your search."
-        )
-
-    # ── Compute gap and classify ──
-    # Reach window: user's percentile is at most 5 points below cutoff
-    REACH_WINDOW = 5.0
-
-    filtered = filtered.copy()
-    filtered["gap"] = req.percentile - filtered["cutoff_percentile"]
-    filtered = filtered[filtered["gap"] >= -REACH_WINDOW]  # exclude totally out-of-range
-    filtered["chance"] = filtered["gap"].apply(classify_chance)
-
-    # ── Sort: within each chance tier, sort by cutoff descending (best first) ──
-    filtered = filtered.sort_values("cutoff_percentile", ascending=False)
-
-    def to_result(row) -> CollegeResult:
-        return CollegeResult(
-            college_name=row["college_name"],
-            branch=row["branch"],
-            category=row["category"],
-            cutoff_percentile=row["cutoff_percentile"],
-            college_type=row["college_type"],
-            district=row["district"],
-            fees=int(row["fees"]),
-            chance=row["chance"],
-            gap=round(row["gap"], 2),
-        )
-
-    safe_df     = filtered[filtered["chance"] == "Safe"]
-    moderate_df = filtered[filtered["chance"] == "Moderate"]
-    reach_df    = filtered[filtered["chance"] == "Reach"]
-
-    return PredictResponse(
-        percentile=req.percentile,
-        category=req.category,
-        safe=[to_result(r) for _, r in safe_df.head(5).iterrows()],
-        moderate=[to_result(r) for _, r in moderate_df.head(5).iterrows()],
-        reach=[to_result(r) for _, r in reach_df.head(5).iterrows()],
-        total_eligible=len(filtered),
-    )
-
-@app.get("/reload-csv")
-def reload_csv():
-    """Hot-reload the CSV without restarting the server. Useful when CSV is updated."""
-    global df
-    df = load_data()
-    return {"message": "CSV reloaded successfully ✅", "rows": len(df)}
