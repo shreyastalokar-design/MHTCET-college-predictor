@@ -1,0 +1,98 @@
+Code,Full Form
+GOPENH,General Open – Home University
+GOPENO,General Open – Other University
+GOPENS,General Open – State Level
+LOPENH,Ladies Open – Home University
+LOPENO,Ladies Open – Other University
+LOPENS,Ladies Open – State Level
+GOBCH,General OBC – Home University
+GOBCO,General OBC – Other University
+GOBCS,General OBC – State Level
+LOBCH,Ladies OBC – Home University
+LOBCO,Ladies OBC – Other University
+LOBCS,Ladies OBC – State Level
+GSCH,General SC – Home University
+GSCO,General SC – Other University
+GSCS,General SC – State Level
+LSCH,Ladies SC – Home University
+LSCO,Ladies SC – Other University
+LSCS,Ladies SC – State Level
+GSTH,General ST – Home University
+GSTO,General ST – Other University
+GSTS,General ST – State Level
+LSTH,Ladies ST – Home University
+LSTO,Ladies ST – Other University
+LSTS,Ladies ST – State Level
+GSEBCH,General SEBC – Home University
+GSEBCO,General SEBC – Other University
+GSEBCS,General SEBC – State Level
+LSEBCH,Ladies SEBC – Home University
+LSEBCO,Ladies SEBC – Other University
+LSEBCS,Ladies SEBC – State Level
+GVJH,General VJ (Denotified Tribes) – Home University
+GVJO,General VJ (Denotified Tribes) – Other University
+GVJS,General VJ (Denotified Tribes) – State Level
+LVJH,Ladies VJ (Denotified Tribes) – Home University
+LVJO,Ladies VJ (Denotified Tribes) – Other University
+LVJS,Ladies VJ (Denotified Tribes) – State Level
+GNT1H,General NT1 (Banjara) – Home University
+GNT1O,General NT1 (Banjara) – Other University
+GNT1S,General NT1 (Banjara) – State Level
+LNT1H,Ladies NT1 (Banjara) – Home University
+LNT1O,Ladies NT1 (Banjara) – Other University
+LNT1S,Ladies NT1 (Banjara) – State Level
+GNT2H,General NT2 (Dhangar) – Home University
+GNT2O,General NT2 (Dhangar) – Other University
+GNT2S,General NT2 (Dhangar) – State Level
+LNT2H,Ladies NT2 (Dhangar) – Home University
+LNT2O,Ladies NT2 (Dhangar) – Other University
+LNT2S,Ladies NT2 (Dhangar) – State Level
+GNT3H,General NT3 (Vanjari) – Home University
+GNT3O,General NT3 (Vanjari) – Other University
+GNT3S,General NT3 (Vanjari) – State Level
+LNT3H,Ladies NT3 (Vanjari) – Home University
+LNT3O,Ladies NT3 (Vanjari) – Other University
+LNT3S,Ladies NT3 (Vanjari) – State Level
+PWDOPENH,PWD Open – Home University
+PWDOPENS,PWD Open – State Level
+PWDOBCH,PWD OBC – Home University
+PWDOBCS,PWD OBC – State Level
+PWDROBC,PWD OBC (Other Region) – State Level
+PWDROBC S,PWD OBC (Other Region) – State Level
+PWDROBCH,PWD OBC (Other Region) – Home University
+PWDROBCS,PWD OBC (Other Region) – State Level
+PWDSCH,PWD SC – Home University
+PWDSCS,PWD SC – State Level
+PWDRSCH,PWD SC (Other Region) – Home University
+PWDRSCS,PWD SC (Other Region) – State Level
+PWDSTS,PWD ST – State Level
+PWDRSTS,PWD ST (Other Region) – State Level
+PWDSEBCH,PWD SEBC – Home University
+PWDSEBCS,PWD SEBC – State Level
+PWDRSEBC H,PWD SEBC (Other Region) – Home University
+PWDRSEBC S,PWD SEBC (Other Region) – State Level
+PWDRSEBCS,PWD SEBC (Other Region) – State Level
+PWDRVJS,PWD VJ (Other Region) – State Level
+PWDRNT1S,PWD NT1 (Other Region) – State Level
+PWDRNT2S,PWD NT2 (Other Region) – State Level
+PWDRNT3S,PWD NT3 (Other Region) – State Level
+DEFOPENS,Defence Open – State Level
+DEFOBCS,Defence OBC – State Level
+DEFROBCS,Defence OBC (Other Region) – State Level
+DEFSCS,Defence SC – State Level
+DEFRSCS,Defence SC (Other Region) – State Level
+DEFSTS,Defence ST – State Level
+DEFRSTS,Defence ST (Other Region) – State Level
+DEFSEBCS,Defence SEBC – State Level
+DEFRSEBC,Defence SEBC (Other Region) – State Level
+DEFRSEBC S,Defence SEBC (Other Region) – State Level
+DEFRSEBCS,Defence SEBC (Other Region) – State Level
+DEFRVJS,Defence VJ (Other Region) – State Level
+DEFRNT1S,Defence NT1 (Other Region) – State Level
+DEFRNT2S,Defence NT2 (Other Region) – State Level
+DEFRNT3S,Defence NT3 (Other Region) – State Level
+EWS,Economically Weaker Section
+TFWS,Tuition Fee Waiver Scheme
+AI,All India Quota
+MI,Minority Quota
+ORPHAN,Orphan Category

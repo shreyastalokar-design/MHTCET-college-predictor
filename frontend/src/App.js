@@ -2,87 +2,911 @@ import React, { useState, useEffect, useRef } from "react";
 
 const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
-// ── Category full forms for display ──────────────────────────────────────────
-const CASTE_OPTIONS = [
+// ── PLACEHOLDERS (update these when ready) ───────────────────────────────────
+const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform?usp=publish-editor";
+const WHATSAPP_NUMBER = "918983798203";
+const WHATSAPP_MSG    = "Hi Concept Delta, I need help choosing the right college.";
+
+// ── Brand ────────────────────────────────────────────────────────────────────
+// ── Animation Hook ───────────────────────────────────────────────────────────
+function useInView(threshold = 0.15) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return [ref, visible];
+}
+
+function FadeIn({ children, delay = 0, direction = "up", style = {} }) {
+  const [ref, visible] = useInView();
+  const transforms = {
+    up:"translateY(28px)", down:"translateY(-28px)",
+    left:"translateX(-28px)", right:"translateX(28px)", none:"scale(0.97)"
+  };
+  return (
+    <div ref={ref} style={{
+      transition: `opacity 0.65s cubic-bezier(0.4,0,0.2,1) ${delay}s, transform 0.65s cubic-bezier(0.4,0,0.2,1) ${delay}s`,
+      opacity: visible ? 1 : 0,
+      transform: visible ? "none" : (transforms[direction] || transforms.up),
+      ...style
+    }}>
+      {children}
+    </div>
+  );
+}
+
+const BRAND = {
+  name:       "Concept Delta",
+  tagline:    "SMART GUIDANCE · BETTER FUTURES",
+  initiative: "An initiative by COEP alumni",
+  contact:    "+91 89837 98203",
+  social: {
+    youtube:   "https://youtube.com/@conceptdelta2026",
+    telegram:  "https://t.me/Conceptdelta",
+    instagram: "https://www.instagram.com/conceptdelta2031",
+  },
+};
+
+// ── Colours ───────────────────────────────────────────────────────────────────
+const C = {
+  navyDeep:    "#1E3A5F",
+  navy:        "#2C5282",
+  gold:        "#D4AF37",
+  goldBg:      "#FEF3C7",
+  goldDark:    "#92400E",
+  pageBg:      "#F1F5F9",
+  card:        "#FFFFFF",
+  subtle:      "#F8FAFC",
+  border:      "#E2E8F0",
+  textDark:    "#1E3A5F",
+  textBody:    "#475569",
+  textMuted:   "#64748B",
+  textLight:   "#94A3B8",
+  safe:        "#16A34A",
+  safeBg:      "#DCFCE7",
+  safeText:    "#166534",
+  modBg:       "#FEF9C3",
+  modText:     "#854D0E",
+  reachBg:     "#FEE2E2",
+  reachText:   "#991B1B",
+};
+
+// ── Form options ──────────────────────────────────────────────────────────────
+const CASTE_OPTS = [
   { value: "OPEN", label: "Open (General)" },
-  { value: "OBC",  label: "OBC – Other Backward Class" },
-  { value: "SC",   label: "SC – Scheduled Caste" },
-  { value: "ST",   label: "ST – Scheduled Tribe" },
-  { value: "SEBC", label: "SEBC – Socially & Educationally Backward Class" },
-  { value: "VJ",   label: "VJ – Vimukta Jati (Denotified Tribes)" },
-  { value: "NT1",  label: "NT1 – Nomadic Tribe 1 (Banjara)" },
-  { value: "NT2",  label: "NT2 – Nomadic Tribe 2 (Dhangar)" },
-  { value: "NT3",  label: "NT3 – Nomadic Tribe 3 (Vanjari)" },
+  { value: "OBC",  label: "OBC - Other Backward Class" },
+  { value: "SC",   label: "SC - Scheduled Caste" },
+  { value: "ST",   label: "ST - Scheduled Tribe" },
+  { value: "SEBC", label: "SEBC" },
+  { value: "VJ",   label: "VJ - Vimukta Jati" },
+  { value: "NT1",  label: "NT1 - Nomadic Tribe 1 (Banjara)" },
+  { value: "NT2",  label: "NT2 - Nomadic Tribe 2 (Dhangar)" },
+  { value: "NT3",  label: "NT3 - Nomadic Tribe 3 (Vanjari)" },
 ];
-
-const QUOTA_OPTIONS = [
-  { value: "NONE",   label: "No Special Quota" },
+const QUOTA_OPTS = [
+  { value: "NONE",   label: "None" },
   { value: "PWD",    label: "PWD – Person with Disability" },
-  { value: "DEF",    label: "Defence – Children of Defence Personnel" },
+  { value: "DEF",    label: "Defence Personnel Children" },
   { value: "EWS",    label: "EWS – Economically Weaker Section" },
-  { value: "TFWS",   label: "TFWS – Tuition Fee Waiver Scheme" },
-  { value: "MI",     label: "MI – Minority Quota" },
+  { value: "TFWS",   label: "TFWS – Tuition Fee Waiver" },
+  { value: "MI",     label: "Minority Quota" },
   { value: "ORPHAN", label: "Orphan Category" },
-  { value: "AI",     label: "AI – All India Quota" },
+  { value: "AI",     label: "All India Quota" },
 ];
-
-const UNI_TYPE_OPTIONS = [
+const UNI_OPTS = [
   { value: "State Level",      label: "State Level (Most Common)" },
   { value: "Home University",  label: "Home University" },
   { value: "Other University", label: "Other University" },
 ];
+const CAP_ROUNDS = ["CAP Round 1","CAP Round 2","CAP Round 3","CAP Round 4"];
+const DOC_CATS   = ["Open","OBC_SBC","SC_ST","NT_VJ"];
+const DOC_LABELS = { Open:"Open", OBC_SBC:"OBC / SBC", SC_ST:"SC / ST", NT_VJ:"NT / VJ" };
 
-const CAP_ROUNDS = [
-  { value: "CAP Round 1", label: "CAP Round 1" },
-  { value: "CAP Round 2", label: "CAP Round 2" },
-  { value: "CAP Round 3", label: "CAP Round 3" },
-  { value: "CAP Round 4", label: "CAP Round 4" },
+// ── Sidebar service list ──────────────────────────────────────────────────────
+const SIDEBAR_SERVICES = [
+  // FREE
+  { id:"predictor",  label:"College Prediction",    icon:"🎯", free:true,  panel:"predictor" },
+  { id:"call",       label:"Call Support",           icon:"📞", free:true,  panel:"contact" },
+  { id:"documents",  label:"Document Support",       icon:"📄", free:true,  panel:"documents" },
+  // PAID
+  { id:"option-form",label:"Personalized Option Form",icon:"✏️",free:false, panel:"paid" },
+  { id:"branch",     label:"Branch & College Guidance",icon:"🎓",free:false,panel:"paid" },
+  { id:"filling",    label:"Option Form Filling",    icon:"📝", free:false, panel:"paid" },
+  { id:"counselling",label:"Complete Counselling",   icon:"🤝", free:false, panel:"paid" },
+  { id:"mentorship", label:"Live Mentorship",        icon:"⭐", free:false, panel:"paid" },
+  { id:"chat24",     label:"24×7 Chat Support",      icon:"💬", free:false, panel:"paid" },
+  { id:"mentor",     label:"Personal Mentor",        icon:"👨‍🏫",free:false, panel:"paid" },
+  { id:"admission",  label:"Admission Assistance",   icon:"🏛️", free:false, panel:"paid" },
+  { id:"cap-round",  label:"CAP Round Support",      icon:"🔄", free:false, panel:"paid" },
+  { id:"ils",        label:"ILS / Spot Round Guidance",icon:"🔦",free:false,panel:"paid" },
 ];
 
-// ── Multi-select dropdown ─────────────────────────────────────────────────────
-function MultiSelect({ options, selected, onChange, placeholder }) {
-  const [open, setOpen] = useState(false);
+// ─────────────────────────────────────────────────────────────────────────────
+// SVG SOCIAL ICONS
+// ─────────────────────────────────────────────────────────────────────────────
+// color="white" for icons on colored bg, color="brand" for standalone use
+function YTIcon({ size = 24, color = "#FF0000" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+    </svg>
+  );
+}
+function TGIcon({ size = 24, color = "#0088CC" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+    </svg>
+  );
+}
+function IGIcon({ size = 24, color = null }) {
+  // color=null → gradient; color="white" → flat white
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      {!color && (
+        <defs>
+          <linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#f09433"/>
+            <stop offset="25%" stopColor="#e6683c"/>
+            <stop offset="50%" stopColor="#dc2743"/>
+            <stop offset="75%" stopColor="#cc2366"/>
+            <stop offset="100%" stopColor="#bc1888"/>
+          </linearGradient>
+        </defs>
+      )}
+      <path fill={color || "url(#igGrad)"} d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+    </svg>
+  );
+}
+function WAIcon({ size = 24, color = "#fff" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="16" fill="#25D366"/>
+      <path d="M16 7C11.03 7 7 11.03 7 16c0 1.61.42 3.12 1.15 4.43L7 25l4.69-1.12A9 9 0 0 0 16 25c4.97 0 9-4.03 9-9s-4.03-9-9-9z" fill="white"/>
+      <path d="M20.87 18.59c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.17.25-.64.81-.78.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-.12-.75-.66-1.24-1.47-1.38-1.72-.15-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.12-.15.17-.25.25-.42.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43-.15 0-.31-.01-.48-.01-.17 0-.43.06-.66.31-.23.25-.87.85-.87 2.07s.89 2.4 1.01 2.57c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.11-.23-.17-.48-.29z" fill="#25D366"/>
+    </svg>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ANIMATED COUNTER
+// ═════════════════════════════════════════════════════════════════════════════
+function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
+  const [count, setCount] = useState(0);
   const ref = useRef(null);
+  const started = useRef(false);
 
   useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const startTime = performance.now();
+          const tick = (now) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setCount(Math.floor(eased * target));
+            if (progress < 1) requestAnimationFrame(tick);
+            else setCount(target);
+          };
+          requestAnimationFrame(tick);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [target, duration]);
 
-  const toggle = (val) => {
-    if (selected.includes(val)) onChange(selected.filter((v) => v !== val));
-    else onChange([...selected, val]);
+  return <span ref={ref}>{count}{suffix}</span>;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ROOT APP
+// ═════════════════════════════════════════════════════════════════════════════
+export default function App() {
+  const [panel,      setPanel]      = useState("predictor");
+  const [sidebarOpen,setSidebarOpen]= useState(false);
+  const [infoMsg,    setInfoMsg]    = useState("");
+
+  const navigate = (svc) => {
+    if (svc.panel === "info") {
+      setInfoMsg(svc.info);
+      setPanel("info");
+    } else {
+      setPanel(svc.panel);
+      setInfoMsg("");
+    }
+    setSidebarOpen(false);
   };
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
-      <div onClick={() => setOpen(!open)} style={styles.multiSelectBox}>
-        <span style={{ color: selected.length ? "#1e293b" : "#94a3b8", fontSize: 14 }}>
-          {selected.length ? `${selected.length} selected` : placeholder}
-        </span>
-        <span style={{ color: "#6366f1" }}>▾</span>
+    <div style={s.app}>
+      {/* ── Tagline bar ── */}
+      <div style={s.taglineBar}>{BRAND.tagline}</div>
+
+      {/* ── Navbar ── */}
+      <nav style={s.nav}>
+        <div style={s.navLeft}>
+          {/* Hamburger */}
+          <button style={s.hamburger} onClick={() => setSidebarOpen(!sidebarOpen)}
+                  aria-label="Toggle menu">
+            <span style={s.hLine}/><span style={s.hLine}/><span style={s.hLine}/>
+          </button>
+          {/* Logo + brand */}
+          <div style={s.brandWrap}>
+            <div style={s.logoCircle}>
+              <img src="/logo.jpeg" alt="CD" style={s.logoImg}
+                   onError={e => { e.target.style.display="none"; }}/>
+            </div>
+            <div>
+              <div style={s.brandName}>{BRAND.name}</div>
+              <div style={s.brandInit}>{BRAND.initiative}</div>
+            </div>
+          </div>
+        </div>
+        <div style={s.navRight}>
+          <a href={BRAND.social.youtube} target="_blank" rel="noopener noreferrer" style={{...s.socialA, background:"#FF0000"}} title="YouTube">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href={BRAND.social.telegram} target="_blank" rel="noopener noreferrer" style={{...s.socialA, background:"#0088CC"}} title="Telegram">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          </a>
+          <a href={BRAND.social.instagram} target="_blank" rel="noopener noreferrer" style={{...s.socialA, background:"linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)"}} title="Instagram">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+          <BookSessionBtn />
+        </div>
+      </nav>
+
+      {/* ── Overlay when sidebar open ── */}
+      {sidebarOpen && (
+        <div style={s.overlay} onClick={() => setSidebarOpen(false)}/>
+      )}
+
+      {/* ── Sidebar drawer ── */}
+      <aside style={{ ...s.sidebar, transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)" }}>
+        <div style={s.sidebarHeader}>
+          <span style={s.sidebarTitle}>Services</span>
+          <button style={s.closeBtn} onClick={() => setSidebarOpen(false)}>✕</button>
+        </div>
+
+        {/* FREE section */}
+        <div style={s.sectionLbl}>
+          <span style={s.tagFree}>FREE</span> SERVICES
+        </div>
+        {SIDEBAR_SERVICES.filter(s => s.free).map((svc, i) => (
+          <FadeIn key={svc.id} delay={i*0.06} direction="left"><SidebarItem svc={svc} active={panel === svc.panel}
+                       onClick={() => navigate(svc)} /></FadeIn>
+        ))}
+
+        {/* PAID section */}
+        <div style={{ ...s.sectionLbl, marginTop: 16 }}>
+          <span style={s.tagPaid}>PREMIUM</span> SERVICES
+        </div>
+        {SIDEBAR_SERVICES.filter(s => !s.free).map((svc, i) => (
+          <FadeIn key={svc.id} delay={i*0.05} direction="left"><SidebarItem svc={svc} active={panel === "paid"}
+                       onClick={() => navigate(svc)} /></FadeIn>
+        ))}
+      </aside>
+
+      {/* ── Hero ── */}
+      <div style={s.hero}>
+        <FadeIn delay={0.1} direction="none"><div style={s.heroBadge}>MHT-CET 2026 · MAHARASHTRA</div></FadeIn>
+        <FadeIn delay={0.2}><h1 style={s.heroTitle}>Find your perfect engineering college</h1></FadeIn>
+        <FadeIn delay={0.35}><p style={s.heroSub}>Personalized predictions · Safe, Moderate & Reach picks · Download as PDF</p></FadeIn>
+        <FadeIn delay={0.5}><div style={s.statsRow}>
+          <div style={s.statItem}>
+            <div style={s.statNum}><AnimatedCounter target={275} suffix="+" duration={2000}/></div>
+            <div style={s.statLbl}>COLLEGES</div>
+          </div>
+          <div style={s.statDivider}/>
+          <div style={s.statItem}>
+            <div style={s.statNum}><AnimatedCounter target={95} duration={1800}/></div>
+            <div style={s.statLbl}>BRANCHES</div>
+          </div>
+          <div style={s.statDivider}/>
+          <div style={s.statItem}>
+            <div style={s.statNum}><AnimatedCounter target={4} duration={1000}/></div>
+            <div style={s.statLbl}>CAP ROUNDS</div>
+          </div>
+        </div></FadeIn>
       </div>
-      {open && (
-        <div style={styles.dropdown}>
-          {options.map((opt) => (
-            <label key={opt} style={styles.dropdownItem}>
-              <input
-                type="checkbox"
-                checked={selected.includes(opt)}
-                onChange={() => toggle(opt)}
-                style={{ marginRight: 8, accentColor: "#6366f1" }}
-              />
-              {opt}
-            </label>
-          ))}
+
+      {/* ── Main panel ── */}
+      <div style={s.mainWrap}>
+        {panel === "predictor" && <PredictorPanel />}
+        {panel === "documents" && <DocumentsPanel />}
+        {panel === "paid"      && <PaidPanel />}
+        {panel === "contact"   && <ContactPanel />}
+        {panel === "info"      && <InfoPanel msg={infoMsg} />}
+      </div>
+
+      <SiteFooter setPanel={setPanel} />
+
+      {/* Floating WhatsApp — bottom-right, 100px from bottom */}
+      <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MSG)}`}
+         target="_blank" rel="noopener noreferrer" style={s.whatsappFloat}
+         title="Chat on WhatsApp">
+        <WAIcon size={22} color="#fff"/>
+        <span>Chat with us</span>
+      </a>
+    </div>
+  );
+}
+
+// ── Sidebar Item ──────────────────────────────────────────────────────────────
+function SidebarItem({ svc, active, onClick }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <div onClick={onClick}
+         onMouseEnter={() => setHover(true)}
+         onMouseLeave={() => setHover(false)}
+         style={{
+           display:"flex", alignItems:"center", gap:10,
+           padding:"10px 14px", borderRadius:8, marginBottom:3,
+           cursor:"pointer",
+           background: active ? "#EFF6FF" : hover ? C.subtle : "transparent",
+           borderLeft: active ? `3px solid ${C.navy}` : "3px solid transparent",
+           transition:"all 0.15s",
+         }}>
+      <span style={{ fontSize:18 }}>{svc.icon}</span>
+      <div style={{ fontSize:14, color: active ? C.navy : C.textDark, fontWeight: active ? 700 : 400 }}>
+        {svc.label}
+      </div>
+    </div>
+  );
+}
+
+// ── Book Session Button ───────────────────────────────────────────────────────
+function BookSessionBtn() {
+  return (
+    <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer" style={s.bookBtn}>
+      📅 Book a Free Session
+    </a>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// COLLEGE PREDICTOR PANEL
+// ═════════════════════════════════════════════════════════════════════════════
+function PredictorPanel() {
+  const [percentile, setPercentile] = useState("");
+  const [gender,     setGender]     = useState("Male");
+  const [caste,      setCaste]      = useState("OPEN");
+  const [quota,      setQuota]      = useState("NONE");
+  const [uniType,    setUniType]    = useState("State Level");
+  const [capRound,   setCapRound]   = useState("CAP Round 1");
+  const [selBranches,  setSelBranches]  = useState([]);
+  const [selDistricts, setSelDistricts] = useState([]);
+  const [showFilters, setShowFilters]   = useState(false);
+  const [allBranches,  setAllBranches]  = useState([]);
+  const [allDistricts, setAllDistricts] = useState([]);
+
+  const [results,   setResults]   = useState(null);
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState("");
+  const [activeTab, setActiveTab] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const resultsRef = useRef(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/branches`).then(r=>r.json()).then(d=>setAllBranches(d.branches||[])).catch(()=>{});
+    fetch(`${API_BASE}/districts`).then(r=>r.json()).then(d=>setAllDistricts(d.districts||[])).catch(()=>{});
+  }, []);
+
+  const isStandalone = ["EWS","TFWS","MI","ORPHAN","AI"].includes(quota);
+
+  // Live category code preview
+  const catPreview = (() => {
+    if (quota==="EWS")    return { code:"EWS",    desc:"Economically Weaker Section" };
+    if (quota==="TFWS")   return { code:"TFWS",   desc:"Tuition Fee Waiver Scheme" };
+    if (quota==="MI")     return { code:"MI",     desc:"Minority Quota" };
+    if (quota==="ORPHAN") return { code:"ORPHAN", desc:"Orphan Category" };
+    if (quota==="AI")     return { code:"AI",     desc:"All India Quota" };
+    const sfx = uniType==="Home University"?"H": uniType==="Other University"?"O":"S";
+    const pfx = gender==="Male"?"G":"L";
+    let code;
+    if (quota==="PWD") code = `PWD${caste==="OPEN"?"OPEN":caste}${sfx}`;
+    else if (quota==="DEF") code = `DEF${caste==="OPEN"?"OPEN":caste}${sfx}`;
+    else code = `${pfx}${caste}${sfx}`;
+    const gl   = gender==="Male"?"General":"Ladies";
+    const ql   = quota==="PWD"?"PWD ": quota==="DEF"?"Defence ":"";
+    return { code, desc:`${ql}${gl} ${caste} · ${uniType}` };
+  })();
+
+  const buildParams = () => {
+    const p = new URLSearchParams({
+      percentile,
+      gender,
+      caste:    isStandalone ? "OPEN" : caste,
+      quota,
+      uni_type: isStandalone ? "State Level" : uniType,
+      cap_round: capRound,
+    });
+    if (selBranches.length)  p.append("branches",  selBranches.join(","));
+    if (selDistricts.length) p.append("districts", selDistricts.join(","));
+    return p;
+  };
+
+  const handlePredict = async () => {
+    if (!percentile || isNaN(percentile) || +percentile < 0 || +percentile > 100) {
+      setError("Please enter a valid percentile between 0 and 100.");
+      return;
+    }
+    setError(""); setLoading(true); setResults(null);
+    try {
+      const res  = await fetch(`${API_BASE}/predict?${buildParams()}`);
+      const data = await res.json();
+      setResults(data);
+      setActiveTab("All");
+      setSearchQuery("");
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior:"smooth" }), 100);
+    } catch {
+      setError("Server is waking up – please wait 30 seconds and try again.");
+    } finally { setLoading(false); }
+  };
+
+  const downloadPDF = () => window.open(`${API_BASE}/predict-pdf?${buildParams()}`, "_blank");
+
+  const filtered = results?.colleges?.filter(c => {
+    const matchTab = activeTab==="All" || c.admission_chance===activeTab;
+    const q = searchQuery.toLowerCase().trim();
+    const matchSearch = !q ||
+      c.college_name?.toLowerCase().includes(q) ||
+      c.branch?.toLowerCase().includes(q) ||
+      c.district?.toLowerCase().includes(q) ||
+      String(c.institution_code).includes(q);
+    return matchTab && matchSearch;
+  }) || [];
+
+  return (
+    <div>
+      {/* ── Breadcrumb ── */}
+      <div style={s.breadcrumb}>Free Services › <strong>College Prediction</strong></div>
+      <div style={s.panelHeaderRow}>
+        <div>
+          <h2 style={s.panelTitle}>MHT-CET College Predictor <span style={s.yr26}>2026</span></h2>
+          <p style={s.panelSub}>Find Safe · Moderate · Reach colleges based on your profile</p>
+        </div>
+        <span style={s.freePill}>🎁 100% Free</span>
+      </div>
+
+      {/* ── Form ── */}
+      <FadeIn delay={0.1} direction="up"><div style={s.card}>
+        <SectionHeading title="Enter your details" />
+
+        <div style={s.row2}>
+          <Field label="Your Percentile *">
+            <input type="number" step="0.01" min="0" max="100"
+                   placeholder="e.g. 92.50" value={percentile}
+                   onChange={e=>setPercentile(e.target.value)} style={s.input}/>
+          </Field>
+          <Field label="CAP Round *">
+            <select value={capRound} onChange={e=>setCapRound(e.target.value)} style={s.select}>
+              {CAP_ROUNDS.map(r=><option key={r} value={r}>{r.replace("CAP ","")}</option>)}
+            </select>
+          </Field>
+        </div>
+
+        <Field label="Gender *">
+          <div style={s.genderRow}>
+            {["Male","Female"].map(g=>(
+              <button key={g} onClick={()=>setGender(g)}
+                      style={gender===g ? s.gBtnActive : s.gBtn}>{g}</button>
+            ))}
+          </div>
+        </Field>
+
+        {!isStandalone && (
+          <div style={s.row2}>
+            <Field label="Caste Category *">
+              <select value={caste} onChange={e=>setCaste(e.target.value)} style={s.select}>
+                {CASTE_OPTS.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </Field>
+            <Field label="University Type *">
+              <select value={uniType} onChange={e=>setUniType(e.target.value)} style={s.select}>
+                {UNI_OPTS.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </Field>
+          </div>
+        )}
+
+        <Field label="Special Quota (Optional)">
+          <select value={quota} onChange={e=>setQuota(e.target.value)} style={s.select}>
+            {QUOTA_OPTS.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </Field>
+
+        {/* Optional filters */}
+        <div style={s.filterBox}>
+          <div onClick={()=>setShowFilters(!showFilters)} style={s.filterToggle}>
+            <span>🔍 Preferred branches & districts (optional)</span>
+            <span>{showFilters?"▲":"▼"}</span>
+          </div>
+          {showFilters && (
+            <div style={{ marginTop:14 }}>
+              <Field label="Preferred Branches">
+                <MultiSelect options={allBranches} selected={selBranches}
+                             onChange={setSelBranches} placeholder="All branches"/>
+              </Field>
+              <Field label="Preferred Districts">
+                <MultiSelect options={allDistricts} selected={selDistricts}
+                             onChange={setSelDistricts} placeholder="All districts"/>
+              </Field>
+            </div>
+          )}
+        </div>
+
+        {/* Category preview */}
+        <div style={s.catPreview}>
+          <span style={{ color:"#1E40AF", fontWeight:600 }}>🔖 Your category: </span>
+          <span style={{ color:C.textDark, fontWeight:700 }}>{catPreview.code}</span>
+          <span style={{ color:C.textMuted, fontSize:12 }}> — {catPreview.desc}</span>
+          <span style={{ float:"right", color:"#16A34A" }}>✅</span>
+        </div>
+
+        {/* AI Quota Warning */}
+        {quota === "AI" && (
+          <div style={s.aiWarning}>
+            ⚠️ <strong>Important:</strong> The cutoff percentiles shown for AI (All India) Quota are based on <strong>JEE Main percentile</strong>, not MHT-CET. Please use your JEE percentile to interpret these results.
+          </div>
+        )}
+
+        {error && <div style={s.errorBox}>⚠ {error}</div>}
+
+        <button onClick={handlePredict} disabled={loading} style={s.predictBtn}>
+          {loading ? "⏳ Finding your colleges…" : "🔍 FIND MY COLLEGES"}
+        </button>
+      </div></FadeIn>
+
+      {/* ── Results ── */}
+      {results && (
+        <div ref={resultsRef} style={{ marginTop:24 }}>
+          <div style={s.resultsHeader}>
+            <div>
+              <h3 style={s.resultsTitle}>
+                <span style={{ color:C.navy }}>{results.total_results}</span> colleges found
+              </h3>
+              <div style={s.resultsMeta}>
+                Category: <strong>{results.category_codes?.join(", ")}</strong>
+                {" · "}<strong>{results.cap_round}</strong>
+                {" · "}Percentile <strong>{results.percentile}</strong>
+              </div>
+              {results.category_codes?.includes("AI") && (
+                <div style={s.aiWarning}>
+                  ⚠️ <strong>AI Quota Note:</strong> Cutoff percentiles shown are <strong>JEE Main percentiles</strong>, not MHT-CET. Use your JEE score to evaluate these results.
+                </div>
+              )}
+            </div>
+            <button onClick={downloadPDF} style={s.dlBtn}>📥 Download PDF</button>
+          </div>
+
+          {/* Tab pills */}
+          <div style={s.tabs}>
+            {[
+              { key:"All",      label:"All",         n:results.total_results },
+              { key:"Safe",     label:"🟢 Safe",     n:results.safe_count },
+              { key:"Moderate", label:"🟡 Moderate", n:results.moderate_count },
+              { key:"Reach",    label:"🔴 Reach",    n:results.reach_count },
+            ].map(t=>(
+              <button key={t.key} onClick={()=>setActiveTab(t.key)}
+                      style={activeTab===t.key ? s.tabActive : s.tab}>
+                {t.label} <span style={s.tabBadge}>{t.n}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Search bar */}
+          <div style={s.searchWrap}>
+            <div style={s.searchIcon}>🔍</div>
+            <input
+              type="text"
+              placeholder="Search by college name, branch, district or code..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={s.searchInput}
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} style={s.searchClear}>✕</button>
+            )}
+          </div>
+          {searchQuery && (
+            <div style={s.searchCount}>
+              Showing <strong>{filtered.length}</strong> of {results.total_results} colleges
+              {activeTab !== "All" ? ` (${activeTab})` : ""}
+              {" "}matching "<strong>{searchQuery}</strong>"
+            </div>
+          )}
+
+          {/* College cards */}
+          {filtered.length===0
+            ? <div style={s.noResults}>
+                {searchQuery
+                  ? `No colleges found for "${searchQuery}". Try a different search.`
+                  : "No colleges for this filter. Try another tab."
+                }
+              </div>
+            : filtered.map((c,i)=><CollegeCard key={i} c={c}/>)
+          }
         </div>
       )}
+    </div>
+  );
+}
+
+// ── College Card ──────────────────────────────────────────────────────────────
+function CollegeCard({ c }) {
+  const borderColor = c.admission_chance==="Safe" ? C.safe
+                    : c.admission_chance==="Moderate" ? "#CA8A04" : "#DC2626";
+  const bg   = c.admission_chance==="Safe" ? C.safeBg
+             : c.admission_chance==="Moderate" ? C.modBg : C.reachBg;
+  const txt  = c.admission_chance==="Safe" ? C.safeText
+             : c.admission_chance==="Moderate" ? C.modText : C.reachText;
+
+  const [hovered, setHovered] = useState(false);
+  const pct = typeof c.cutoff_percentile==="number"
+              ? c.cutoff_percentile.toFixed(2)+"ile"
+              : c.cutoff_percentile;
+  const rank = c.cutoff_rank!=="N/A" ? (+c.cutoff_rank).toLocaleString() : "N/A";
+
+  return (
+    <div style={{ ...s.collegeCard, borderLeft:`4px solid ${borderColor}`,
+                transform: hovered ? "translateY(-3px)" : "none",
+                boxShadow: hovered ? "0 8px 24px rgba(44,82,130,0.12)" : "0 1px 4px rgba(0,0,0,0.06)" }}
+         onMouseEnter={()=>setHovered(true)}
+         onMouseLeave={()=>setHovered(false)}>
+      <div style={s.ccTop}>
+        <div>
+          <div style={s.ccCode}>Code: {c.institution_code}</div>
+          <div style={s.ccName}>{c.college_name}</div>
+          <div style={s.ccSub}>📍 {c.district} · {c.college_type}</div>
+        </div>
+        <span style={{ ...s.chancePill, background:bg, color:txt }}>
+          {c.admission_chance==="Safe"?"🟢":c.admission_chance==="Moderate"?"🟡":"🔴"} {c.admission_chance.toUpperCase()}
+        </span>
+      </div>
+      <div style={s.ccMeta}>
+        <div>
+          <div style={s.ccMetaLbl}>BRANCH</div>
+          <div style={s.ccMetaVal}>{c.branch}</div>
+        </div>
+        <div>
+          <div style={s.ccMetaLbl}>CUTOFF %ILE</div>
+          <div style={s.ccMetaVal}>{pct}</div>
+        </div>
+        <div>
+          <div style={s.ccMetaLbl}>CUTOFF RANK</div>
+          <div style={s.ccMetaVal}>{rank}</div>
+        </div>
+        <div>
+          <div style={s.ccMetaLbl}>CATEGORY</div>
+          <div style={s.ccMetaVal}>{c.category}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// DOCUMENTS PANEL
+// ═════════════════════════════════════════════════════════════════════════════
+function DocumentsPanel() {
+  const [cat,  setCat]  = useState("Open");
+  const [docs, setDocs] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/documents?category=${cat}`)
+      .then(r=>r.json()).then(setDocs).catch(()=>{});
+  }, [cat]);
+
+  const downloadDocPDF = () =>
+    window.open(`${API_BASE}/documents-pdf?category=${cat}`, "_blank");
+
+  return (
+    <div>
+      <div style={s.breadcrumb}>Free Services › <strong>Document Support</strong></div>
+      <div style={s.panelHeaderRow}>
+        <div>
+          <h2 style={s.panelTitle}>Documents Required</h2>
+          <p style={s.panelSub}>For BE / B.Tech / B.Pharma admission process</p>
+        </div>
+        <span style={s.freePill}>🎁 Free</span>
+      </div>
+
+      <div style={s.card}>
+        <SectionHeading title="Select your category" />
+        <div style={s.docCatRow}>
+          {DOC_CATS.map(dc=>(
+            <button key={dc} onClick={()=>setCat(dc)}
+                    style={cat===dc ? s.gBtnActive : s.gBtn}>
+              {DOC_LABELS[dc]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {docs && (
+        <div style={{ ...s.card, marginTop:16 }}>
+          <div style={s.resultsHeader}>
+            <h3 style={{ ...s.resultsTitle, fontSize:16 }}>
+              Required for {DOC_LABELS[cat]} — <span style={{ color:C.navy }}>{docs.total}</span> documents
+            </h3>
+            <button onClick={downloadDocPDF} style={s.dlBtn}>📥 Download PDF</button>
+          </div>
+
+          <div style={{ marginTop:14 }}>
+            {docs.documents.map((d,i)=>(
+              <div key={i} style={s.docItem}>
+                <span style={s.docNum}>{i+1}</span>
+                <span style={s.docText}>{d}</span>
+              </div>
+            ))}
+          </div>
+
+          {docs.notes && (
+            <div style={s.noteBox}>
+              <div style={s.noteTitle}>📌 Important Notes</div>
+              {docs.notes.map((n,i)=>(
+                <div key={i} style={s.noteItem}>• {n}</div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// PAID PANEL
+// ═════════════════════════════════════════════════════════════════════════════
+function PaidPanel() {
+  const paidList = SIDEBAR_SERVICES.filter(sv => !sv.free);
+  return (
+    <div>
+      <div style={s.breadcrumb}>Premium Services</div>
+      <h2 style={s.panelTitle}>Premium Guidance Services</h2>
+      <p style={s.panelSub}>Expert-led personalized support for your engineering admission journey</p>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginTop:20 }}>
+        {paidList.map(svc=>(
+          <div key={svc.id} style={s.paidCard}>
+            <span style={{ fontSize:28 }}>{svc.icon}</span>
+            <div style={{ fontWeight:600, color:C.textDark, marginTop:8 }}>{svc.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ ...s.noteBox, marginTop:24 }}>
+        <div style={s.noteTitle}>📞 Interested in premium services?</div>
+        <div style={s.noteItem}>Contact us at <a href={`tel:${BRAND.contact.replace(/ /g,"")}`} style={{ color:"inherit", fontWeight:700 }}>{BRAND.contact}</a></div>
+        <div style={s.noteItem}>Or book a free session to know more!</div>
+        <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer" style={{ ...s.bookBtn, display:"inline-block", marginTop:12, textDecoration:"none" }}>
+          📅 Book a Free Session
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// CONTACT PANEL
+// ═════════════════════════════════════════════════════════════════════════════
+function ContactPanel() {
+  return (
+    <div>
+      <div style={s.breadcrumb}>Free Services › <strong>Call Support</strong></div>
+      <h2 style={s.panelTitle}>Contact Us</h2>
+      <div style={s.card}>
+        <div style={{ textAlign:"center", padding:"20px 0" }}>
+          <div style={{ fontSize:48 }}>📞</div>
+          <a href={`tel:${BRAND.contact.replace(/ /g,"")}`} style={{ fontSize:24, fontWeight:700, color:C.navyDeep, margin:"12px 0 4px", display:"block", textDecoration:"none" }}>{BRAND.contact}</a>
+          <div style={{ color:C.textMuted, marginBottom:24 }}>Call or WhatsApp for free guidance</div>
+          <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
+            <a href={`tel:${BRAND.contact}`} style={s.contactBtn}>📞 Call Now</a>
+            <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MSG)}`}
+               target="_blank" rel="noopener noreferrer"
+               style={{ ...s.contactBtn, background:"#25D366" }}>💬 WhatsApp</a>
+          </div>
+        </div>
+        <div style={s.divider}/>
+        <div style={{ textAlign:"center" }}>
+          <div style={{ color:C.textMuted, marginBottom:14 }}>Also find us on</div>
+          <div style={{ display:"flex", gap:16, justifyContent:"center" }}>
+            <a href={BRAND.social.youtube} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:6,color:"#FF0000",fontWeight:700,fontSize:14,textDecoration:"none"}}>
+              <YTIcon size={22}/> YouTube
+            </a>
+            <a href={BRAND.social.telegram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:6,color:"#0088CC",fontWeight:700,fontSize:14,textDecoration:"none"}}>
+              <TGIcon size={22}/> Telegram
+            </a>
+            <a href={BRAND.social.instagram} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:6,color:"#E1306C",fontWeight:700,fontSize:14,textDecoration:"none"}}>
+              <IGIcon size={22}/> Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InfoPanel({ msg }) {
+  return (
+    <div style={s.card}>
+      <div style={{ fontSize:32, textAlign:"center", marginBottom:12 }}>ℹ️</div>
+      <p style={{ color:C.textDark, textAlign:"center", fontSize:15, lineHeight:1.7 }}>{msg}</p>
+      <div style={{ textAlign:"center", marginTop:16 }}>
+        <a href={BRAND.social.youtube} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center",color:"#FF0000",fontWeight:700,fontSize:14,textDecoration:"none"}}><YTIcon size={22}/> Watch on YouTube</a>
+      </div>
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// MULTI-SELECT DROPDOWN
+// ═════════════════════════════════════════════════════════════════════════════
+function MultiSelect({ options, selected, onChange, placeholder }) {
+  const [open,   setOpen]   = useState(false);
+  const [search, setSearch] = useState("");
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const h = e => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setSearch(""); } };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+
+  const toggle = v => onChange(selected.includes(v) ? selected.filter(x=>x!==v) : [...selected, v]);
+  const filtered = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div ref={ref} style={{ position:"relative" }}>
+      {/* Search input always visible */}
+      <div style={{ position:"relative" }}>
+        <input
+          type="text"
+          placeholder={selected.length ? `${selected.length} selected — type to search` : `Search ${placeholder}...`}
+          value={search}
+          onChange={e => { setSearch(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          style={{ ...s.input, paddingRight:36 }}
+        />
+        <span onClick={() => setOpen(!open)}
+              style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", cursor:"pointer", color:C.navy, fontSize:12 }}>
+          {open ? "▲" : "▼"}
+        </span>
+      </div>
+
+      {/* Dropdown */}
+      {open && (
+        <div style={s.msDropdown}>
+          {filtered.length === 0
+            ? <div style={{ padding:"10px 14px", color:C.textLight, fontSize:13 }}>No results</div>
+            : filtered.map(o => (
+              <label key={o} style={{ ...s.msItem, background: selected.includes(o) ? "#EFF6FF" : "transparent" }}>
+                <input type="checkbox" checked={selected.includes(o)} onChange={() => toggle(o)}
+                       style={{ marginRight:8, accentColor:C.navy }}/>
+                {o}
+              </label>
+            ))
+          }
+        </div>
+      )}
+
+      {/* Selected tags */}
       {selected.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
-          {selected.map((s) => (
-            <span key={s} style={styles.tag}>
-              {s} <span onClick={() => toggle(s)} style={{ cursor: "pointer", marginLeft: 4 }}>×</span>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:8 }}>
+          {selected.map(t => (
+            <span key={t} style={s.msTag}>
+              {t} <span onClick={() => toggle(t)} style={{ cursor:"pointer", marginLeft:4, fontWeight:700 }}>×</span>
             </span>
           ))}
         </div>
@@ -91,380 +915,210 @@ function MultiSelect({ options, selected, onChange, placeholder }) {
   );
 }
 
-// ── Main App ──────────────────────────────────────────────────────────────────
-export default function App() {
-  // Form state
-  const [percentile, setPercentile]   = useState("");
-  const [gender, setGender]           = useState("Male");
-  const [caste, setCaste]             = useState("OPEN");
-  const [quota, setQuota]             = useState("NONE");
-  const [uniType, setUniType]         = useState("State Level");
-  const [capRound, setCapRound]       = useState("CAP Round 1");
-  const [selBranches, setSelBranches] = useState([]);
-  const [selDistricts, setSelDistricts] = useState([]);
-
-  // Data state
-  const [allBranches, setAllBranches]   = useState([]);
-  const [allDistricts, setAllDistricts] = useState([]);
-  const [results, setResults]           = useState(null);
-  const [loading, setLoading]           = useState(false);
-  const [error, setError]               = useState("");
-  const [activeTab, setActiveTab]       = useState("All");
-
-  const resultsRef = useRef(null);
-
-  // Load branches & districts
-  useEffect(() => {
-    fetch(`${API_BASE}/branches`).then(r => r.json()).then(d => setAllBranches(d.branches || [])).catch(() => {});
-    fetch(`${API_BASE}/districts`).then(r => r.json()).then(d => setAllDistricts(d.districts || [])).catch(() => {});
-  }, []);
-
-  // Hide caste/uniType for standalone quotas
-  const isStandaloneQuota = ["EWS", "TFWS", "MI", "ORPHAN", "AI"].includes(quota);
-  const isAI = quota === "AI";
-
-  const handlePredict = async () => {
-    if (!percentile || isNaN(percentile) || percentile < 0 || percentile > 100) {
-      setError("Please enter a valid percentile between 0 and 100.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    setResults(null);
-
-    const params = new URLSearchParams({
-      percentile,
-      gender,
-      caste: isStandaloneQuota ? "OPEN" : caste,
-      quota,
-      uni_type: isStandaloneQuota ? "State Level" : uniType,
-      cap_round: capRound,
-    });
-    if (selBranches.length)  params.append("branches",  selBranches.join(","));
-    if (selDistricts.length) params.append("districts", selDistricts.join(","));
-
-    try {
-      const res  = await fetch(`${API_BASE}/predict?${params}`);
-      const data = await res.json();
-      setResults(data);
-      setActiveTab("All");
-      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-    } catch {
-      setError("Could not connect to server. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Filter results by tab
-  const filteredColleges = results?.colleges?.filter(c =>
-    activeTab === "All" ? true : c.admission_chance === activeTab
-  ) || [];
-
-  const counts = {
-    All:      results?.colleges?.length || 0,
-    Reach:    results?.colleges?.filter(c => c.admission_chance === "Reach").length    || 0,
-    Moderate: results?.colleges?.filter(c => c.admission_chance === "Moderate").length || 0,
-    Safe:     results?.colleges?.filter(c => c.admission_chance === "Safe").length     || 0,
-  };
-
+// ═════════════════════════════════════════════════════════════════════════════
+// FOOTER
+// ═════════════════════════════════════════════════════════════════════════════
+function SiteFooter({ setPanel }) {
   return (
-    <div style={styles.page}>
-      {/* Header */}
-      <div style={styles.header}>
-        <div style={styles.headerContent}>
-          <div style={styles.subtitle}>MAHARASHTRA HSC / PCM</div>
-          <h1 style={styles.title}>🎓 MHT-CET College Predictor</h1>
-          <p style={styles.desc}>
-            Enter your percentile & details to discover the best engineering colleges —
-            Safe, Moderate & Reach picks!
-          </p>
+    <footer style={s.footer}>
+      <div style={s.footerGrid}>
+        <div>
+          <div style={s.footerBrand}>{BRAND.name}</div>
+          <div style={s.footerTagline}>{BRAND.tagline}</div>
+          <div style={s.footerInit}>{BRAND.initiative}</div>
+          <div style={s.footerDesc}>
+            Your trusted partner for engineering admissions in Maharashtra.
+          </div>
+        </div>
+        <div>
+          <div style={s.footerHead}>QUICK LINKS</div>
+          {[
+            { label:"College Predictor",  action:() => { setPanel("predictor"); window.scrollTo({top:0,behavior:"smooth"}); } },
+            { label:"Documents Guidance", action:() => { setPanel("documents"); window.scrollTo({top:0,behavior:"smooth"}); } },
+            { label:"Call Support",       action:() => { setPanel("contact");   window.scrollTo({top:0,behavior:"smooth"}); } },
+            { label:"Book a Free Session",  action:() => window.open(GOOGLE_FORM_URL,"_blank") },
+          ].map(({label,action})=>(
+            <div key={label} onClick={action}
+                 style={{ ...s.footerLink, textDecoration:"underline", textDecorationColor:"rgba(255,255,255,0.2)" }}>
+              {label}
+            </div>
+          ))}
+        </div>
+        <div>
+          <div style={s.footerHead}>CONNECT</div>
+          <a href={`tel:${BRAND.contact.replace(/ /g,"")}`} style={{ ...s.footerContact, textDecoration:"none", display:"block" }}>📞 {BRAND.contact}</a>
+          <div style={{ display:"flex", gap:10, marginTop:14 }}>
+            <a href={BRAND.social.youtube} target="_blank" rel="noopener noreferrer" style={{ ...s.footerIcon, background:"#FF0000" }} title="YouTube">
+              <YTIcon size={24} color="white"/>
+            </a>
+            <a href={BRAND.social.telegram} target="_blank" rel="noopener noreferrer" style={{ ...s.footerIcon, background:"#0088CC" }} title="Telegram">
+              <TGIcon size={24} color="white"/>
+            </a>
+            <a href={BRAND.social.instagram} target="_blank" rel="noopener noreferrer" style={{ ...s.footerIcon, background:"linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)" }} title="Instagram">
+              <IGIcon size={24} color="white"/>
+            </a>
+          </div>
         </div>
       </div>
-
-      {/* Form Card */}
-      <div style={styles.card}>
-        <h2 style={styles.cardTitle}>Enter Your Details</h2>
-
-        {/* Row 1: Percentile + Gender */}
-        <div style={styles.row}>
-          <div style={styles.field}>
-            <label style={styles.label}>Your Percentile *</label>
-            <input
-              type="number"
-              min="0" max="100" step="0.01"
-              placeholder="e.g. 92.50"
-              value={percentile}
-              onChange={e => setPercentile(e.target.value)}
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.field}>
-            <label style={styles.label}>Gender *</label>
-            <div style={styles.btnGroup}>
-              {["Male", "Female"].map(g => (
-                <button key={g} onClick={() => setGender(g)}
-                  style={gender === g ? styles.btnActive : styles.btnInactive}>
-                  {g === "Male" ? "👨 Male" : "👩 Female"}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Row 2: CAP Round */}
-        <div style={styles.field}>
-          <label style={styles.label}>CAP Round *</label>
-          <div style={styles.btnGroup}>
-            {CAP_ROUNDS.map(r => (
-              <button key={r.value} onClick={() => setCapRound(r.value)}
-                style={capRound === r.value ? styles.btnActive : styles.btnInactive}>
-                {r.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Row 3: Special Quota */}
-        <div style={styles.field}>
-          <label style={styles.label}>Special Quota</label>
-          <select value={quota} onChange={e => setQuota(e.target.value)} style={styles.select}>
-            {QUOTA_OPTIONS.map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Row 4: Caste + University Type (hidden for standalone quotas) */}
-        {!isStandaloneQuota && (
-          <div style={styles.row}>
-            <div style={styles.field}>
-              <label style={styles.label}>Caste Category *</label>
-              <select value={caste} onChange={e => setCaste(e.target.value)} style={styles.select}>
-                {CASTE_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label}>University Type *</label>
-              <select value={uniType} onChange={e => setUniType(e.target.value)} style={styles.select}>
-                {UNI_TYPE_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              <span style={styles.hint}>
-                💡 State Level = most common choice
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Row 5: Preferred Branches */}
-        <div style={styles.field}>
-          <label style={styles.label}>Preferred Branches (Optional)</label>
-          <MultiSelect
-            options={allBranches}
-            selected={selBranches}
-            onChange={setSelBranches}
-            placeholder="All branches"
-          />
-        </div>
-
-        {/* Row 6: Preferred Districts */}
-        <div style={styles.field}>
-          <label style={styles.label}>Preferred Districts (Optional)</label>
-          <MultiSelect
-            options={allDistricts}
-            selected={selDistricts}
-            onChange={setSelDistricts}
-            placeholder="All districts"
-          />
-        </div>
-
-        {/* Category Preview */}
-        {!isAI && (
-          <div style={styles.categoryPreview}>
-            <span style={{ color: "#6366f1", fontWeight: 600 }}>🔖 Your Category: </span>
-            {getCategoryLabel(gender, caste, quota, uniType)}
-          </div>
-        )}
-
-        {error && <div style={styles.error}>{error}</div>}
-
-        <button onClick={handlePredict} disabled={loading} style={styles.predictBtn}>
-          {loading ? "⏳ Predicting..." : "🚀 Predict My Colleges"}
-        </button>
+      <div style={s.footerBottom}>
+        © 2026 Concept Delta · MHT-CET College Guidance · {BRAND.initiative}
       </div>
+    </footer>
+  );
+}
 
-      {/* Results */}
-      {results && (
-        <div ref={resultsRef} style={styles.resultsSection}>
-          <h2 style={styles.resultsTitle}>
-            Found <span style={{ color: "#6366f1" }}>{results.total_results}</span> colleges
-            for percentile <span style={{ color: "#6366f1" }}>{results.percentile}</span>
-          </h2>
-          <p style={styles.resultsSubtitle}>
-            Category: <strong>{results.category_codes?.join(", ")}</strong> &nbsp;|&nbsp;
-            Round: <strong>{results.cap_round}</strong>
-          </p>
-
-          {/* Tabs */}
-          <div style={styles.tabs}>
-            {["All", "Reach", "Moderate", "Safe"].map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)}
-                style={activeTab === tab ? { ...styles.tab, ...styles.tabActive } : styles.tab}>
-                {tab === "Reach" ? "🔴" : tab === "Moderate" ? "🟡" : tab === "Safe" ? "🟢" : "📋"} {tab}
-                <span style={styles.tabCount}>{counts[tab]}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Results Table */}
-          {filteredColleges.length === 0 ? (
-            <div style={styles.noResults}>
-              No colleges found for this filter. Try a different tab or broaden your search.
-            </div>
-          ) : (
-            <div style={styles.tableWrapper}>
-              <table style={styles.table}>
-                <thead>
-                  <tr style={styles.thead}>
-                    <th style={styles.th}>College</th>
-                    <th style={styles.th}>Branch</th>
-                    <th style={styles.th}>District</th>
-                    <th style={styles.th}>Cutoff %ile</th>
-                    <th style={styles.th}>Cutoff Rank</th>
-                    <th style={styles.th}>Fee (₹)</th>
-                    <th style={styles.th}>Chance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredColleges.map((c, i) => (
-                    <tr key={i} style={i % 2 === 0 ? styles.trEven : styles.trOdd}>
-                      <td style={styles.td}>
-                        <div style={styles.collegeName}>{c.college_name}</div>
-                        <div style={styles.collegeType}>{c.college_type}</div>
-                      </td>
-                      <td style={styles.td}>{c.branch}</td>
-                      <td style={styles.td}>{c.district}</td>
-                      <td style={{ ...styles.td, textAlign: "center", fontWeight: 600 }}>
-                        {typeof c.cutoff_percentile === "number"
-                          ? c.cutoff_percentile.toFixed(2)
-                          : c.cutoff_percentile}
-                      </td>
-                      <td style={{ ...styles.td, textAlign: "center" }}>
-                        {c.cutoff_rank !== "N/A" ? Number(c.cutoff_rank).toLocaleString() : "N/A"}
-                      </td>
-                      <td style={{ ...styles.td, textAlign: "center" }}>
-                        {c.total_fee !== "N/A" ? `₹${Number(c.total_fee).toLocaleString()}` : "N/A"}
-                      </td>
-                      <td style={{ ...styles.td, textAlign: "center" }}>
-                        <span style={{
-                          ...styles.chanceBadge,
-                          background: c.admission_chance === "Safe"
-                            ? "#dcfce7" : c.admission_chance === "Moderate"
-                            ? "#fef9c3" : "#fee2e2",
-                          color: c.admission_chance === "Safe"
-                            ? "#16a34a" : c.admission_chance === "Moderate"
-                            ? "#ca8a04" : "#dc2626",
-                        }}>
-                          {c.admission_chance === "Safe" ? "🟢" : c.admission_chance === "Moderate" ? "🟡" : "🔴"}
-                          {" "}{c.admission_chance}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Footer */}
-      <div style={styles.footer}>
-        <p>MHT-CET College Predictor • Data based on official CAP Round cutoffs</p>
-        <p style={{ fontSize: 12, marginTop: 4, opacity: 0.7 }}>
-          Results are indicative. Always verify with official DTE Maharashtra website.
-        </p>
-      </div>
+// ═════════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═════════════════════════════════════════════════════════════════════════════
+function Field({ label, children }) {
+  return (
+    <div style={{ marginBottom:14 }}>
+      <label style={s.label}>{label}</label>
+      {children}
     </div>
   );
 }
 
-// ── Helper: build human-readable category label ───────────────────────────────
-function getCategoryLabel(gender, caste, quota, uniType) {
-  if (quota === "EWS")    return "Economically Weaker Section (EWS)";
-  if (quota === "TFWS")   return "Tuition Fee Waiver Scheme (TFWS)";
-  if (quota === "MI")     return "Minority Quota (MI)";
-  if (quota === "ORPHAN") return "Orphan Category";
-  if (quota === "AI")     return "All India Quota (AI)";
-
-  const gLabel    = gender === "Male" ? "General" : "Ladies";
-  const casteMap  = { OPEN: "Open", OBC: "OBC", SC: "SC", ST: "ST", SEBC: "SEBC", VJ: "VJ (Denotified Tribes)", NT1: "NT1 (Banjara)", NT2: "NT2 (Dhangar)", NT3: "NT3 (Vanjari)" };
-  const quotaLabel = quota === "PWD" ? "PWD " : quota === "DEF" ? "Defence " : "";
-  const uniLabel  = uniType === "Home University" ? "Home University" : uniType === "Other University" ? "Other University" : "State Level";
-
-  return `${quotaLabel}${gLabel} ${casteMap[caste] || caste} – ${uniLabel}`;
+function SectionHeading({ title }) {
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:18, paddingBottom:12, borderBottom:`0.5px solid ${C.border}` }}>
+      <div style={{ width:4, height:18, background:C.gold, borderRadius:2 }}/>
+      <h3 style={{ margin:0, color:C.textDark, fontSize:15, fontWeight:600 }}>{title}</h3>
+    </div>
+  );
 }
 
-// ── Styles ────────────────────────────────────────────────────────────────────
-const styles = {
-  page: { minHeight: "100vh", background: "#f8fafc", fontFamily: "'Segoe UI', sans-serif" },
+// ═════════════════════════════════════════════════════════════════════════════
+// STYLES
+// ═════════════════════════════════════════════════════════════════════════════
+const s = {
+  app:         { fontFamily:"'Segoe UI',sans-serif", background:C.pageBg, minHeight:"100vh", position:"relative" },
+  taglineBar:  { background:C.navyDeep, color:C.gold, textAlign:"center", padding:"7px 0", fontSize:11, letterSpacing:"3px" },
 
-  header: { background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)", padding: "48px 20px", textAlign: "center" },
-  headerContent: { maxWidth: 700, margin: "0 auto" },
-  subtitle: { color: "rgba(255,255,255,0.8)", fontSize: 13, letterSpacing: 2, marginBottom: 8 },
-  title: { color: "#fff", fontSize: 36, fontWeight: 800, margin: "0 0 12px" },
-  desc: { color: "rgba(255,255,255,0.85)", fontSize: 16, lineHeight: 1.6 },
+  nav:        { background:C.navy, padding:"13px 24px", display:"flex", alignItems:"center", justifyContent:"space-between" },
+  navLeft:    { display:"flex", alignItems:"center", gap:14 },
+  navRight:   { display:"flex", alignItems:"center", gap:10 },
 
-  card: { maxWidth: 820, margin: "-24px auto 32px", background: "#fff", borderRadius: 16, padding: 32, boxShadow: "0 4px 24px rgba(0,0,0,0.10)" },
-  cardTitle: { fontSize: 20, fontWeight: 700, color: "#1e293b", marginBottom: 24 },
+  hamburger:  { background:"transparent", border:"none", cursor:"pointer", padding:6, display:"flex", flexDirection:"column", gap:5 },
+  hLine:      { display:"block", width:24, height:2, background:"#fff", borderRadius:2 },
 
-  row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 },
-  field: { marginBottom: 20 },
-  label: { display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 8 },
-  hint: { fontSize: 11, color: "#94a3b8", marginTop: 4, display: "block" },
+  brandWrap:  { display:"flex", alignItems:"center", gap:12 },
+  logoCircle: { width:62, height:62, background:"#fff", borderRadius:"50%", overflow:"hidden", display:"flex", alignItems:"center", justifyContent:"center", border:"2px solid rgba(212,175,55,0.5)", flexShrink:0 },
+  logoImg:    { width:"100%", height:"100%", objectFit:"cover" },
+  brandName:  { color:"#fff", fontSize:22, fontWeight:700, letterSpacing:"0.3px" },
+  brandInit:  { color:C.gold, fontSize:12, fontStyle:"italic", letterSpacing:"0.5px", marginTop:2 },
 
-  input: { width: "100%", padding: "10px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", fontSize: 15, outline: "none", boxSizing: "border-box" },
-  select: { width: "100%", padding: "10px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", background: "#fff", boxSizing: "border-box" },
+  socialA:    { color:"#fff", fontSize:18, textDecoration:"none", width:38, height:38, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 },
 
-  btnGroup: { display: "flex", gap: 8, flexWrap: "wrap" },
-  btnActive: { padding: "8px 16px", borderRadius: 8, border: "2px solid #6366f1", background: "#6366f1", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13 },
-  btnInactive: { padding: "8px 16px", borderRadius: 8, border: "2px solid #e2e8f0", background: "#fff", color: "#475569", fontWeight: 500, cursor: "pointer", fontSize: 13 },
+  bookBtn:    { background:C.gold, color:C.navyDeep, border:"none", padding:"9px 16px", borderRadius:8, fontWeight:700, fontSize:13, cursor:"pointer", textDecoration:"none" },
 
-  multiSelectBox: { padding: "10px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fff" },
-  dropdown: { position: "absolute", top: "100%", left: 0, right: 0, background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 8, maxHeight: 220, overflowY: "auto", zIndex: 100, boxShadow: "0 8px 24px rgba(0,0,0,0.12)" },
-  dropdownItem: { display: "flex", alignItems: "center", padding: "8px 14px", cursor: "pointer", fontSize: 13, color: "#1e293b" },
-  tag: { background: "#ede9fe", color: "#6366f1", padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 500 },
+  overlay:    { position:"fixed", inset:0, background:"rgba(0,0,0,0.4)", zIndex:99 },
 
-  categoryPreview: { background: "#f5f3ff", border: "1.5px solid #c4b5fd", borderRadius: 8, padding: "10px 16px", marginBottom: 20, fontSize: 14, color: "#1e293b" },
-  error: { background: "#fee2e2", color: "#dc2626", padding: "10px 16px", borderRadius: 8, marginBottom: 16, fontSize: 14 },
+  sidebar:    { position:"fixed", top:0, left:0, height:"100vh", width:280, background:"#fff", zIndex:100, overflowY:"auto", boxShadow:"4px 0 20px rgba(0,0,0,0.15)", transition:"transform 0.3s ease", paddingBottom:40 },
+  sidebarHeader:{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 16px 10px", borderBottom:`0.5px solid ${C.border}`, marginBottom:8 },
+  sidebarTitle: { fontWeight:700, fontSize:15, color:C.textDark },
+  closeBtn:   { background:"transparent", border:"none", fontSize:18, cursor:"pointer", color:C.textMuted, padding:"2px 6px" },
 
-  predictBtn: { width: "100%", padding: "14px", background: "linear-gradient(135deg, #6366f1, #7c3aed)", color: "#fff", border: "none", borderRadius: 10, fontSize: 16, fontWeight: 700, cursor: "pointer" },
+  sectionLbl: { fontSize:12, color:C.textBody, letterSpacing:"1.5px", padding:"10px 14px 6px", display:"flex", alignItems:"center", gap:8, fontWeight:700 },
+  tagFree:    { background:"#DCFCE7", color:"#166534", padding:"3px 10px", borderRadius:10, fontSize:11, fontWeight:700 },
+  tagPaid:    { background:C.goldBg, color:C.goldDark, padding:"3px 10px", borderRadius:10, fontSize:11, fontWeight:700 },
 
-  resultsSection: { maxWidth: 1100, margin: "0 auto 40px", padding: "0 16px" },
-  resultsTitle: { fontSize: 22, fontWeight: 700, color: "#1e293b", marginBottom: 4 },
-  resultsSubtitle: { color: "#64748b", fontSize: 14, marginBottom: 20 },
+  hero:       { background:`linear-gradient(135deg, ${C.navyDeep} 0%, ${C.navy} 100%)`, padding:"40px 24px", textAlign:"center" },
+  heroBadge:  { display:"inline-block", background:"rgba(212,175,55,0.2)", color:C.gold, padding:"5px 16px", borderRadius:20, fontSize:11, letterSpacing:"1.5px", marginBottom:14, border:`1px solid ${C.gold}` },
+  heroTitle:  { color:"#fff", fontSize:28, fontWeight:700, margin:"0 0 10px", letterSpacing:"-0.5px" },
+  heroSub:    { color:"#CBD5E1", fontSize:14, margin:"0 0 22px", lineHeight:1.6 },
+  statsRow:   { display:"inline-flex", gap:28, background:"rgba(255,255,255,0.07)", padding:"12px 28px", borderRadius:50, border:"1px solid rgba(212,175,55,0.25)" },
+  statItem:   { textAlign:"center" },
+  statDivider: { width:"1px", background:"rgba(212,175,55,0.3)", alignSelf:"stretch" },
+  statNum:    { fontSize:20, fontWeight:700, color:C.gold },
+  statLbl:    { fontSize:10, color:"#94A3B8", letterSpacing:"1px", marginTop:2 },
 
-  tabs: { display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" },
-  tab: { padding: "8px 18px", borderRadius: 8, border: "1.5px solid #e2e8f0", background: "#fff", color: "#64748b", cursor: "pointer", fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 6 },
-  tabActive: { border: "1.5px solid #6366f1", background: "#ede9fe", color: "#6366f1", fontWeight: 700 },
-  tabCount: { background: "#e2e8f0", borderRadius: 20, padding: "1px 8px", fontSize: 12 },
+  mainWrap:   { maxWidth:900, margin:"0 auto", padding:"28px 20px 60px" },
 
-  noResults: { textAlign: "center", padding: 40, color: "#94a3b8", fontSize: 16 },
+  breadcrumb: { fontSize:12, color:C.textMuted, marginBottom:6 },
+  panelHeaderRow: { display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20 },
+  panelTitle: { fontSize:22, fontWeight:700, color:C.textDark, margin:"0 0 4px" },
+  panelSub:   { fontSize:13, color:C.textMuted, margin:0 },
+  yr26:       { background:C.goldBg, color:C.goldDark, padding:"2px 10px", borderRadius:20, fontSize:11, verticalAlign:"middle", marginLeft:8 },
+  freePill:   { background:"#DCFCE7", color:"#166534", padding:"5px 14px", borderRadius:20, fontSize:12, fontWeight:600, whiteSpace:"nowrap" },
 
-  tableWrapper: { overflowX: "auto", borderRadius: 12, boxShadow: "0 2px 12px rgba(0,0,0,0.08)" },
-  table: { width: "100%", borderCollapse: "collapse", background: "#fff" },
-  thead: { background: "linear-gradient(135deg, #4f46e5, #7c3aed)" },
-  th: { padding: "12px 16px", color: "#fff", fontSize: 13, fontWeight: 600, textAlign: "left", whiteSpace: "nowrap" },
-  trEven: { background: "#fff" },
-  trOdd: { background: "#f8fafc" },
-  td: { padding: "12px 16px", fontSize: 13, color: "#334155", borderBottom: "1px solid #f1f5f9", verticalAlign: "top" },
-  collegeName: { fontWeight: 600, color: "#1e293b", marginBottom: 2 },
-  collegeType: { fontSize: 11, color: "#94a3b8" },
-  chanceBadge: { padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" },
+  card:       { background:"#fff", borderRadius:12, padding:24, border:`0.5px solid ${C.border}`, boxShadow:"0 2px 8px rgba(0,0,0,0.04)" },
 
-  footer: { textAlign: "center", padding: "24px", color: "#94a3b8", fontSize: 13 },
+  row2:       { display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 },
+  label:      { display:"block", fontSize:12, color:C.textBody, fontWeight:600, marginBottom:6, letterSpacing:"0.3px" },
+  req:        { color:"#DC2626" },
+  input:      { width:"100%", padding:"10px 14px", borderRadius:8, border:`1.5px solid ${C.border}`, fontSize:14, outline:"none", boxSizing:"border-box" },
+  select:     { width:"100%", padding:"10px 14px", borderRadius:8, border:`1.5px solid ${C.border}`, fontSize:13, outline:"none", background:"#fff", boxSizing:"border-box" },
+
+  genderRow:  { display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 },
+  gBtnActive: { background:C.navyDeep, color:C.gold, border:`1px solid ${C.gold}`, padding:"10px 20px", borderRadius:8, fontWeight:600, fontSize:13, cursor:"pointer" },
+  gBtn:       { background:"#fff", color:C.textBody, border:`1.5px solid ${C.border}`, padding:"10px 20px", borderRadius:8, fontSize:13, cursor:"pointer" },
+
+  filterBox:  { background:C.subtle, borderRadius:8, padding:"12px 14px", marginBottom:14 },
+  filterToggle:{ display:"flex", justifyContent:"space-between", cursor:"pointer", fontSize:13, color:C.navy, fontWeight:500 },
+
+  catPreview: { background:"#EFF6FF", borderLeft:`3px solid ${C.navy}`, padding:"10px 14px", borderRadius:8, marginBottom:16, fontSize:13 },
+  errorBox:   { background:"#FEE2E2", color:"#991B1B", padding:"10px 14px", borderRadius:8, marginBottom:14, fontSize:13 },
+  predictBtn: { width:"100%", background:C.navyDeep, color:C.gold, border:`1px solid ${C.gold}`, padding:14, fontSize:14, fontWeight:700, borderRadius:8, cursor:"pointer", letterSpacing:"0.5px", transition:"transform 0.15s, box-shadow 0.15s" },
+
+  resultsHeader:{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 },
+  resultsTitle: { fontSize:18, fontWeight:700, color:C.textDark, margin:"0 0 4px" },
+  resultsMeta:  { fontSize:12, color:C.textMuted },
+  dlBtn:       { background:"#16A34A", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer" },
+
+  tabs:       { display:"flex", gap:8, marginBottom:16, flexWrap:"wrap" },
+  tab:        { padding:"7px 16px", borderRadius:20, border:`1.5px solid ${C.border}`, background:"#fff", color:C.textMuted, fontSize:13, cursor:"pointer" },
+  tabActive:  { background:C.navyDeep, color:C.gold, border:`1.5px solid ${C.gold}`, fontSize:13, cursor:"pointer", padding:"7px 16px", borderRadius:20 },
+  tabBadge:   { background:"rgba(255,255,255,0.2)", borderRadius:10, padding:"1px 7px", marginLeft:4, fontSize:11 },
+  noResults:  { textAlign:"center", padding:40, color:C.textMuted, fontSize:15 },
+  aiWarning:  { background:"#FEF9C3", border:"1px solid #FCD34D", borderLeft:"4px solid #F59E0B", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#78350F", marginBottom:14, lineHeight:1.6 },
+  searchWrap: { display:"flex", alignItems:"center", background:"#fff", border:`2px solid ${C.navy}`, borderRadius:10, padding:"0 14px", marginBottom:10, gap:8 },
+  searchIcon: { fontSize:16, color:C.textMuted, flexShrink:0 },
+  searchInput:{ flex:1, border:"none", outline:"none", padding:"12px 0", fontSize:15, color:C.textDark, background:"transparent" },
+  searchClear:{ background:"none", border:"none", cursor:"pointer", color:C.textMuted, fontSize:16, padding:"4px 6px", borderRadius:6, fontWeight:700 },
+  searchCount:{ fontSize:13, color:C.textMuted, marginBottom:12, padding:"6px 2px" },
+
+  collegeCard:{ background:"#fff", border:`0.5px solid ${C.border}`, borderRadius:10, padding:"14px 16px", marginBottom:12, boxShadow:"0 1px 4px rgba(0,0,0,0.06)", transition:"transform 0.2s ease, box-shadow 0.2s ease", cursor:"default" },
+  ccTop:      { display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 },
+  ccCode:     { fontSize:11, color:C.textLight, marginBottom:2, fontWeight:500 },
+  ccName:     { fontSize:14, fontWeight:600, color:C.textDark },
+  ccSub:      { fontSize:11, color:C.textMuted, marginTop:3 },
+  chancePill: { padding:"3px 12px", borderRadius:20, fontSize:11, fontWeight:700, whiteSpace:"nowrap" },
+  ccMeta:     { display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:8, paddingTop:10, borderTop:`0.5px dashed ${C.border}` },
+  ccMetaLbl:  { fontSize:10, color:C.textLight, letterSpacing:"0.5px" },
+  ccMetaVal:  { fontSize:13, color:C.textDark, fontWeight:600, marginTop:2 },
+
+  docCatRow:  { display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 },
+  docItem:    { display:"flex", alignItems:"center", gap:12, padding:"10px 14px", background:C.subtle, borderRadius:8, marginBottom:6, borderLeft:`3px solid ${C.gold}` },
+  docNum:     { background:C.navyDeep, color:C.gold, width:24, height:24, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, flexShrink:0 },
+  docText:    { fontSize:13, color:C.textDark },
+
+  noteBox:    { background:C.goldBg, borderLeft:`3px solid ${C.gold}`, padding:"14px 16px", borderRadius:8, marginTop:16 },
+  noteTitle:  { fontWeight:700, color:C.goldDark, marginBottom:8, fontSize:14 },
+  noteItem:   { fontSize:13, color:C.goldDark, lineHeight:1.8 },
+
+  paidCard:   { background:"#fff", border:`0.5px solid ${C.border}`, borderRadius:10, padding:"20px 16px", textAlign:"center", boxShadow:"0 1px 4px rgba(0,0,0,0.04)" },
+
+  contactBtn: { background:C.navyDeep, color:"#fff", border:"none", padding:"11px 22px", borderRadius:8, fontSize:14, fontWeight:600, cursor:"pointer", textDecoration:"none" },
+  divider:    { height:"0.5px", background:C.border, margin:"20px 0" },
+  socialLinkBig:{ color:C.navy, fontWeight:600, fontSize:13, textDecoration:"none" },
+
+  msBox:      { padding:"10px 14px", borderRadius:8, border:`1.5px solid ${C.border}`, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center", background:"#fff" },
+  msDropdown: { position:"absolute", top:"100%", left:0, right:0, background:"#fff", border:`1.5px solid ${C.border}`, borderRadius:8, maxHeight:200, overflowY:"auto", zIndex:50, boxShadow:"0 8px 20px rgba(0,0,0,0.12)" },
+  msItem:     { display:"flex", alignItems:"center", padding:"8px 14px", cursor:"pointer", fontSize:13, color:C.textDark },
+  msTag:      { background:"#EDE9FE", color:C.navy, padding:"3px 10px", borderRadius:20, fontSize:12, fontWeight:500 },
+
+  footer:     { background:C.navyDeep, padding:"28px 24px 0" },
+  footerGrid: { display:"grid", gridTemplateColumns:"2fr 1fr 1fr", gap:24, maxWidth:900, margin:"0 auto", paddingBottom:20 },
+  footerBrand:{ color:"#fff", fontSize:22, fontWeight:700, marginBottom:6 },
+  footerTagline:{ color:C.gold, fontSize:13, letterSpacing:"2px", marginBottom:6, fontWeight:600 },
+  footerInit: { color:"#BFDBFE", fontSize:13, fontStyle:"italic", marginBottom:12 },
+  footerDesc: { color:"#94A3B8", fontSize:13, lineHeight:1.8 },
+  footerHead: { color:C.gold, fontSize:13, letterSpacing:"1.5px", marginBottom:12, fontWeight:700 },
+  footerLink: { color:"#CBD5E1", fontSize:14, lineHeight:2.2, cursor:"pointer" },
+  footerContact:{ color:"#CBD5E1", fontSize:15, fontWeight:600, marginBottom:6 },
+  footerIcon: { width:40, height:40, background:"rgba(255,255,255,0.1)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", fontSize:20 },
+  footerBottom:{ borderTop:`1px solid rgba(255,255,255,0.08)`, padding:"16px 0", textAlign:"center", color:"#94A3B8", fontSize:13, maxWidth:900, margin:"0 auto" },
+
+  whatsappFloat:{ position:"fixed", right:24, bottom:90, background:"linear-gradient(135deg,#25D366,#128C7E)", color:"#fff", padding:"12px 20px", borderRadius:30, fontWeight:700, fontSize:14, textDecoration:"none", boxShadow:"0 6px 24px rgba(37,211,102,0.45)", zIndex:200, display:"flex", alignItems:"center", gap:10, letterSpacing:"0.3px" },
 };
