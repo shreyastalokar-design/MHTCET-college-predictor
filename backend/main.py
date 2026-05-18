@@ -171,13 +171,12 @@ def filter_colleges(percentile, gender, caste, quota, uni_type, cap_round,
     """Core filtering logic shared by /predict and /predict-pdf"""
     category_codes = build_category_code(gender, caste, quota, uni_type)
 
-    if quota == "AI":
-        filtered = df[df['Category'] == 'AI'].copy()
-    else:
-        filtered = df[
-            (df['Category'].isin(category_codes)) &
-            (df['CAP Round'] == cap_round)
-        ].copy()
+    # Always filter by BOTH category AND CAP round — no exceptions
+    # Works for all quotas: AI, EWS, TFWS, MI, ORPHAN, PWD, DEF, and regular categories
+    filtered = df[
+        (df['Category'].isin(category_codes)) &
+        (df['CAP Round'] == cap_round)
+    ].copy()
 
     filtered = filtered[filtered['Percentile'] <= percentile + 0.20]  # include Reach window
 

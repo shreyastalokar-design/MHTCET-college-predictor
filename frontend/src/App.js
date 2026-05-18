@@ -8,6 +8,17 @@ const WHATSAPP_NUMBER = "918983798203";
 const WHATSAPP_MSG    = "Hi Concept Delta, I need help choosing the right college.";
 
 // ── Brand ────────────────────────────────────────────────────────────────────
+// ── Responsive Hook ──────────────────────────────────────────────────────────
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return isMobile;
+}
+
 // ── Animation Hook ───────────────────────────────────────────────────────────
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
@@ -214,6 +225,7 @@ function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
 export default function App() {
   const [panel,      setPanel]      = useState("predictor");
   const [sidebarOpen,setSidebarOpen]= useState(false);
+  const isMobile = useIsMobile();
   const [infoMsg,    setInfoMsg]    = useState("");
 
   const navigate = (svc) => {
@@ -229,6 +241,19 @@ export default function App() {
 
   return (
     <div style={s.app}>
+      {/* ── Mobile CSS ── */}
+      <style>{`
+        @media (max-width: 768px) {
+          .mob-row2      { grid-template-columns: 1fr !important; }
+          .mob-col1      { grid-template-columns: 1fr !important; }
+          .mob-hide      { display: none !important; }
+          .mob-small     { font-size: 13px !important; }
+          .mob-wrap      { flex-wrap: wrap !important; }
+          .mob-center    { text-align: center !important; }
+          .mob-pad       { padding: 16px 12px !important; }
+          .mob-full      { width: 100% !important; }
+        }
+      `}</style>
       {/* ── Tagline bar ── */}
       <div style={s.taglineBar}>{BRAND.tagline}</div>
 
@@ -253,7 +278,8 @@ export default function App() {
           </div>
         </div>
         <div style={s.navRight}>
-          <a href={BRAND.social.youtube} target="_blank" rel="noopener noreferrer" style={{...s.socialA, background:"#FF0000"}} title="YouTube">
+          <a href={BRAND.social.youtube} target="_blank" rel="noopener noreferrer"
+             style={{...s.socialA, background:"#FF0000", display: window.innerWidth < 480 ? "none":"flex"}} title="YouTube">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
           </a>
           <a href={BRAND.social.telegram} target="_blank" rel="noopener noreferrer" style={{...s.socialA, background:"#0088CC"}} title="Telegram">
@@ -329,15 +355,17 @@ export default function App() {
         {panel === "info"      && <InfoPanel msg={infoMsg} />}
       </div>
 
-      <SiteFooter setPanel={setPanel} />
+      <SiteFooter setPanel={setPanel} isMobile={window.innerWidth <= 768} />
 
       {/* Floating WhatsApp — bottom-right, 100px from bottom */}
-      <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MSG)}`}
-         target="_blank" rel="noopener noreferrer" style={s.whatsappFloat}
-         title="Chat on WhatsApp">
-        <WAIcon size={22} color="#fff"/>
-        <span>Chat with us</span>
-      </a>
+      {!isMobile && (
+        <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MSG)}`}
+           target="_blank" rel="noopener noreferrer" style={s.whatsappFloat}
+           title="Chat on WhatsApp">
+          <WAIcon size={22} color="#fff"/>
+          <span>Chat with us</span>
+        </a>
+      )}
     </div>
   );
 }
@@ -367,9 +395,15 @@ function SidebarItem({ svc, active, onClick }) {
 
 // ── Book Session Button ───────────────────────────────────────────────────────
 function BookSessionBtn() {
+  const isMob = window.innerWidth <= 768;
   return (
-    <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer" style={s.bookBtn}>
-      📅 Book a Free Session
+    <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer"
+       style={{ ...s.bookBtn,
+         fontSize: isMob ? 10 : 13,
+         padding: isMob ? "7px 10px" : "9px 16px",
+         whiteSpace: "nowrap"
+       }}>
+      📅 {isMob ? "Free Counselling" : "Book a Free Counselling Session"}
     </a>
   );
 }
@@ -777,7 +811,7 @@ function PaidPanel() {
       <h2 style={s.panelTitle}>Premium Guidance Services</h2>
       <p style={s.panelSub}>Expert-led personalized support for your engineering admission journey</p>
 
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginTop:20 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(140px,1fr))", gap:14, marginTop:20 }}>
         {paidList.map(svc=>(
           <div key={svc.id} style={s.paidCard}>
             <span style={{ fontSize:28 }}>{svc.icon}</span>
@@ -791,7 +825,7 @@ function PaidPanel() {
         <div style={s.noteItem}>Contact us at <a href={`tel:${BRAND.contact.replace(/ /g,"")}`} style={{ color:"inherit", fontWeight:700 }}>{BRAND.contact}</a></div>
         <div style={s.noteItem}>Or book a free session to know more!</div>
         <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer" style={{ ...s.bookBtn, display:"inline-block", marginTop:12, textDecoration:"none" }}>
-          📅 Book a Free Session
+          📅 Book a Free Counselling Session
         </a>
       </div>
     </div>
@@ -918,9 +952,9 @@ function MultiSelect({ options, selected, onChange, placeholder }) {
 // ═════════════════════════════════════════════════════════════════════════════
 // FOOTER
 // ═════════════════════════════════════════════════════════════════════════════
-function SiteFooter({ setPanel }) {
+function SiteFooter({ setPanel, isMobile }) {
   return (
-    <footer style={s.footer}>
+    <footer style={{...s.footer, padding:"clamp(20px,4vw,28px) clamp(14px,3vw,24px) 0"}}>
       <div style={s.footerGrid}>
         <div>
           <div style={s.footerBrand}>{BRAND.name}</div>
@@ -936,7 +970,7 @@ function SiteFooter({ setPanel }) {
             { label:"College Predictor",  action:() => { setPanel("predictor"); window.scrollTo({top:0,behavior:"smooth"}); } },
             { label:"Documents Guidance", action:() => { setPanel("documents"); window.scrollTo({top:0,behavior:"smooth"}); } },
             { label:"Call Support",       action:() => { setPanel("contact");   window.scrollTo({top:0,behavior:"smooth"}); } },
-            { label:"Book a Free Session",  action:() => window.open(GOOGLE_FORM_URL,"_blank") },
+            { label:"Book a Free Counselling Session", action:() => window.open(GOOGLE_FORM_URL,"_blank") },
           ].map(({label,action})=>(
             <div key={label} onClick={action}
                  style={{ ...s.footerLink, textDecoration:"underline", textDecorationColor:"rgba(255,255,255,0.2)" }}>
@@ -947,7 +981,7 @@ function SiteFooter({ setPanel }) {
         <div>
           <div style={s.footerHead}>CONNECT</div>
           <a href={`tel:${BRAND.contact.replace(/ /g,"")}`} style={{ ...s.footerContact, textDecoration:"none", display:"block" }}>📞 {BRAND.contact}</a>
-          <div style={{ display:"flex", gap:10, marginTop:14 }}>
+          <div style={{ display:"flex", gap:12, marginTop:14, flexWrap:"wrap" }}>
             <a href={BRAND.social.youtube} target="_blank" rel="noopener noreferrer" style={{ ...s.footerIcon, background:"#FF0000" }} title="YouTube">
               <YTIcon size={24} color="white"/>
             </a>
@@ -957,6 +991,13 @@ function SiteFooter({ setPanel }) {
             <a href={BRAND.social.instagram} target="_blank" rel="noopener noreferrer" style={{ ...s.footerIcon, background:"linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)" }} title="Instagram">
               <IGIcon size={24} color="white"/>
             </a>
+            {isMobile && (
+              <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MSG)}`}
+                 target="_blank" rel="noopener noreferrer"
+                 style={{ ...s.footerIcon, background:"#25D366" }} title="WhatsApp">
+                <WAIcon size={24} color="white"/>
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -997,7 +1038,7 @@ const s = {
 
   nav:        { background:C.navy, padding:"13px 24px", display:"flex", alignItems:"center", justifyContent:"space-between" },
   navLeft:    { display:"flex", alignItems:"center", gap:14 },
-  navRight:   { display:"flex", alignItems:"center", gap:10 },
+  navRight:   { display:"flex", alignItems:"center", gap:8, flexShrink:0 },
 
   hamburger:  { background:"transparent", border:"none", cursor:"pointer", padding:6, display:"flex", flexDirection:"column", gap:5 },
   hLine:      { display:"block", width:24, height:2, background:"#fff", borderRadius:2 },
@@ -1014,7 +1055,7 @@ const s = {
 
   overlay:    { position:"fixed", inset:0, background:"rgba(0,0,0,0.4)", zIndex:99 },
 
-  sidebar:    { position:"fixed", top:0, left:0, height:"100vh", width:280, background:"#fff", zIndex:100, overflowY:"auto", boxShadow:"4px 0 20px rgba(0,0,0,0.15)", transition:"transform 0.3s ease", paddingBottom:40 },
+  sidebar:    { position:"fixed", top:0, left:0, height:"100vh", width:"min(280px, 85vw)", background:"#fff", zIndex:100, overflowY:"auto", boxShadow:"4px 0 20px rgba(0,0,0,0.15)", transition:"transform 0.3s ease", paddingBottom:40 },
   sidebarHeader:{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 16px 10px", borderBottom:`0.5px solid ${C.border}`, marginBottom:8 },
   sidebarTitle: { fontWeight:700, fontSize:15, color:C.textDark },
   closeBtn:   { background:"transparent", border:"none", fontSize:18, cursor:"pointer", color:C.textMuted, padding:"2px 6px" },
@@ -1023,28 +1064,28 @@ const s = {
   tagFree:    { background:"#DCFCE7", color:"#166534", padding:"3px 10px", borderRadius:10, fontSize:11, fontWeight:700 },
   tagPaid:    { background:C.goldBg, color:C.goldDark, padding:"3px 10px", borderRadius:10, fontSize:11, fontWeight:700 },
 
-  hero:       { background:`linear-gradient(135deg, ${C.navyDeep} 0%, ${C.navy} 100%)`, padding:"40px 24px", textAlign:"center" },
+  hero:       { background:`linear-gradient(135deg, ${C.navyDeep} 0%, ${C.navy} 100%)`, padding:"28px 16px", textAlign:"center" },
   heroBadge:  { display:"inline-block", background:"rgba(212,175,55,0.2)", color:C.gold, padding:"5px 16px", borderRadius:20, fontSize:11, letterSpacing:"1.5px", marginBottom:14, border:`1px solid ${C.gold}` },
-  heroTitle:  { color:"#fff", fontSize:28, fontWeight:700, margin:"0 0 10px", letterSpacing:"-0.5px" },
+  heroTitle:  { color:"#fff", fontSize:"clamp(20px,5vw,28px)", fontWeight:700, margin:"0 0 10px", letterSpacing:"-0.5px" },
   heroSub:    { color:"#CBD5E1", fontSize:14, margin:"0 0 22px", lineHeight:1.6 },
-  statsRow:   { display:"inline-flex", gap:28, background:"rgba(255,255,255,0.07)", padding:"12px 28px", borderRadius:50, border:"1px solid rgba(212,175,55,0.25)" },
+  statsRow:   { display:"inline-flex", gap:"clamp(12px,4vw,28px)", background:"rgba(255,255,255,0.07)", padding:"10px clamp(14px,4vw,28px)", borderRadius:50, border:"1px solid rgba(212,175,55,0.25)", flexWrap:"wrap", justifyContent:"center" },
   statItem:   { textAlign:"center" },
   statDivider: { width:"1px", background:"rgba(212,175,55,0.3)", alignSelf:"stretch" },
   statNum:    { fontSize:20, fontWeight:700, color:C.gold },
   statLbl:    { fontSize:10, color:"#94A3B8", letterSpacing:"1px", marginTop:2 },
 
-  mainWrap:   { maxWidth:900, margin:"0 auto", padding:"28px 20px 60px" },
+  mainWrap:   { maxWidth:900, margin:"0 auto", padding:"20px 12px 80px" },
 
   breadcrumb: { fontSize:12, color:C.textMuted, marginBottom:6 },
-  panelHeaderRow: { display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20 },
-  panelTitle: { fontSize:22, fontWeight:700, color:C.textDark, margin:"0 0 4px" },
+  panelHeaderRow: { display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20, flexWrap:"wrap", gap:10 },
+  panelTitle: { fontSize:"clamp(17px,4vw,22px)", fontWeight:700, color:C.textDark, margin:"0 0 4px" },
   panelSub:   { fontSize:13, color:C.textMuted, margin:0 },
   yr26:       { background:C.goldBg, color:C.goldDark, padding:"2px 10px", borderRadius:20, fontSize:11, verticalAlign:"middle", marginLeft:8 },
   freePill:   { background:"#DCFCE7", color:"#166534", padding:"5px 14px", borderRadius:20, fontSize:12, fontWeight:600, whiteSpace:"nowrap" },
 
-  card:       { background:"#fff", borderRadius:12, padding:24, border:`0.5px solid ${C.border}`, boxShadow:"0 2px 8px rgba(0,0,0,0.04)" },
+  card:       { background:"#fff", borderRadius:12, padding:"clamp(14px,4vw,24px)", border:`0.5px solid ${C.border}`, boxShadow:"0 2px 8px rgba(0,0,0,0.04)" },
 
-  row2:       { display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 },
+  row2:       { display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(240px, 1fr))", gap:16 },
   label:      { display:"block", fontSize:12, color:C.textBody, fontWeight:600, marginBottom:6, letterSpacing:"0.3px" },
   req:        { color:"#DC2626" },
   input:      { width:"100%", padding:"10px 14px", borderRadius:8, border:`1.5px solid ${C.border}`, fontSize:14, outline:"none", boxSizing:"border-box" },
@@ -1061,7 +1102,7 @@ const s = {
   errorBox:   { background:"#FEE2E2", color:"#991B1B", padding:"10px 14px", borderRadius:8, marginBottom:14, fontSize:13 },
   predictBtn: { width:"100%", background:C.navyDeep, color:C.gold, border:`1px solid ${C.gold}`, padding:14, fontSize:14, fontWeight:700, borderRadius:8, cursor:"pointer", letterSpacing:"0.5px", transition:"transform 0.15s, box-shadow 0.15s" },
 
-  resultsHeader:{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 },
+  resultsHeader:{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:14, flexWrap:"wrap", gap:10 },
   resultsTitle: { fontSize:18, fontWeight:700, color:C.textDark, margin:"0 0 4px" },
   resultsMeta:  { fontSize:12, color:C.textMuted },
   dlBtn:       { background:"#16A34A", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer" },
@@ -1084,11 +1125,11 @@ const s = {
   ccName:     { fontSize:14, fontWeight:600, color:C.textDark },
   ccSub:      { fontSize:11, color:C.textMuted, marginTop:3 },
   chancePill: { padding:"3px 12px", borderRadius:20, fontSize:11, fontWeight:700, whiteSpace:"nowrap" },
-  ccMeta:     { display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:8, paddingTop:10, borderTop:`0.5px dashed ${C.border}` },
+  ccMeta:     { display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(100px,1fr))", gap:8, paddingTop:10, borderTop:`0.5px dashed ${C.border}` },
   ccMetaLbl:  { fontSize:10, color:C.textLight, letterSpacing:"0.5px" },
   ccMetaVal:  { fontSize:13, color:C.textDark, fontWeight:600, marginTop:2 },
 
-  docCatRow:  { display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 },
+  docCatRow:  { display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(100px,1fr))", gap:8 },
   docItem:    { display:"flex", alignItems:"center", gap:12, padding:"10px 14px", background:C.subtle, borderRadius:8, marginBottom:6, borderLeft:`3px solid ${C.gold}` },
   docNum:     { background:C.navyDeep, color:C.gold, width:24, height:24, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, flexShrink:0 },
   docText:    { fontSize:13, color:C.textDark },
@@ -1108,17 +1149,17 @@ const s = {
   msItem:     { display:"flex", alignItems:"center", padding:"8px 14px", cursor:"pointer", fontSize:13, color:C.textDark },
   msTag:      { background:"#EDE9FE", color:C.navy, padding:"3px 10px", borderRadius:20, fontSize:12, fontWeight:500 },
 
-  footer:     { background:C.navyDeep, padding:"28px 24px 0" },
-  footerGrid: { display:"grid", gridTemplateColumns:"2fr 1fr 1fr", gap:24, maxWidth:900, margin:"0 auto", paddingBottom:20 },
-  footerBrand:{ color:"#fff", fontSize:22, fontWeight:700, marginBottom:6 },
+  footer:     { background:C.navyDeep, padding:"28px 24px 0", marginTop:"auto" },
+  footerGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px,1fr))", gap:24, maxWidth:900, margin:"0 auto", paddingBottom:24 },
+  footerBrand:{ color:"#fff", fontSize:"clamp(18px,4vw,22px)", fontWeight:700, marginBottom:6 },
   footerTagline:{ color:C.gold, fontSize:13, letterSpacing:"2px", marginBottom:6, fontWeight:600 },
   footerInit: { color:"#BFDBFE", fontSize:13, fontStyle:"italic", marginBottom:12 },
   footerDesc: { color:"#94A3B8", fontSize:13, lineHeight:1.8 },
   footerHead: { color:C.gold, fontSize:13, letterSpacing:"1.5px", marginBottom:12, fontWeight:700 },
-  footerLink: { color:"#CBD5E1", fontSize:14, lineHeight:2.2, cursor:"pointer" },
-  footerContact:{ color:"#CBD5E1", fontSize:15, fontWeight:600, marginBottom:6 },
-  footerIcon: { width:40, height:40, background:"rgba(255,255,255,0.1)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", fontSize:20 },
-  footerBottom:{ borderTop:`1px solid rgba(255,255,255,0.08)`, padding:"16px 0", textAlign:"center", color:"#94A3B8", fontSize:13, maxWidth:900, margin:"0 auto" },
+  footerLink: { color:"#CBD5E1", fontSize:"clamp(13px,3vw,14px)", lineHeight:2.2, cursor:"pointer" },
+  footerContact:{ color:"#CBD5E1", fontSize:"clamp(14px,3.5vw,15px)", fontWeight:600, marginBottom:8, display:"block" },
+  footerIcon: { width:44, height:44, background:"rgba(255,255,255,0.1)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", fontSize:22, flexShrink:0 },
+  footerBottom:{ borderTop:`1px solid rgba(255,255,255,0.08)`, padding:"16px 8px", textAlign:"center", color:"#94A3B8", fontSize:"clamp(11px,2.5vw,13px)", maxWidth:900, margin:"0 auto" },
 
-  whatsappFloat:{ position:"fixed", right:24, bottom:90, background:"linear-gradient(135deg,#25D366,#128C7E)", color:"#fff", padding:"12px 20px", borderRadius:30, fontWeight:700, fontSize:14, textDecoration:"none", boxShadow:"0 6px 24px rgba(37,211,102,0.45)", zIndex:200, display:"flex", alignItems:"center", gap:10, letterSpacing:"0.3px" },
+  whatsappFloat:{ position:"fixed", right:16, bottom:80, background:"linear-gradient(135deg,#25D366,#128C7E)", color:"#fff", padding:"12px 20px", borderRadius:30, fontWeight:700, fontSize:14, textDecoration:"none", boxShadow:"0 6px 24px rgba(37,211,102,0.45)", zIndex:200, display:"flex", alignItems:"center", gap:10, letterSpacing:"0.3px" },
 };
