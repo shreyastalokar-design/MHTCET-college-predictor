@@ -318,18 +318,19 @@ def add_services_page(usable_width=25.7*cm):
     free_w = usable_width * 0.40
     prem_w = usable_width * 0.60
 
-    cell_s = ParagraphStyle('svc_cell', fontName='Helvetica', fontSize=10,
-                             textColor=colors.HexColor("#166534"), leading=17)
-    cell_p = ParagraphStyle('svc_prem', fontName='Helvetica', fontSize=10,
-                             textColor=NAVY, leading=17)
+    # Tighter leading so everything fits on one page
+    cell_s = ParagraphStyle('svc_cell', fontName='Helvetica', fontSize=9.5,
+                             textColor=colors.HexColor("#166534"), leading=14)
+    cell_p = ParagraphStyle('svc_prem', fontName='Helvetica', fontSize=9.5,
+                             textColor=NAVY, leading=14)
 
     free_cell = [
         Paragraph("<b>FREE SERVICES</b>",
                   ParagraphStyle('fh', fontName='Helvetica-Bold', fontSize=11,
                                  textColor=colors.white, alignment=TA_CENTER,
                                  backColor=colors.HexColor("#16A34A"),
-                                 borderPadding=(7, 0, 7, 0))),
-        Spacer(1, 0.25*cm),
+                                 borderPadding=(6, 0, 6, 0))),
+        Spacer(1, 0.2*cm),
     ] + [Paragraph(f"   >  {s}", cell_s) for s in _FREE_SVCS]
 
     prem_cell = [
@@ -337,8 +338,8 @@ def add_services_page(usable_width=25.7*cm):
                   ParagraphStyle('ph', fontName='Helvetica-Bold', fontSize=11,
                                  textColor=GOLD, alignment=TA_CENTER,
                                  backColor=NAVY,
-                                 borderPadding=(7, 0, 7, 0))),
-        Spacer(1, 0.25*cm),
+                                 borderPadding=(6, 0, 6, 0))),
+        Spacer(1, 0.2*cm),
     ] + [Paragraph(f"   >  {s}", cell_p) for s in _PREM_SVCS]
 
     svc_table = Table([[free_cell, prem_cell]], colWidths=[free_w, prem_w])
@@ -350,14 +351,16 @@ def add_services_page(usable_width=25.7*cm):
         ('BOX',           (1,0), (1,0),   0.8, NAVY),
         ('LEFTPADDING',   (0,0), (-1,-1), 12),
         ('RIGHTPADDING',  (0,0), (-1,-1), 12),
-        ('TOPPADDING',    (0,0), (-1,-1), 10),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 14),
+        ('TOPPADDING',    (0,0), (-1,-1), 8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 10),
     ]))
 
-    cta_style = ParagraphStyle('cta', fontName='Helvetica-Bold', fontSize=13,
-                                textColor=GOLD, alignment=TA_CENTER, leading=22)
-    sub_style = ParagraphStyle('sub', fontName='Helvetica', fontSize=11,
-                                textColor=colors.white, alignment=TA_CENTER, leading=20)
+    cta_style = ParagraphStyle('cta', fontName='Helvetica-Bold', fontSize=12,
+                                textColor=GOLD, alignment=TA_CENTER, leading=20)
+    sub_style = ParagraphStyle('sub', fontName='Helvetica', fontSize=10.5,
+                                textColor=colors.white, alignment=TA_CENTER, leading=18)
+    web_style = ParagraphStyle('web', fontName='Helvetica-Bold', fontSize=13,
+                                textColor=NAVY, alignment=TA_CENTER)
 
     cta_table = Table(
         [[Paragraph(
@@ -368,40 +371,39 @@ def add_services_page(usable_width=25.7*cm):
             f'<a href="{WHATSAPP_URL}" color="#25D366"><b>{CONTACT_PHONE}</b></a>'
             f'   |   '
             f'<a href="{WHATSAPP_URL}" color="#25D366">WhatsApp us anytime!</a>',
-            sub_style)]],
+            sub_style)],
+         [Paragraph(
+            f'<a href="{WEBSITE_URL}" color="#D4AF37"><u>{WEBSITE_URL}</u></a>',
+            ParagraphStyle('wl', fontName='Helvetica-Bold', fontSize=12,
+                           textColor=GOLD, alignment=TA_CENTER, leading=18))]],
         colWidths=[usable_width]
     )
     cta_table.setStyle(TableStyle([
         ('BACKGROUND',    (0,0), (-1,-1), NAVY),
         ('LEFTPADDING',   (0,0), (-1,-1), 20),
         ('RIGHTPADDING',  (0,0), (-1,-1), 20),
-        ('TOPPADDING',    (0,0), (0,0),   14),
+        ('TOPPADDING',    (0,0), (0,0),   12),
         ('BOTTOMPADDING', (0,0), (0,0),   4),
         ('TOPPADDING',    (0,1), (0,1),   4),
-        ('BOTTOMPADDING', (0,1), (0,1),   14),
+        ('BOTTOMPADDING', (0,1), (0,1),   4),
+        ('TOPPADDING',    (0,2), (0,2),   4),
+        ('BOTTOMPADDING', (0,2), (0,2),   12),
     ]))
 
-    web_style = ParagraphStyle('web', fontName='Helvetica-Bold', fontSize=14,
-                                textColor=NAVY, alignment=TA_CENTER)
-
     return [
-        Spacer(1, 0.3*cm),
+        Spacer(1, 0.2*cm),
         Paragraph("Our Services",
                   ParagraphStyle('sh', fontName='Helvetica-Bold', fontSize=18,
-                                 textColor=NAVY, alignment=TA_CENTER, spaceAfter=4)),
+                                 textColor=NAVY, alignment=TA_CENTER, spaceAfter=0)),
+        Spacer(1, 0.35*cm),   # <-- increased gap between heading and subtitle
         Paragraph("Everything you need for a successful MHT-CET admission",
                   ParagraphStyle('ss', fontName='Helvetica', fontSize=10,
                                  textColor=colors.grey, alignment=TA_CENTER)),
-        Spacer(1, 0.25*cm),
-        HRFlowable(width="100%", thickness=1.5, color=GOLD, spaceAfter=12),
+        Spacer(1, 0.2*cm),
+        HRFlowable(width="100%", thickness=1.5, color=GOLD, spaceAfter=10),
         svc_table,
-        Spacer(1, 0.45*cm),
+        Spacer(1, 0.3*cm),
         cta_table,
-        Spacer(1, 0.45*cm),
-        Paragraph(
-            f'Check out our website: '
-            f'<a href="{WEBSITE_URL}" color="#2C5282"><u>{WEBSITE_URL}</u></a>',
-            web_style),
     ]
 
 
