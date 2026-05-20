@@ -132,7 +132,7 @@ const DOC_LABELS = {
 
 const SIDEBAR_SERVICES = [
   // FREE
-  { id:"predictor",  label:"Category-wise College Predictor",    icon:"🎯", free:true,  panel:"predictor" },
+  { id:"predictor",  label:"Detailed College Predictor",           icon:"🎯", free:true,  panel:"predictor" },
   { id:"call",       label:"Call Support",                        icon:"📞", free:true,  panel:"contact" },
   { id:"documents",  label:"Document Support",                    icon:"📄", free:true,  panel:"documents" },
   // PAID

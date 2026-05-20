@@ -38,9 +38,9 @@ SOCIAL_LINKS = {
     "telegram": "https://t.me/Conceptdelta",
     "instagram": "https://www.instagram.com/conceptdelta2031",
 }
-WEBSITE_URL      = "https://conceptdelta.in"
-GOOGLE_FORM_URL  = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform"
-WHATSAPP_URL     = f"https://wa.me/{CONTACT_PHONE.replace('+','').replace(' ','')}"
+WEBSITE_URL     = "https://conceptdelta.in"
+GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform"
+WHATSAPP_URL    = "https://wa.me/918983798203"
 NAVY = colors.HexColor("#1E3A5F")
 BLUE = colors.HexColor("#2C5282")
 GOLD = colors.HexColor("#D4AF37")
@@ -82,43 +82,42 @@ _COMMON = [
 DOCUMENTS_DATA = {
     "Open":     _COMMON + [],
     "OBC":      _COMMON + [
-        "Caste Certificate (OBC / SBC / VJ / NT) issued by Maharashtra",
-        "Caste Validity Certificate issued by Maharashtra",
-        "Valid Non-Creamy Layer (NCL) Certificate",
-        "Income Certificate",
-    ],
+                    "Caste Certificate (OBC / SBC / VJ / NT) issued by Maharashtra",
+                    "Caste Validity Certificate issued by Maharashtra",
+                    "Valid Non-Creamy Layer (NCL) Certificate",
+                    "Income Certificate",
+                ],
     "SC":       _COMMON + [
-        "Caste Certificate (SC) issued by competent authority in Maharashtra",
-        "Caste Validity Certificate issued by competent authority in Maharashtra",
-    ],
+                    "Caste Certificate (SC) issued by competent authority in Maharashtra",
+                    "Caste Validity Certificate issued by competent authority in Maharashtra",
+                ],
     "ST":       _COMMON + [
-        "Caste Certificate (ST) issued by competent authority in Maharashtra",
-        "Caste Validity Certificate issued by competent authority in Maharashtra",
-    ],
+                    "Caste Certificate (ST) issued by competent authority in Maharashtra",
+                    "Caste Validity Certificate issued by competent authority in Maharashtra",
+                ],
     "EWS":      _COMMON + [
-        "Valid EWS Certificate issued by competent authority in Maharashtra",
-        "Income Certificate showing family income below Rs.8 lakhs",
-    ],
+                    "Valid EWS Certificate issued by competent authority in Maharashtra",
+                    "Income Certificate showing family income below Rs.8 lakhs",
+                ],
     "MINORITY": _COMMON + [
-        "Self Declaration (Proforma O) / Samaj Letter",
-        "Linguistic Minority Certificate",
-        "Domicile Certificate of any one amongst Student / Father / Mother",
-    ],
+                    "Self Declaration (Proforma O) / Samaj Letter",
+                    "Linguistic Minority Certificate",
+                    "Domicile Certificate of any one amongst Student / Father / Mother",
+                ],
     "PWD":      _COMMON + [
-        "Physically Handicapped Certificate / PWD Certificate from relevant authority",
-    ],
+                    "Physically Handicapped Certificate / PWD Certificate from relevant authority",
+                ],
     "DEFENCE":  _COMMON + [
-        "Defence Service Certificate (Proforma C) from Zilla Sainik Board",
-        "For DEF-1 & DEF-2: Domicile Certificate of father/mother who is/was in Defence Service",
-    ],
+                    "Defence Service Certificate (Proforma C) from Zilla Sainik Board",
+                    "For DEF-1 and DEF-2: Domicile Certificate of father/mother who is/was in Defence Service",
+                ],
     "ORPHAN":   _COMMON + [
-        "Orphan Certificate from Regional Deputy Commissioner, Women & Child Development",
-    ],
+                    "Orphan Certificate from Regional Deputy Commissioner, Women and Child Development",
+                ],
     "TFWS":     _COMMON + [
-        "Family Income Certificate for Tuition Fee Waiver Scheme (annual income below Rs.8 lakhs)",
-    ],
+                    "Family Income Certificate for Tuition Fee Waiver Scheme (annual income below Rs.8 lakhs)",
+                ],
 }
-
 DOCUMENT_NOTES = [
     "Gap certificate is mandatory for Repeaters.",
     "Keep 5 xerox sets in your file and make PDF of all your original documents.",
@@ -292,10 +291,6 @@ def predict(
     }
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# SERVICES PAGE HELPER  (call site: story.append(PageBreak()); story.extend(add_services_page()))
-# ════════════════════════════════════════════════════════════════════════════
-
 _FREE_SVCS = [
     "Detailed Category-wise College Predictor",
     "Call Support",
@@ -315,65 +310,66 @@ _PREM_SVCS = [
     "Special Guest Lecture on Each Branch",
 ]
 
-def add_services_page():
-    """Returns a list of flowables for the services last page.
-    Caller must prepend a PageBreak() before extending story with this list.
+def add_services_page(usable_width=25.7*cm):
+    """Returns list of flowables for the services last page.
+    Pass usable_width = page_width - left_margin - right_margin.
+    Caller adds PageBreak() separately before extending story.
     """
-    from reportlab.platypus import PageBreak
+    free_w = usable_width * 0.40
+    prem_w = usable_width * 0.60
 
-    item_free = ParagraphStyle('IF', fontName='Helvetica', fontSize=10,
-                               textColor=colors.HexColor("#166534"), leading=18,
-                               leftIndent=6)
-    item_prem = ParagraphStyle('IP', fontName='Helvetica', fontSize=10,
-                               textColor=NAVY, leading=18, leftIndent=6)
-    head_free = ParagraphStyle('HF', fontName='Helvetica-Bold', fontSize=11,
-                               textColor=colors.white, alignment=TA_CENTER,
-                               backColor=colors.HexColor("#16A34A"),
-                               borderPadding=(6, 0, 6, 0))
-    head_prem = ParagraphStyle('HP', fontName='Helvetica-Bold', fontSize=11,
-                               textColor=GOLD, alignment=TA_CENTER,
-                               backColor=NAVY,
-                               borderPadding=(6, 0, 6, 0))
+    cell_s = ParagraphStyle('svc_cell', fontName='Helvetica', fontSize=10,
+                             textColor=colors.HexColor("#166534"), leading=17)
+    cell_p = ParagraphStyle('svc_prem', fontName='Helvetica', fontSize=10,
+                             textColor=NAVY, leading=17)
 
-    free_cell = [Paragraph("FREE SERVICES", head_free), Spacer(1, 0.2*cm)] + \
-                [Paragraph(f"  •  {s}", item_free) for s in _FREE_SVCS]
-    prem_cell = [Paragraph("PREMIUM SERVICES", head_prem), Spacer(1, 0.2*cm)] + \
-                [Paragraph(f"  •  {s}", item_prem) for s in _PREM_SVCS]
+    free_cell = [
+        Paragraph("<b>FREE SERVICES</b>",
+                  ParagraphStyle('fh', fontName='Helvetica-Bold', fontSize=11,
+                                 textColor=colors.white, alignment=TA_CENTER,
+                                 backColor=colors.HexColor("#16A34A"),
+                                 borderPadding=(7, 0, 7, 0))),
+        Spacer(1, 0.25*cm),
+    ] + [Paragraph(f"   >  {s}", cell_s) for s in _FREE_SVCS]
 
-    svc_table = Table([[free_cell, prem_cell]],
-                      colWidths=[11*cm, 14.5*cm])
+    prem_cell = [
+        Paragraph("<b>PREMIUM SERVICES</b>",
+                  ParagraphStyle('ph', fontName='Helvetica-Bold', fontSize=11,
+                                 textColor=GOLD, alignment=TA_CENTER,
+                                 backColor=NAVY,
+                                 borderPadding=(7, 0, 7, 0))),
+        Spacer(1, 0.25*cm),
+    ] + [Paragraph(f"   >  {s}", cell_p) for s in _PREM_SVCS]
+
+    svc_table = Table([[free_cell, prem_cell]], colWidths=[free_w, prem_w])
     svc_table.setStyle(TableStyle([
-        ('VALIGN',       (0,0), (-1,-1), 'TOP'),
-        ('BACKGROUND',   (0,0), (0,0),   colors.HexColor("#F0FDF4")),
-        ('BACKGROUND',   (1,0), (1,0),   colors.HexColor("#EFF6FF")),
-        ('BOX',          (0,0), (0,0),   0.8, colors.HexColor("#16A34A")),
-        ('BOX',          (1,0), (1,0),   0.8, NAVY),
-        ('LEFTPADDING',  (0,0), (-1,-1), 10),
-        ('RIGHTPADDING', (0,0), (-1,-1), 10),
-        ('TOPPADDING',   (0,0), (-1,-1), 8),
-        ('BOTTOMPADDING',(0,0), (-1,-1), 14),
+        ('VALIGN',        (0,0), (-1,-1), 'TOP'),
+        ('BACKGROUND',    (0,0), (0,0),   colors.HexColor("#F0FDF4")),
+        ('BACKGROUND',    (1,0), (1,0),   colors.HexColor("#EFF6FF")),
+        ('BOX',           (0,0), (0,0),   0.8, colors.HexColor("#16A34A")),
+        ('BOX',           (1,0), (1,0),   0.8, NAVY),
+        ('LEFTPADDING',   (0,0), (-1,-1), 12),
+        ('RIGHTPADDING',  (0,0), (-1,-1), 12),
+        ('TOPPADDING',    (0,0), (-1,-1), 10),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 14),
     ]))
 
-    # CTA box — Book a Free Session (hyperlink) + WhatsApp (hyperlink)
-    cta_style = ParagraphStyle('CTA', fontName='Helvetica-Bold', fontSize=13,
-                               textColor=GOLD, alignment=TA_CENTER, leading=22,
-                               backColor=NAVY, borderPadding=(12, 0, 4, 0))
-    cta_sub   = ParagraphStyle('CTASUB', fontName='Helvetica', fontSize=11,
-                               textColor=colors.white, alignment=TA_CENTER,
-                               leading=20, backColor=NAVY, borderPadding=(0, 0, 12, 0))
-
-    cta_text  = (f'<a href="{GOOGLE_FORM_URL}" color="#D4AF37">'
-                 f'Book a FREE Counselling Session</a>')
-    wa_text   = (f'Call / WhatsApp: '
-                 f'<a href="{WHATSAPP_URL}" color="#25D366">'
-                 f'<b>{CONTACT_PHONE}</b></a>'
-                 f'   |   '
-                 f'<a href="{WHATSAPP_URL}" color="#25D366">WhatsApp us anytime!</a>')
+    cta_style = ParagraphStyle('cta', fontName='Helvetica-Bold', fontSize=13,
+                                textColor=GOLD, alignment=TA_CENTER, leading=22)
+    sub_style = ParagraphStyle('sub', fontName='Helvetica', fontSize=11,
+                                textColor=colors.white, alignment=TA_CENTER, leading=20)
 
     cta_table = Table(
-        [[Paragraph(cta_text, cta_style)],
-         [Paragraph(wa_text,  cta_sub)]],
-        colWidths=["100%"]
+        [[Paragraph(
+            f'<a href="{GOOGLE_FORM_URL}" color="#D4AF37">'
+            f'<b>Book a FREE Counselling Session</b></a>', cta_style)],
+         [Paragraph(
+            f'Call / WhatsApp: '
+            f'<a href="{WHATSAPP_URL}" color="#25D366"><b>{CONTACT_PHONE}</b></a>'
+            f'   |   '
+            f'<a href="{WHATSAPP_URL}" color="#25D366">WhatsApp us anytime!</a>',
+            sub_style)]],
+        colWidths=[usable_width]
     )
     cta_table.setStyle(TableStyle([
         ('BACKGROUND',    (0,0), (-1,-1), NAVY),
@@ -385,30 +381,27 @@ def add_services_page():
         ('BOTTOMPADDING', (0,1), (0,1),   14),
     ]))
 
-    # Website link — bigger font, only on this last page
-    web_style = ParagraphStyle('WL', fontName='Helvetica-Bold', fontSize=13,
-                               textColor=NAVY, alignment=TA_CENTER, spaceAfter=0)
-    web_para  = Paragraph(
-        f'Check out our website: '
-        f'<a href="{WEBSITE_URL}" color="#2C5282"><u>{WEBSITE_URL}</u></a>',
-        web_style
-    )
+    web_style = ParagraphStyle('web', fontName='Helvetica-Bold', fontSize=14,
+                                textColor=NAVY, alignment=TA_CENTER)
 
     return [
-        Spacer(1, 0.4*cm),
+        Spacer(1, 0.3*cm),
         Paragraph("Our Services",
-                  ParagraphStyle('SH', fontName='Helvetica-Bold', fontSize=18,
+                  ParagraphStyle('sh', fontName='Helvetica-Bold', fontSize=18,
                                  textColor=NAVY, alignment=TA_CENTER, spaceAfter=4)),
         Paragraph("Everything you need for a successful MHT-CET admission",
-                  ParagraphStyle('SS', fontName='Helvetica', fontSize=10,
-                                 textColor=colors.grey, alignment=TA_CENTER, spaceAfter=0)),
-        Spacer(1, 0.2*cm),
+                  ParagraphStyle('ss', fontName='Helvetica', fontSize=10,
+                                 textColor=colors.grey, alignment=TA_CENTER)),
+        Spacer(1, 0.25*cm),
         HRFlowable(width="100%", thickness=1.5, color=GOLD, spaceAfter=12),
         svc_table,
-        Spacer(1, 0.5*cm),
+        Spacer(1, 0.45*cm),
         cta_table,
-        Spacer(1, 0.5*cm),
-        web_para,
+        Spacer(1, 0.45*cm),
+        Paragraph(
+            f'Check out our website: '
+            f'<a href="{WEBSITE_URL}" color="#2C5282"><u>{WEBSITE_URL}</u></a>',
+            web_style),
     ]
 
 
@@ -645,9 +638,7 @@ def predict_pdf(
 
     # ── Table ─────────────────────────────────────────────────────────────────
     cell_style = ParagraphStyle('cell', fontName='Helvetica', fontSize=7.5,
-                                 leading=10, wordWrap='CJK', spaceAfter=0)
-    cell_bold  = ParagraphStyle('cellb', fontName='Helvetica-Bold', fontSize=7.5,
-                                 leading=10, wordWrap='CJK', textColor=NAVY)
+                                 leading=10, wordWrap='LTR', spaceAfter=0)
 
     def P(text, style=None):
         return Paragraph(str(text), style or cell_style)
@@ -704,7 +695,6 @@ def predict_pdf(
     story.append(table)
     story.append(Spacer(1, 0.4*cm))
 
-    # 100-row limit note
     if total_found > PDF_LIMIT:
         story.append(Paragraph(
             f"<b>Note:</b> Only the top {PDF_LIMIT} colleges are shown in this PDF. "
@@ -721,10 +711,10 @@ def predict_pdf(
         ParagraphStyle('disc', fontSize=8, textColor=colors.grey, alignment=TA_LEFT)
     ))
 
-    # Services last page — PageBreak added here so no blank page appears
+    # Services last page — landscape A4: 29.7cm - 1cm - 1cm = 27.7cm usable
     from reportlab.platypus import PageBreak
     story.append(PageBreak())
-    story.extend(add_services_page())
+    story.extend(add_services_page(usable_width=27.7*cm))
 
     doc.build(story, onFirstPage=add_pdf_header_footer, onLaterPages=add_pdf_header_footer)
     buf.seek(0)
@@ -775,10 +765,12 @@ def documents_pdf(category: str = Query("Open")):
     ))
     story.append(Spacer(1, 0.2*cm))
 
-    # Table with plain strings — TableStyle colors work correctly
+    # Table — use Paragraph for long text cells so they wrap properly
+    doc_cell = ParagraphStyle('dc', fontName='Helvetica', fontSize=11,
+                               textColor=NAVY, leading=15, wordWrap='LTR')
     data = [["Sr. No", "Document Required"]]
     for i, d in enumerate(docs, 1):
-        data.append([str(i), d])
+        data.append([str(i), Paragraph(d, doc_cell)])
 
     table = Table(data, colWidths=[2*cm, 14*cm])
     table.setStyle(TableStyle([
@@ -799,10 +791,6 @@ def documents_pdf(category: str = Query("Open")):
         ('FONTNAME',      (0,1), (0,-1),  'Helvetica-Bold'),
         ('FONTSIZE',      (0,1), (0,-1),  12),
         ('ALIGN',         (0,1), (0,-1),  'CENTER'),
-        # Body text
-        ('TEXTCOLOR',     (1,1), (1,-1),  NAVY),
-        ('FONTNAME',      (1,1), (1,-1),  'Helvetica'),
-        ('FONTSIZE',      (1,1), (1,-1),  11),
         # Alternating rows
         ('ROWBACKGROUNDS',(0,1), (-1,-1), [colors.white, colors.HexColor("#EEF2FF")]),
         ('GRID',          (0,0), (-1,-1), 0.4, colors.HexColor("#D0D8E8")),
@@ -818,12 +806,15 @@ def documents_pdf(category: str = Query("Open")):
         ParagraphStyle('NH', fontName='Helvetica-Bold', fontSize=14,
                        textColor=colors.HexColor("#92400E"), spaceAfter=10)))
 
-    notes_table = Table([[f"• {n}"] for n in DOCUMENT_NOTES], colWidths=[15.5*cm])
+    notes_table = Table(
+        [[Paragraph(f"• {n}", ParagraphStyle('ni', fontName='Helvetica', fontSize=11,
+                                              textColor=colors.HexColor("#78350F"),
+                                              leading=16, wordWrap='LTR'))]
+         for n in DOCUMENT_NOTES],
+        colWidths=[15.5*cm]
+    )
     notes_table.setStyle(TableStyle([
         ('BACKGROUND',    (0,0), (-1,-1), colors.HexColor("#FEF3C7")),
-        ('TEXTCOLOR',     (0,0), (-1,-1), colors.HexColor("#78350F")),
-        ('FONTSIZE',      (0,0), (-1,-1), 11),
-        ('FONTNAME',      (0,0), (-1,-1), 'Helvetica'),
         ('LEFTPADDING',   (0,0), (-1,-1), 16),
         ('RIGHTPADDING',  (0,0), (-1,-1), 16),
         ('TOPPADDING',    (0,0), (-1,-1), 10),
@@ -832,10 +823,10 @@ def documents_pdf(category: str = Query("Open")):
     ]))
     story.append(notes_table)
 
-    # Services last page
+    # Services last page — portrait A4: 21cm - 1.5cm - 1.5cm = 18cm usable
     from reportlab.platypus import PageBreak
     story.append(PageBreak())
-    story.extend(add_services_page())
+    story.extend(add_services_page(usable_width=18*cm))
 
     doc.build(story, onFirstPage=add_pdf_header_footer, onLaterPages=add_pdf_header_footer)
     buf.seek(0)
