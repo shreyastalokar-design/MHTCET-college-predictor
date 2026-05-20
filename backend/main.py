@@ -28,6 +28,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
+
 # ── Brand constants ───────────────────────────────────────────────────────────
 BRAND_NAME = "Concept Delta"
 BRAND_TAGLINE = "SMART GUIDANCE · BETTER FUTURES"
