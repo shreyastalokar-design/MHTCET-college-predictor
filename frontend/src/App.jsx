@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -120,35 +118,35 @@ const UNI_OPTS = [
 const CAP_ROUNDS = ["CAP Round 1","CAP Round 2","CAP Round 3","CAP Round 4"];
 const DOC_CATS   = ["Open","OBC","SC","ST","EWS","MINORITY","PWD","DEFENCE","ORPHAN","TFWS"];
 const DOC_LABELS = {
-  Open:    "Open (General)",
-  OBC:     "OBC / SBC / VJ / NT",
-  SC:      "SC – Scheduled Caste",
-  ST:      "ST – Scheduled Tribe",
-  EWS:     "EWS – Eco. Weaker Section",
-  MINORITY:"Minority",
-  PWD:     "PWD – Person with Disability",
-  DEFENCE: "Defence Personnel",
-  ORPHAN:  "Orphan Category",
-  TFWS:    "TFWS – Tuition Fee Waiver",
+  Open:     "Open (General)",
+  OBC:      "OBC / SBC / VJ / NT",
+  SC:       "SC – Scheduled Caste",
+  ST:       "ST – Scheduled Tribe",
+  EWS:      "EWS – Eco. Weaker Section",
+  MINORITY: "Minority",
+  PWD:      "PWD – Person with Disability",
+  DEFENCE:  "Defence Personnel",
+  ORPHAN:   "Orphan Category",
+  TFWS:     "TFWS – Tuition Fee Waiver",
 };
 
 const SIDEBAR_SERVICES = [
   // FREE
-  { id:"predictor",  label:"Category-wise College Predictor", icon:"🎯", free:true,  panel:"predictor" },
-  { id:"call",       label:"Call Support",                    icon:"📞", free:true,  panel:"contact" },
-  { id:"documents",  label:"Document Support",                icon:"📄", free:true,  panel:"documents" },
+  { id:"predictor",  label:"Category-wise College Predictor",    icon:"🎯", free:true,  panel:"predictor" },
+  { id:"call",       label:"Call Support",                        icon:"📞", free:true,  panel:"contact" },
+  { id:"documents",  label:"Document Support",                    icon:"📄", free:true,  panel:"documents" },
   // PAID
-  { id:"option-form",label:"Personalized Option Form",        icon:"✏️", free:false, panel:"paid" },
-  { id:"branch",     label:"Branch & College Guidance",       icon:"🎓", free:false, panel:"paid" },
-  { id:"filling",    label:"Option Form Filling",             icon:"📝", free:false, panel:"paid" },
-  { id:"counselling",label:"Complete Counselling",            icon:"🤝", free:false, panel:"paid" },
-  { id:"mentorship", label:"Live Mentorship",                 icon:"⭐", free:false, panel:"paid" },
-  { id:"chat24",     label:"24×7 Chat Support",               icon:"💬", free:false, panel:"paid" },
-  { id:"mentor",     label:"Personal Mentor",                 icon:"👨‍🏫", free:false, panel:"paid" },
-  { id:"admission",  label:"Admission Assistance",            icon:"🏛️", free:false, panel:"paid" },
-  { id:"cap-round",  label:"CAP Round Support",               icon:"🔄", free:false, panel:"paid" },
-  { id:"ils",        label:"ILS / Spot Round Guidance",       icon:"🔦", free:false, panel:"paid" },
-  { id:"lecture",    label:"Special Guest Lecture on Each Branch", icon:"🎤", free:false, panel:"paid" },
+  { id:"option-form",label:"Personalized Option Form",            icon:"✏️", free:false, panel:"paid" },
+  { id:"branch",     label:"Branch & College Guidance",           icon:"🎓", free:false, panel:"paid" },
+  { id:"filling",    label:"Option Form Filling",                 icon:"📝", free:false, panel:"paid" },
+  { id:"counselling",label:"Complete Counselling",                icon:"🤝", free:false, panel:"paid" },
+  { id:"mentorship", label:"Live Mentorship",                     icon:"⭐", free:false, panel:"paid" },
+  { id:"chat24",     label:"24×7 Chat Support",                   icon:"💬", free:false, panel:"paid" },
+  { id:"mentor",     label:"Personal Mentor",                     icon:"👨‍🏫",free:false, panel:"paid" },
+  { id:"admission",  label:"Admission Assistance",                icon:"🏛️", free:false, panel:"paid" },
+  { id:"cap-round",  label:"CAP Round Support",                   icon:"🔄", free:false, panel:"paid" },
+  { id:"ils",        label:"ILS / Spot Round Guidance",           icon:"🔦", free:false, panel:"paid" },
+  { id:"lecture",    label:"Special Guest Lecture on Each Branch",icon:"🎤", free:false, panel:"paid" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -516,276 +514,7 @@ function PredictorPanel() {
     } finally { setLoading(false); }
   };
 
-  const downloadPDF = () => {
-    if (!results?.colleges?.length) return;
-
-    const NAVY  = [30,  58,  95];   // #1E3A5F
-    const GOLD  = [212, 175, 55];   // #D4AF37
-    const WHITE = [255, 255, 255];
-    const LIGHT = [248, 250, 252];  // alternating row bg
-
-    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-    const PAGE_W = 297;
-    const PAGE_H = 210;
-
-    // ── Header / Footer on every page ──────────────────────────────────────
-    const addHeaderFooter = (data) => {
-      const pg   = data.pageNumber;
-      const pgCount = doc.internal.getNumberOfPages();
-
-      // Top bar
-      doc.setFillColor(...NAVY);
-      doc.rect(0, 0, PAGE_W, 14, "F");
-      doc.setTextColor(...GOLD);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text("Concept Delta", 10, 9.5);
-      doc.setFontSize(7.5);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(200, 215, 235);
-      doc.text("SMART GUIDANCE · BETTER FUTURES  |  An initiative by COEP alumni", 52, 9.5);
-      doc.setTextColor(...GOLD);
-      doc.text(`Page ${pg} of ${pgCount}`, PAGE_W - 10, 9.5, { align: "right" });
-
-      // Gold accent line
-      doc.setDrawColor(...GOLD);
-      doc.setLineWidth(0.5);
-      doc.line(0, 14, PAGE_W, 14);
-
-      // Bottom bar
-      doc.setFillColor(...NAVY);
-      doc.rect(0, PAGE_H - 10, PAGE_W, 10, "F");
-      doc.setFontSize(7);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(180, 200, 220);
-      doc.text(
-        "⚠ Indicative results based on previous CAP Round cutoffs. Verify with DTE Maharashtra official website before final decisions.",
-        PAGE_W / 2, PAGE_H - 4, { align: "center" }
-      );
-    };
-
-    // ── Title section ───────────────────────────────────────────────────────
-    doc.setFillColor(...NAVY);
-    doc.rect(0, 0, PAGE_W, 14, "F");
-
-    doc.setFontSize(15);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...WHITE);
-    doc.text("MHT-CET College Predictor Results", PAGE_W / 2, 36, { align: "center" });
-
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139);
-    const meta = `Category: ${results.category_codes?.join(", ")}  ·  ${results.cap_round}  ·  Percentile: ${results.percentile}  ·  Total: ${results.total_results} colleges`;
-    doc.text(meta, PAGE_W / 2, 43, { align: "center" });
-
-    // Gold divider
-    doc.setDrawColor(...GOLD);
-    doc.setLineWidth(0.8);
-    doc.line(10, 47, PAGE_W - 10, 47);
-
-    // Summary pills
-    const pills = [
-      { label: "Safe",     count: results.safe_count,     bg: [220,252,231], text: [22,101,52]  },
-      { label: "Moderate", count: results.moderate_count, bg: [254,249,195], text: [133,77,14]  },
-      { label: "Reach",    count: results.reach_count,    bg: [254,226,226], text: [153,27,27]  },
-    ];
-    let px = 10;
-    pills.forEach(p => {
-      doc.setFillColor(...p.bg);
-      doc.roundedRect(px, 50, 38, 8, 2, 2, "F");
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...p.text);
-      doc.text(`${p.label}: ${p.count}`, px + 19, 55.2, { align: "center" });
-      px += 42;
-    });
-
-    // Generated date
-    doc.setFontSize(7.5);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(148, 163, 184);
-    doc.text(`Generated: ${new Date().toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })}`, PAGE_W - 10, 55, { align: "right" });
-
-    // ── Table ───────────────────────────────────────────────────────────────
-    const colleges = results.colleges.slice(0, 100);
-    const isLimited = results.colleges.length > 100;
-
-    autoTable(doc, {
-      startY: 62,
-      head: [["#", "Code", "College Name", "Branch", "District", "Type", "Cutoff %ile", "Rank", "Chance"]],
-      body: colleges.map((c, i) => [
-        i + 1,
-        c.institution_code ?? "N/A",
-        c.college_name,
-        c.branch,
-        c.district,
-        c.status,
-        c.percentile != null ? Number(c.percentile).toFixed(2) : "N/A",
-        c.cutoff_rank != null ? Number(c.cutoff_rank).toLocaleString("en-IN") : "N/A",
-        c.admission_chance,
-      ]),
-      columnStyles: {
-        0: { cellWidth: 8,  halign: "center" },
-        1: { cellWidth: 14, halign: "center" },
-        2: { cellWidth: 68 },
-        3: { cellWidth: 52 },
-        4: { cellWidth: 26 },
-        5: { cellWidth: 28, halign: "center" },
-        6: { cellWidth: 20, halign: "center" },
-        7: { cellWidth: 20, halign: "center" },
-        8: { cellWidth: 22, halign: "center" },
-      },
-      headStyles: {
-        fillColor: NAVY,
-        textColor: GOLD,
-        fontStyle: "bold",
-        fontSize: 8.5,
-        cellPadding: { top: 5, bottom: 5, left: 4, right: 4 },
-      },
-      bodyStyles: {
-        fontSize: 7.5,
-        textColor: [30, 58, 95],
-        cellPadding: { top: 4, bottom: 4, left: 4, right: 4 },
-      },
-      alternateRowStyles: { fillColor: LIGHT },
-      didParseCell: (hookData) => {
-        if (hookData.column.index === 8 && hookData.section === "body") {
-          const v = hookData.cell.raw;
-          if (v === "Safe")     { hookData.cell.styles.fillColor = [220,252,231]; hookData.cell.styles.textColor = [22,101,52];   hookData.cell.styles.fontStyle = "bold"; }
-          if (v === "Moderate") { hookData.cell.styles.fillColor = [254,249,195]; hookData.cell.styles.textColor = [133,77,14];   hookData.cell.styles.fontStyle = "bold"; }
-          if (v === "Reach")    { hookData.cell.styles.fillColor = [254,226,226]; hookData.cell.styles.textColor = [153,27,27];   hookData.cell.styles.fontStyle = "bold"; }
-        }
-      },
-      didDrawPage: addHeaderFooter,
-      margin: { top: 18, bottom: 12, left: 10, right: 10 },
-    });
-
-    // ── 100-row note ────────────────────────────────────────────────────────
-    if (isLimited) {
-      const noteY = doc.lastAutoTable.finalY + 8;
-      doc.setFillColor(254, 243, 199);
-      doc.roundedRect(10, noteY, PAGE_W - 20, 10, 2, 2, "F");
-      doc.setFontSize(7.5);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(133, 77, 14);
-      doc.text(
-        `Note: Only top 100 colleges shown in PDF. Full list of ${results.colleges.length} colleges available on the website.`,
-        PAGE_W / 2, noteY + 6.5, { align: "center" }
-      );
-    }
-
-    // ── Disclaimer ──────────────────────────────────────────────────────────
-    const discY = (isLimited ? doc.lastAutoTable.finalY + 22 : doc.lastAutoTable.finalY + 8);
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(150, 150, 150);
-    doc.text(
-      "Disclaimer: Results are indicative based on previous CAP Round cutoffs. Verify with DTE Maharashtra official website.",
-      10, Math.min(discY, PAGE_H - 15)
-    );
-
-    // ── Services last page ──────────────────────────────────────────────────
-    doc.addPage();
-    addHeaderFooter({ pageNumber: doc.internal.getNumberOfPages() });
-
-    const WEBSITE = "https://conceptdelta.in";
-    const sp = 30;
-
-    doc.setFillColor(...NAVY);
-    doc.rect(0, 0, PAGE_W, 14, "F");
-
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...NAVY);
-    doc.text("Our Services", PAGE_W / 2, sp, { align: "center" });
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139);
-    doc.text("Everything you need for a successful MHT-CET admission", PAGE_W / 2, sp + 7, { align: "center" });
-
-    doc.setDrawColor(...GOLD);
-    doc.setLineWidth(0.8);
-    doc.line(10, sp + 12, PAGE_W - 10, sp + 12);
-
-    const freeSvcs = [
-      "🎯  Category-wise College Predictor",
-      "📞  Call Support",
-      "📄  Document Checklist & Guidance",
-    ];
-    const premSvcs = [
-      "✏️  Personalized Option Form",
-      "🎓  Branch & College Guidance",
-      "📝  Option Form Filling",
-      "🤝  Complete Counselling",
-      "⭐  Live Mentorship",
-      "💬  24×7 Chat Support",
-      "👨‍🏫  Personal Mentor",
-      "🏛️  Admission Assistance",
-      "🔄  CAP Round Support",
-      "🔦  ILS / Spot Round Guidance",
-      "🎤  Special Guest Lecture on Each Branch",
-    ];
-
-    const colW = (PAGE_W - 30) / 2;
-    let ly = sp + 20;
-
-    // Free header
-    doc.setFillColor(22, 163, 74);
-    doc.roundedRect(10, ly, colW, 8, 2, 2, "F");
-    doc.setFontSize(8.5);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(255, 255, 255);
-    doc.text("FREE SERVICES", 10 + colW / 2, ly + 5.5, { align: "center" });
-
-    // Premium header
-    doc.setFillColor(...NAVY);
-    doc.roundedRect(20 + colW, ly, colW, 8, 2, 2, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.text("PREMIUM SERVICES", 20 + colW + colW / 2, ly + 5.5, { align: "center" });
-
-    ly += 12;
-
-    // Free body
-    doc.setFillColor(240, 253, 244);
-    doc.rect(10, ly, colW, freeSvcs.length * 9 + 4, "F");
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(22, 101, 52);
-    freeSvcs.forEach((s, i) => doc.text(s, 14, ly + 7 + i * 9));
-
-    // Premium body
-    doc.setFillColor(239, 246, 255);
-    doc.rect(20 + colW, ly, colW, premSvcs.length * 9 + 4, "F");
-    doc.setTextColor(...NAVY);
-    premSvcs.forEach((s, i) => doc.text(s, 24 + colW, ly + 7 + i * 9));
-
-    ly += Math.max(freeSvcs.length, premSvcs.length) * 9 + 12;
-
-    // CTA box
-    doc.setFillColor(...NAVY);
-    doc.roundedRect(10, ly, PAGE_W - 20, 22, 3, 3, "F");
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...GOLD);
-    doc.text("Book a FREE Counselling Session", PAGE_W / 2, ly + 8, { align: "center" });
-    doc.setFontSize(8.5);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(255, 255, 255);
-    doc.text(`Call / WhatsApp: +91 89837 98203`, PAGE_W / 2, ly + 15, { align: "center" });
-
-    ly += 28;
-
-    // Website link
-    doc.setFontSize(9);
-    doc.setTextColor(...NAVY);
-    doc.text("Check out our website: ", PAGE_W / 2 - 20, ly, { align: "right" });
-    doc.setTextColor(37, 99, 235);
-    doc.textWithLink(WEBSITE, PAGE_W / 2 - 18, ly, { url: WEBSITE });
-
-    const fname = `ConceptDelta_Colleges_${results.percentile}_${results.cap_round.replace(/ /g,"")}.pdf`;
-    doc.save(fname);
-  };
+  const downloadPDF = () => window.open(`${API_BASE}/predict-pdf?${buildParams()}`, "_blank");
 
   const filtered = results?.colleges?.filter(c => {
     const matchTab = activeTab==="All" || c.admission_chance===activeTab;
