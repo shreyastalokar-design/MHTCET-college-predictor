@@ -38,6 +38,9 @@ SOCIAL_LINKS = {
     "telegram": "https://t.me/Conceptdelta",
     "instagram": "https://www.instagram.com/conceptdelta2031",
 }
+WEBSITE_URL      = "https://conceptdelta.in"
+GOOGLE_FORM_URL  = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform"
+WHATSAPP_URL     = f"https://wa.me/{CONTACT_PHONE.replace('+','').replace(' ','')}"
 NAVY = colors.HexColor("#1E3A5F")
 BLUE = colors.HexColor("#2C5282")
 GOLD = colors.HexColor("#D4AF37")
@@ -49,7 +52,7 @@ CSV_PATH = os.environ.get("CSV_PATH", os.path.join(BASE_DIR, "../data/mhtcet_com
 CAT_FORMS_PATH = os.environ.get("CAT_FORMS_PATH", os.path.join(BASE_DIR, "../data/category_full_forms.csv"))
 
 df = pd.read_csv(CSV_PATH, dtype={'Institution Code': str})
-df['Institution Code'] = df['Institution Code'].astype(str).str.strip().str.zfill(5)
+df['Institution Code'] = df['Institution Code'].astype(str).str.strip().str.split('.').str[0]
 df['Category'] = df['Category'].astype(str).str.strip()
 df['Percentile'] = pd.to_numeric(df['Percentile'], errors='coerce')
 df['Cutoff Rank'] = pd.to_numeric(df['Cutoff Rank'], errors='coerce')
@@ -62,7 +65,7 @@ CATEGORY_FULL_FORMS = dict(zip(cat_forms_df['Code'].astype(str).str.strip(),
                                 cat_forms_df['Full Form'].astype(str).str.strip()))
 print(f"✅ Loaded {len(CATEGORY_FULL_FORMS)} category mappings")
 
-# ── Documents data (verified from DTE Maharashtra guidelines) ─────────────────
+# ── Documents data ────────────────────────────────────────────────────────────
 _COMMON = [
     "MHT CET Application Form",
     "MHT CET Admit Card",
@@ -73,56 +76,46 @@ _COMMON = [
     "Certificate of Indian Nationality OR Nationality mentioned on 12th Leaving Certificate OR Birth Certificate issued in India",
     "Domicile Certificate of Maharashtra (Student / Father / Mother)",
     "Passport-sized photographs",
-    "Photo Identity Proof – Aadhaar Card",
+    "Photo Identity Proof - Aadhaar Card",
     "JEE Score Card (if appeared)",
 ]
-
 DOCUMENTS_DATA = {
-    "Open": _COMMON + [],
-
-    "OBC": _COMMON + [
+    "Open":     _COMMON + [],
+    "OBC":      _COMMON + [
         "Caste Certificate (OBC / SBC / VJ / NT) issued by Maharashtra",
         "Caste Validity Certificate issued by Maharashtra",
         "Valid Non-Creamy Layer (NCL) Certificate",
         "Income Certificate",
     ],
-
-    "SC": _COMMON + [
+    "SC":       _COMMON + [
         "Caste Certificate (SC) issued by competent authority in Maharashtra",
         "Caste Validity Certificate issued by competent authority in Maharashtra",
     ],
-
-    "ST": _COMMON + [
+    "ST":       _COMMON + [
         "Caste Certificate (ST) issued by competent authority in Maharashtra",
         "Caste Validity Certificate issued by competent authority in Maharashtra",
     ],
-
-    "EWS": _COMMON + [
+    "EWS":      _COMMON + [
         "Valid EWS Certificate issued by competent authority in Maharashtra",
-        "Income Certificate showing family income below \u20b98 lakhs",
+        "Income Certificate showing family income below Rs.8 lakhs",
     ],
-
     "MINORITY": _COMMON + [
         "Self Declaration (Proforma O) / Samaj Letter",
         "Linguistic Minority Certificate",
         "Domicile Certificate of any one amongst Student / Father / Mother",
     ],
-
-    "PWD": _COMMON + [
+    "PWD":      _COMMON + [
         "Physically Handicapped Certificate / PWD Certificate from relevant authority",
     ],
-
-    "DEFENCE": _COMMON + [
+    "DEFENCE":  _COMMON + [
         "Defence Service Certificate (Proforma C) from Zilla Sainik Board",
         "For DEF-1 & DEF-2: Domicile Certificate of father/mother who is/was in Defence Service",
     ],
-
-    "ORPHAN": _COMMON + [
+    "ORPHAN":   _COMMON + [
         "Orphan Certificate from Regional Deputy Commissioner, Women & Child Development",
     ],
-
-    "TFWS": _COMMON + [
-        "Family Income Certificate for Tuition Fee Waiver Scheme (annual income below \u20b98 lakhs)",
+    "TFWS":     _COMMON + [
+        "Family Income Certificate for Tuition Fee Waiver Scheme (annual income below Rs.8 lakhs)",
     ],
 }
 
@@ -268,12 +261,9 @@ def predict(
         'Institution Code', 'College Name', 'University', 'Status',
         'District', 'Region', 'Branch', 'CAP Round', 'Category',
         'Cutoff Rank', 'Percentile', 'Total Fee', 'Admission Chance'
-    ]].copy()
+    ]].fillna('N/A')
 
-    # Keep institution_code as string to preserve leading zeros
-    results['Institution Code'] = results['Institution Code'].astype(str)
-
-    colleges = results.fillna('N/A').rename(columns={
+    colleges = results.rename(columns={
         'Institution Code': 'institution_code',
         'College Name': 'college_name',
         'University': 'university',
@@ -303,131 +293,123 @@ def predict(
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# SERVICES LAST PAGE HELPER
+# SERVICES PAGE HELPER  (call site: story.append(PageBreak()); story.extend(add_services_page()))
 # ════════════════════════════════════════════════════════════════════════════
 
-WEBSITE_URL = "https://conceptdelta.in"  # Update once domain is confirmed
-
-FREE_SERVICES = [
-    ("🎯", "Category-wise College Predictor"),
-    ("📞", "Call Support"),
-    ("📄", "Document Checklist & Guidance"),
+_FREE_SVCS = [
+    "Detailed Category-wise College Predictor",
+    "Call Support",
+    "Document Checklist & Guidance",
 ]
-
-PREMIUM_SERVICES = [
-    ("✏️", "Personalized Option Form"),
-    ("🎓", "Branch & College Guidance"),
-    ("📝", "Option Form Filling"),
-    ("🤝", "Complete Counselling"),
-    ("⭐", "Live Mentorship"),
-    ("💬", "24×7 Chat Support"),
-    ("👨‍🏫", "Personal Mentor"),
-    ("🏛️", "Admission Assistance"),
-    ("🔄", "CAP Round Support"),
-    ("🔦", "ILS / Spot Round Guidance"),
-    ("🎤", "Special Guest Lecture on Each Branch"),
+_PREM_SVCS = [
+    "Personalized Option Form",
+    "Branch & College Guidance",
+    "Option Form Filling",
+    "Complete Counselling",
+    "Live Mentorship",
+    "24x7 Chat Support",
+    "Personal Mentor",
+    "Admission Assistance",
+    "CAP Round Support",
+    "ILS / Spot Round Guidance",
+    "Special Guest Lecture on Each Branch",
 ]
 
 def add_services_page():
-    """Returns a KeepTogether block with the services + contact last page."""
-    from reportlab.platypus import KeepTogether, PageBreak
-    from reportlab.lib.enums import TA_CENTER
+    """Returns a list of flowables for the services last page.
+    Caller must prepend a PageBreak() before extending story with this list.
+    """
+    from reportlab.platypus import PageBreak
 
-    styles = getSampleStyleSheet()
+    item_free = ParagraphStyle('IF', fontName='Helvetica', fontSize=10,
+                               textColor=colors.HexColor("#166534"), leading=18,
+                               leftIndent=6)
+    item_prem = ParagraphStyle('IP', fontName='Helvetica', fontSize=10,
+                               textColor=NAVY, leading=18, leftIndent=6)
+    head_free = ParagraphStyle('HF', fontName='Helvetica-Bold', fontSize=11,
+                               textColor=colors.white, alignment=TA_CENTER,
+                               backColor=colors.HexColor("#16A34A"),
+                               borderPadding=(6, 0, 6, 0))
+    head_prem = ParagraphStyle('HP', fontName='Helvetica-Bold', fontSize=11,
+                               textColor=GOLD, alignment=TA_CENTER,
+                               backColor=NAVY,
+                               borderPadding=(6, 0, 6, 0))
 
-    heading_style = ParagraphStyle('SH', fontName='Helvetica-Bold', fontSize=16,
-                                    textColor=NAVY, alignment=TA_CENTER, spaceAfter=4)
-    sub_style     = ParagraphStyle('SS', fontName='Helvetica', fontSize=10,
-                                    textColor=colors.grey, alignment=TA_CENTER, spaceAfter=0)
-    cat_style     = ParagraphStyle('SC', fontName='Helvetica-Bold', fontSize=11,
-                                    textColor=GOLD, alignment=TA_LEFT, spaceAfter=6,
-                                    backColor=NAVY, borderPadding=(6, 10, 6, 10))
-    item_style    = ParagraphStyle('SI', fontName='Helvetica', fontSize=9.5,
-                                    textColor=NAVY, leading=16)
-    web_style     = ParagraphStyle('WB', fontName='Helvetica-Bold', fontSize=10,
-                                    textColor=NAVY, alignment=TA_CENTER, spaceAfter=0)
+    free_cell = [Paragraph("FREE SERVICES", head_free), Spacer(1, 0.2*cm)] + \
+                [Paragraph(f"  •  {s}", item_free) for s in _FREE_SVCS]
+    prem_cell = [Paragraph("PREMIUM SERVICES", head_prem), Spacer(1, 0.2*cm)] + \
+                [Paragraph(f"  •  {s}", item_prem) for s in _PREM_SVCS]
 
-    story_pg = [PageBreak()]
-
-    story_pg.append(Spacer(1, 0.5*cm))
-    story_pg.append(Paragraph("Our Services", heading_style))
-    story_pg.append(Paragraph("Everything you need for a successful MHT-CET admission", sub_style))
-    story_pg.append(Spacer(1, 0.3*cm))
-    story_pg.append(HRFlowable(width="100%", thickness=1.5, color=GOLD, spaceAfter=14))
-
-    # Two-column table: Free | Premium
-    free_items  = "\n".join(f"  ✅  {icon}  {lbl}" for icon, lbl in FREE_SERVICES)
-    prem_items  = "\n".join(f"  ⭐  {icon}  {lbl}" for icon, lbl in PREMIUM_SERVICES)
-
-    free_cell  = [
-        Paragraph("<b>FREE SERVICES</b>", ParagraphStyle('FH', fontName='Helvetica-Bold',
-                   fontSize=10, textColor=colors.white, alignment=TA_CENTER,
-                   backColor=colors.HexColor("#16A34A"), borderPadding=(5,8,5,8))),
-        Spacer(1, 0.2*cm),
-    ] + [
-        Paragraph(f"✅  {icon}  {lbl}", ParagraphStyle('FI', fontName='Helvetica', fontSize=9,
-                   textColor=colors.HexColor("#166534"), leading=18))
-        for icon, lbl in FREE_SERVICES
-    ]
-    prem_cell  = [
-        Paragraph("<b>PREMIUM SERVICES</b>", ParagraphStyle('PH', fontName='Helvetica-Bold',
-                   fontSize=10, textColor=colors.white, alignment=TA_CENTER,
-                   backColor=NAVY, borderPadding=(5,8,5,8))),
-        Spacer(1, 0.2*cm),
-    ] + [
-        Paragraph(f"⭐  {icon}  {lbl}", ParagraphStyle('PI', fontName='Helvetica', fontSize=9,
-                   textColor=NAVY, leading=18))
-        for icon, lbl in PREMIUM_SERVICES
-    ]
-
-    svc_table = Table(
-        [[free_cell, prem_cell]],
-        colWidths=None,
-    )
+    svc_table = Table([[free_cell, prem_cell]],
+                      colWidths=[11*cm, 14.5*cm])
     svc_table.setStyle(TableStyle([
-        ('VALIGN',      (0,0), (-1,-1), 'TOP'),
-        ('BACKGROUND',  (0,0), (0,0),  colors.HexColor("#F0FDF4")),
-        ('BACKGROUND',  (1,0), (1,0),  colors.HexColor("#EFF6FF")),
-        ('BOX',         (0,0), (0,0),  0.5, colors.HexColor("#16A34A")),
-        ('BOX',         (1,0), (1,0),  0.5, NAVY),
-        ('LEFTPADDING', (0,0), (-1,-1), 12),
-        ('RIGHTPADDING',(0,0), (-1,-1), 12),
-        ('TOPPADDING',  (0,0), (-1,-1), 8),
-        ('BOTTOMPADDING',(0,0),(-1,-1), 12),
-    ]))
-    story_pg.append(svc_table)
-    story_pg.append(Spacer(1, 0.5*cm))
-
-    # Book session + contact box
-    cta_data = [[
-        Paragraph(
-            f'<b>Book a FREE Counselling Session</b><br/>'
-            f'Call / WhatsApp: <font color="#D4AF37"><b>{CONTACT_PHONE}</b></font><br/>'
-            f'<font color="#25D366">WhatsApp us anytime!</font>',
-            ParagraphStyle('CTA', fontName='Helvetica', fontSize=10, textColor=colors.white,
-                           backColor=NAVY, alignment=TA_CENTER, leading=16, borderPadding=10)
-        )
-    ]]
-    cta_table = Table(cta_data, colWidths=["100%"])
-    cta_table.setStyle(TableStyle([
-        ('BACKGROUND',   (0,0), (-1,-1), NAVY),
-        ('ROUNDEDCORNERS', [8]),
-        ('LEFTPADDING',  (0,0), (-1,-1), 20),
-        ('RIGHTPADDING', (0,0), (-1,-1), 20),
-        ('TOPPADDING',   (0,0), (-1,-1), 14),
+        ('VALIGN',       (0,0), (-1,-1), 'TOP'),
+        ('BACKGROUND',   (0,0), (0,0),   colors.HexColor("#F0FDF4")),
+        ('BACKGROUND',   (1,0), (1,0),   colors.HexColor("#EFF6FF")),
+        ('BOX',          (0,0), (0,0),   0.8, colors.HexColor("#16A34A")),
+        ('BOX',          (1,0), (1,0),   0.8, NAVY),
+        ('LEFTPADDING',  (0,0), (-1,-1), 10),
+        ('RIGHTPADDING', (0,0), (-1,-1), 10),
+        ('TOPPADDING',   (0,0), (-1,-1), 8),
         ('BOTTOMPADDING',(0,0), (-1,-1), 14),
     ]))
-    story_pg.append(cta_table)
-    story_pg.append(Spacer(1, 0.4*cm))
 
-    # Website link
-    story_pg.append(Paragraph(
-        f'Check out our website: <a href="{WEBSITE_URL}" color="#2C5282"><u>{WEBSITE_URL}</u></a>',
-        ParagraphStyle('WL', fontName='Helvetica', fontSize=10,
-                       textColor=NAVY, alignment=TA_CENTER)
-    ))
+    # CTA box — Book a Free Session (hyperlink) + WhatsApp (hyperlink)
+    cta_style = ParagraphStyle('CTA', fontName='Helvetica-Bold', fontSize=13,
+                               textColor=GOLD, alignment=TA_CENTER, leading=22,
+                               backColor=NAVY, borderPadding=(12, 0, 4, 0))
+    cta_sub   = ParagraphStyle('CTASUB', fontName='Helvetica', fontSize=11,
+                               textColor=colors.white, alignment=TA_CENTER,
+                               leading=20, backColor=NAVY, borderPadding=(0, 0, 12, 0))
 
-    return KeepTogether(story_pg)
+    cta_text  = (f'<a href="{GOOGLE_FORM_URL}" color="#D4AF37">'
+                 f'Book a FREE Counselling Session</a>')
+    wa_text   = (f'Call / WhatsApp: '
+                 f'<a href="{WHATSAPP_URL}" color="#25D366">'
+                 f'<b>{CONTACT_PHONE}</b></a>'
+                 f'   |   '
+                 f'<a href="{WHATSAPP_URL}" color="#25D366">WhatsApp us anytime!</a>')
+
+    cta_table = Table(
+        [[Paragraph(cta_text, cta_style)],
+         [Paragraph(wa_text,  cta_sub)]],
+        colWidths=["100%"]
+    )
+    cta_table.setStyle(TableStyle([
+        ('BACKGROUND',    (0,0), (-1,-1), NAVY),
+        ('LEFTPADDING',   (0,0), (-1,-1), 20),
+        ('RIGHTPADDING',  (0,0), (-1,-1), 20),
+        ('TOPPADDING',    (0,0), (0,0),   14),
+        ('BOTTOMPADDING', (0,0), (0,0),   4),
+        ('TOPPADDING',    (0,1), (0,1),   4),
+        ('BOTTOMPADDING', (0,1), (0,1),   14),
+    ]))
+
+    # Website link — bigger font, only on this last page
+    web_style = ParagraphStyle('WL', fontName='Helvetica-Bold', fontSize=13,
+                               textColor=NAVY, alignment=TA_CENTER, spaceAfter=0)
+    web_para  = Paragraph(
+        f'Check out our website: '
+        f'<a href="{WEBSITE_URL}" color="#2C5282"><u>{WEBSITE_URL}</u></a>',
+        web_style
+    )
+
+    return [
+        Spacer(1, 0.4*cm),
+        Paragraph("Our Services",
+                  ParagraphStyle('SH', fontName='Helvetica-Bold', fontSize=18,
+                                 textColor=NAVY, alignment=TA_CENTER, spaceAfter=4)),
+        Paragraph("Everything you need for a successful MHT-CET admission",
+                  ParagraphStyle('SS', fontName='Helvetica', fontSize=10,
+                                 textColor=colors.grey, alignment=TA_CENTER, spaceAfter=0)),
+        Spacer(1, 0.2*cm),
+        HRFlowable(width="100%", thickness=1.5, color=GOLD, spaceAfter=12),
+        svc_table,
+        Spacer(1, 0.5*cm),
+        cta_table,
+        Spacer(1, 0.5*cm),
+        web_para,
+    ]
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -657,37 +639,28 @@ def predict_pdf(
         story.append(Spacer(1, 0.25*cm))
 
     # ── Limit to 100 rows ─────────────────────────────────────────────────────
-    PDF_LIMIT = 100
+    PDF_LIMIT   = 100
     total_found = len(filtered)
-    filtered = filtered.head(PDF_LIMIT)
+    filtered    = filtered.head(PDF_LIMIT)
 
     # ── Table ─────────────────────────────────────────────────────────────────
-    # Cell styles for wrapping
     cell_style = ParagraphStyle('cell', fontName='Helvetica', fontSize=7.5,
                                  leading=10, wordWrap='CJK', spaceAfter=0)
     cell_bold  = ParagraphStyle('cellb', fontName='Helvetica-Bold', fontSize=7.5,
                                  leading=10, wordWrap='CJK', textColor=NAVY)
 
     def P(text, style=None):
-        """Wrap text in Paragraph for proper word wrapping in PDF cells."""
         return Paragraph(str(text), style or cell_style)
 
-    # Header uses plain strings so TableStyle TEXTCOLOR/FONTNAME apply correctly
     data = [["#", "Code", "College Name", "Branch", "District", "Type", "Cutoff %ile", "Rank", "Chance"]]
     for i, (_, r) in enumerate(filtered.iterrows(), 1):
-        rank_str  = f"{int(r['Cutoff Rank']):,}" if pd.notna(r['Cutoff Rank']) and r['Cutoff Rank'] != 'N/A' else "N/A"
+        rank_str  = f"{int(r['Cutoff Rank']):,}" if pd.notna(r['Cutoff Rank']) else "N/A"
         pct_str   = f"{r['Percentile']:.2f}" if pd.notna(r['Percentile']) else "N/A"
         inst_code = str(r['Institution Code']) if pd.notna(r['Institution Code']) else "N/A"
         data.append([
-            str(i),
-            inst_code,
-            P(r['College Name']),
-            P(r['Branch']),
-            P(r['District']),
-            P(str(r['Status'])),
-            pct_str,
-            rank_str,
-            r['Admission Chance']
+            str(i), inst_code,
+            P(r['College Name']), P(r['Branch']), P(r['District']),
+            P(str(r['Status'])), pct_str, rank_str, r['Admission Chance']
         ])
 
     col_widths = [0.7*cm, 1.4*cm, 6.5*cm, 5.2*cm, 2.5*cm, 3.0*cm, 1.9*cm, 1.8*cm, 2.0*cm]
@@ -729,19 +702,16 @@ def predict_pdf(
 
     table.setStyle(ts)
     story.append(table)
-
     story.append(Spacer(1, 0.4*cm))
 
-    # 100-row note
+    # 100-row limit note
     if total_found > PDF_LIMIT:
         story.append(Paragraph(
-            f"<b>Note:</b> Only the top {PDF_LIMIT} colleges (sorted by cutoff percentile) are shown in this PDF. "
-            f"Your full result of <b>{total_found} colleges</b> is visible on the website. "
-            "Visit our website and use the Download PDF button to get the complete list.",
-            ParagraphStyle('note100', fontSize=8, textColor=colors.HexColor("#854D0E"),
-                           backColor=colors.HexColor("#FEF3C7"),
-                           borderColor=colors.HexColor("#FCD34D"), borderWidth=0.5,
-                           borderPadding=6, alignment=TA_LEFT, leading=12)
+            f"<b>Note:</b> Only the top {PDF_LIMIT} colleges are shown in this PDF. "
+            f"Your full result of <b>{total_found} colleges</b> is available on the website.",
+            ParagraphStyle('note100', fontSize=9, textColor=colors.HexColor("#854D0E"),
+                           backColor=colors.HexColor("#FEF3C7"), borderPadding=8,
+                           alignment=TA_LEFT, leading=14)
         ))
         story.append(Spacer(1, 0.3*cm))
 
@@ -751,8 +721,10 @@ def predict_pdf(
         ParagraphStyle('disc', fontSize=8, textColor=colors.grey, alignment=TA_LEFT)
     ))
 
-    # ── Services last page ────────────────────────────────────────────────────
-    story.append(add_services_page())
+    # Services last page — PageBreak added here so no blank page appears
+    from reportlab.platypus import PageBreak
+    story.append(PageBreak())
+    story.extend(add_services_page())
 
     doc.build(story, onFirstPage=add_pdf_header_footer, onLaterPages=add_pdf_header_footer)
     buf.seek(0)
@@ -860,14 +832,10 @@ def documents_pdf(category: str = Query("Open")):
     ]))
     story.append(notes_table)
 
-    story.append(Spacer(1, 0.4*cm))
-    story.append(Paragraph(
-        f'Check out our website: <a href="{WEBSITE_URL}" color="#2C5282"><u>{WEBSITE_URL}</u></a>',
-        ParagraphStyle('WL', fontName='Helvetica', fontSize=9,
-                       textColor=NAVY, alignment=TA_LEFT)
-    ))
-
-    story.append(add_services_page())
+    # Services last page
+    from reportlab.platypus import PageBreak
+    story.append(PageBreak())
+    story.extend(add_services_page())
 
     doc.build(story, onFirstPage=add_pdf_header_footer, onLaterPages=add_pdf_header_footer)
     buf.seek(0)
