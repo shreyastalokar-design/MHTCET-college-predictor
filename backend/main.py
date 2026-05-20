@@ -38,7 +38,7 @@ SOCIAL_LINKS = {
     "telegram": "https://t.me/Conceptdelta",
     "instagram": "https://www.instagram.com/conceptdelta2031",
 }
-WEBSITE_URL     = "https://conceptdelta.in"
+WEBSITE_URL     = "https://www.conceptdelta.in"
 GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform"
 WHATSAPP_URL    = "https://wa.me/918983798203"
 NAVY = colors.HexColor("#1E3A5F")
@@ -373,9 +373,10 @@ def add_services_page(usable_width=25.7*cm):
             f'<a href="{WHATSAPP_URL}" color="#25D366">WhatsApp us anytime!</a>',
             sub_style)],
          [Paragraph(
+            f'To know more visit  >>  '
             f'<a href="{WEBSITE_URL}" color="#D4AF37"><u>{WEBSITE_URL}</u></a>',
             ParagraphStyle('wl', fontName='Helvetica-Bold', fontSize=12,
-                           textColor=GOLD, alignment=TA_CENTER, leading=18))]],
+                           textColor=colors.white, alignment=TA_CENTER, leading=18))]],
         colWidths=[usable_width]
     )
     cta_table.setStyle(TableStyle([
