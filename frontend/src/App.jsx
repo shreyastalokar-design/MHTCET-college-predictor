@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 // ── PLACEHOLDERS (update these when ready) ───────────────────────────────────
-const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform?usp=publish-editor";
+const GOOGLE_FORM_URL    = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform?usp=publish-editor";
+const PREMIUM_FORM_URL   = "https://docs.google.com/forms/d/e/1FAIpQLSfFa4T3I_lx74G93fVjL0mB6DgUwtux3VyDSFLvB1Jto4MTew/viewform?usp=publish-editor";
 const WHATSAPP_NUMBER = "918983798203";
 const WHATSAPP_MSG    = "Hi Concept Delta, I need help choosing the right college.";
 
@@ -135,18 +136,21 @@ const SIDEBAR_SERVICES = [
   { id:"predictor",  label:"Detailed College Predictor",           icon:"🎯", free:true,  panel:"predictor" },
   { id:"call",       label:"Call Support",                        icon:"📞", free:true,  panel:"contact" },
   { id:"documents",  label:"Document Support",                    icon:"📄", free:true,  panel:"documents" },
-  // PAID
-  { id:"option-form",label:"Personalized Option Form",            icon:"✏️", free:false, panel:"paid" },
-  { id:"branch",     label:"Branch & College Guidance",           icon:"🎓", free:false, panel:"paid" },
-  { id:"filling",    label:"Option Form Filling",                 icon:"📝", free:false, panel:"paid" },
-  { id:"counselling",label:"Complete Counselling",                icon:"🤝", free:false, panel:"paid" },
-  { id:"mentorship", label:"Live Mentorship",                     icon:"⭐", free:false, panel:"paid" },
-  { id:"chat24",     label:"24×7 Chat Support",                   icon:"💬", free:false, panel:"paid" },
-  { id:"mentor",     label:"Personal Mentor",                     icon:"👨‍🏫",free:false, panel:"paid" },
-  { id:"admission",  label:"Admission Assistance",                icon:"🏛️", free:false, panel:"paid" },
-  { id:"cap-round",  label:"CAP Round Support",                   icon:"🔄", free:false, panel:"paid" },
-  { id:"ils",        label:"ILS / Spot Round Guidance",           icon:"🔦", free:false, panel:"paid" },
-  { id:"lecture",    label:"Special Guest Lecture on Each Branch",icon:"🎤", free:false, panel:"paid" },
+  // PAID — all open the same poster page "buy-premium"
+  { id:"option-form",   label:"Personalized Option Form",                  icon:"✏️", free:false, panel:"buy-premium" },
+  { id:"branch",        label:"Branch & College Guidance",                 icon:"🎓", free:false, panel:"buy-premium" },
+  { id:"filling",       label:"Option Form Filling Guidance",              icon:"📝", free:false, panel:"buy-premium" },
+  { id:"counselling",   label:"Complete Counselling",                      icon:"🤝", free:false, panel:"buy-premium" },
+  { id:"mentorship",    label:"Live Mentorship",                           icon:"⭐", free:false, panel:"buy-premium" },
+  { id:"chat24",        label:"24×7 Chat Support",                         icon:"💬", free:false, panel:"buy-premium" },
+  { id:"mentor",        label:"Personal Mentor",                           icon:"👨‍🏫",free:false, panel:"buy-premium" },
+  { id:"admission",     label:"Admission Assistance",                      icon:"🏛️", free:false, panel:"buy-premium" },
+  { id:"cap-round",     label:"CAP Round Support",                         icon:"🔄", free:false, panel:"buy-premium" },
+  { id:"ils",           label:"ILS / Spot Round Guidance",                 icon:"🔦", free:false, panel:"buy-premium" },
+  { id:"lecture",       label:"Special Guest Lecture on Each Branch",      icon:"🎤", free:false, panel:"buy-premium" },
+  { id:"material",      label:"Personalized Counselling Material",         icon:"📚", free:false, panel:"buy-premium" },
+  { id:"recordings",    label:"Live Session Recordings",                   icon:"🎥", free:false, panel:"buy-premium" },
+  { id:"whatsapp-grp",  label:"WhatsApp Group Access & Guidance Material", icon:"💼", free:false, panel:"buy-premium" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -326,17 +330,39 @@ export default function App() {
                        onClick={() => navigate(svc)} /></FadeIn>
         ))}
 
-        {/* PAID section */}
+        {/* PAID section — non-clickable list + buy button */}
         <div style={{ ...s.sectionLbl, marginTop: 16 }}>
           <span style={s.tagPaid}>PREMIUM</span> SERVICES
         </div>
-        {SIDEBAR_SERVICES.filter(s => !s.free).map((svc, i) => (
-          <FadeIn key={svc.id} delay={i*0.05} direction="left"><SidebarItem svc={svc} active={panel === "paid"}
-                       onClick={() => navigate(svc)} /></FadeIn>
+        {SIDEBAR_SERVICES.filter(sv => !sv.free).map((svc, i) => (
+          <FadeIn key={svc.id} delay={i*0.03} direction="left">
+            <div style={{ display:"flex", alignItems:"center", gap:10, padding:"6px 12px",
+                          color:"#CBD5E1", fontSize:12, cursor:"default", opacity:0.8 }}>
+              <span style={{ fontSize:14 }}>{svc.icon}</span>
+              <span>{svc.label}</span>
+            </div>
+          </FadeIn>
         ))}
+        {/* Buy button */}
+        <FadeIn delay={0.1} direction="left">
+          <div onClick={() => { setPanel("buy-premium"); setSidebarOpen(false); window.scrollTo({top:0,behavior:"smooth"}); }}
+               style={{ background:C.gold, borderRadius:8, padding:"10px 8px", margin:"10px 8px 0",
+                        textAlign:"center", cursor:"pointer" }}>
+            <div style={{ fontSize:11, color:C.navyDeep, textDecoration:"line-through", opacity:0.6 }}>₹3,000</div>
+            <div style={{ color:C.navyDeep, fontWeight:700, fontSize:14, display:"flex",
+                          alignItems:"center", justifyContent:"center", gap:6 }}>
+              🛒 Buy at ₹1,500
+            </div>
+            <div style={{ background:"#DC2626", color:"#fff", fontSize:9, fontWeight:700,
+                          padding:"2px 8px", borderRadius:10, display:"inline-block", marginTop:4 }}>
+              50% OFF
+            </div>
+          </div>
+        </FadeIn>
       </aside>
 
-      {/* ── Hero ── */}
+      {/* ── Hero — only on landing/predictor page ── */}
+      {panel === "predictor" && (
       <div style={s.hero}>
         <FadeIn delay={0.1} direction="none"><div style={s.heroBadge}>MHT-CET 2026 · MAHARASHTRA</div></FadeIn>
         <FadeIn delay={0.2}><h1 style={s.heroTitle}>Find your perfect engineering college</h1></FadeIn>
@@ -371,14 +397,16 @@ export default function App() {
           </FadeIn>
         )}
       </div>
+      )} {/* end hero */}
 
       {/* ── Main panel ── */}
       <div style={s.mainWrap}>
-        {panel === "predictor" && <PredictorPanel />}
-        {panel === "documents" && <DocumentsPanel />}
-        {panel === "paid"      && <PaidPanel />}
-        {panel === "contact"   && <ContactPanel />}
-        {panel === "info"      && <InfoPanel msg={infoMsg} />}
+        {panel === "predictor"   && <PredictorPanel />}
+        {panel === "documents"   && <DocumentsPanel />}
+        {panel === "buy-premium" && <PremiumPosterPanel />}
+        {panel === "paid"        && <PremiumPosterPanel />}
+        {panel === "contact"     && <ContactPanel />}
+        {panel === "info"        && <InfoPanel msg={infoMsg} />}
       </div>
 
       <SiteFooter setPanel={setPanel} isMobile={window.innerWidth <= 768} />
@@ -826,32 +854,179 @@ function DocumentsPanel() {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// PAID PANEL
+// PREMIUM SERVICE DETAILS
 // ═════════════════════════════════════════════════════════════════════════════
-function PaidPanel() {
-  const paidList = SIDEBAR_SERVICES.filter(sv => !sv.free);
+const PREMIUM_DETAILS = {
+  "option-form": {
+    icon:"✏️", price:"₹199", badge:"Most Popular",
+    title:"Personalized Option Form",
+    desc:"Get a customized option form built by our experts based on your percentile, category, district preference and branch interest. Stop guessing — let us fill it right.",
+    features:["Personalized college priority list","Category-wise cutoff analysis","District & region preference","Round-wise filling strategy","Delivered within 24 hours"],
+  },
+  "branch": {
+    icon:"🎓", price:"₹299", badge:"High Demand",
+    title:"Branch & College Guidance",
+    desc:"Confused between CS, IT, ENTC, Mechanical? Our mentors help you pick the right branch based on your interests, market trends and career goals.",
+    features:["1-on-1 mentor session (45 min)","Branch scope & salary comparison","Career path roadmap","College culture insights","2026 market trend analysis"],
+  },
+  "filling": {
+    icon:"📝", price:"₹399", badge:null,
+    title:"Option Form Filling",
+    desc:"We sit with you and fill the actual CAP Round option form live — making sure every choice is in the right order to maximize your admission chances.",
+    features:["Live screen-share session","Step-by-step form filling","Real-time cutoff reference","Priority order optimization","Post-submission guidance"],
+  },
+  "counselling": {
+    icon:"🤝", price:"₹599", badge:"Best Value",
+    title:"Complete Counselling Package",
+    desc:"End-to-end support from option form to final admission. Our most comprehensive package covering everything you need for a stress-free admission.",
+    features:["Option form + filling included","Branch & college guidance","Document checklist review","All CAP rounds covered","WhatsApp support throughout"],
+  },
+  "mentorship": {
+    icon:"⭐", price:"₹249", badge:null,
+    title:"Live Mentorship Session",
+    desc:"A focused 1-on-1 session with a COEP alumni mentor. Ask anything about college life, placements, branch selection, hostel, future scope — nothing off limits.",
+    features:["45-minute live session","COEP alumni mentor","College life insights","Placement & internship tips","Recording shared after session"],
+  },
+  "chat24": {
+    icon:"💬", price:"₹149", badge:null,
+    title:"24×7 Chat Support",
+    desc:"Get instant answers to all your admission doubts on WhatsApp — anytime, day or night. Perfect for students who need quick answers during the stressful CAP process.",
+    features:["WhatsApp chat support","Response within 30 minutes","Valid for entire CAP season","Unlimited questions","Document guidance included"],
+  },
+  "mentor": {
+    icon:"👨‍🏫", price:"₹499", badge:null,
+    title:"Personal Mentor",
+    desc:"Get assigned a dedicated personal mentor (COEP alumni) who guides you throughout the entire admission process — from form filling to final seat confirmation.",
+    features:["Dedicated personal mentor","Available on call + WhatsApp","Full CAP season coverage","College & branch strategy","Spot round guidance too"],
+  },
+  "admission": {
+    icon:"🏛️", price:"₹299", badge:null,
+    title:"Admission Assistance",
+    desc:"On-ground help during the actual admission day — document verification, fee payment, college reporting. We make sure nothing goes wrong on the most important day.",
+    features:["Document checklist review","Admission day support","Fee payment guidance","Reporting formalities help","Online + offline support"],
+  },
+  "cap-round": {
+    icon:"🔄", price:"₹349", badge:null,
+    title:"CAP Round Support",
+    desc:"Expert guidance for every CAP round — when to freeze, when to float, how to upgrade. Maximize your seat with smart round-by-round strategy.",
+    features:["All 4 CAP rounds covered","Freeze vs float strategy","Seat upgrade planning","Cutoff trend analysis","Real-time round support"],
+  },
+  "ils": {
+    icon:"🔦", price:"₹199", badge:null,
+    title:"ILS / Spot Round Guidance",
+    desc:"Didn't get a seat in CAP rounds? Institute Level Seats and Spot rounds are your last chance — we help you navigate them perfectly.",
+    features:["ILS eligibility check","Spot round college list","Application guidance","Document preparation","Same-day support available"],
+  },
+  "lecture": {
+    icon:"🎤", price:"₹99", badge:"New",
+    title:"Special Guest Lecture on Each Branch",
+    desc:"Live online sessions by industry professionals and COEP seniors — one lecture per branch covering scope, placements, skills needed and real career stories.",
+    features:["Live Zoom/Meet session","Industry expert speakers","Branch-specific content","Q&A session included","Recording available after"],
+  },
+};
+
+// PREMIUM POSTER PANEL
+// ═════════════════════════════════════════════════════════════════════════════
+const ALL_PREMIUM_SERVICES = [
+  { icon:"✏️", label:"Personalized Option Form" },
+  { icon:"🎓", label:"Branch & College Guidance" },
+  { icon:"📝", label:"Option Form Filling Guidance" },
+  { icon:"🤝", label:"Complete Counselling" },
+  { icon:"⭐", label:"Live Mentorship" },
+  { icon:"💬", label:"24×7 Chat Support" },
+  { icon:"👨‍🏫", label:"Personal Mentor" },
+  { icon:"🏛️", label:"Admission Assistance" },
+  { icon:"🔄", label:"CAP Round Support" },
+  { icon:"🔦", label:"ILS / Spot Round Guidance" },
+  { icon:"🎤", label:"Special Guest Lecture on Each Branch" },
+  { icon:"📚", label:"Personalized Counselling Material" },
+  { icon:"🎥", label:"Live Session Recordings" },
+  { icon:"💼", label:"WhatsApp Group Access & Guidance Material" },
+];
+
+function PremiumPosterPanel() {
+  const half = Math.ceil(ALL_PREMIUM_SERVICES.length / 2);
+  const col1 = ALL_PREMIUM_SERVICES.slice(0, half);
+  const col2 = ALL_PREMIUM_SERVICES.slice(half);
+
   return (
     <div>
       <div style={s.breadcrumb}>Premium Services</div>
-      <h2 style={s.panelTitle}>Premium Guidance Services</h2>
-      <p style={s.panelSub}>Expert-led personalized support for your engineering admission journey</p>
 
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(140px,1fr))", gap:14, marginTop:20 }}>
-        {paidList.map(svc=>(
-          <div key={svc.id} style={s.paidCard}>
-            <span style={{ fontSize:28 }}>{svc.icon}</span>
-            <div style={{ fontWeight:600, color:C.textDark, marginTop:8 }}>{svc.label}</div>
+      {/* Main poster card */}
+      <div style={{ background:`linear-gradient(160deg, #031343 0%, #0A2060 55%, #031343 100%)`,
+                    borderRadius:16, padding:"28px 24px", position:"relative", overflow:"hidden" }}>
+
+        {/* Decorative circles */}
+        <div style={{ position:"absolute", top:-40, right:-40, width:160, height:160,
+                      background:"rgba(212,175,55,0.07)", borderRadius:"50%", pointerEvents:"none" }}/>
+        <div style={{ position:"absolute", bottom:-30, left:-30, width:100, height:100,
+                      background:"rgba(212,175,55,0.05)", borderRadius:"50%", pointerEvents:"none" }}/>
+
+        {/* Badge + price */}
+        <div style={{ textAlign:"center", marginBottom:20 }}>
+          <span style={{ background:"#DC2626", color:"#fff", fontSize:12, fontWeight:700,
+                         padding:"5px 16px", borderRadius:20, letterSpacing:"0.05em" }}>
+            LIMITED TIME — 50% OFF
+          </span>
+          <div style={{ color:"#94A3B8", fontSize:13, marginTop:12,
+                        textDecoration:"line-through" }}>Regular price ₹3,000</div>
+          <div style={{ color:C.gold, fontSize:44, fontWeight:700, lineHeight:1.1,
+                        margin:"4px 0" }}>₹1,500</div>
+          <div style={{ color:"#CBD5E1", fontSize:12 }}>
+            One-time payment · Entire CAP 2026 season covered
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div style={{ ...s.noteBox, marginTop:24 }}>
-        <div style={s.noteTitle}>📞 Interested in premium services?</div>
-        <div style={s.noteItem}>Contact us at <a href={`tel:${BRAND.contact.replace(/ /g,"")}`} style={{ color:"inherit", fontWeight:700 }}>{BRAND.contact}</a></div>
-        <div style={s.noteItem}>Or book a free session to know more!</div>
-        <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer" style={{ ...s.bookBtn, display:"inline-block", marginTop:12, textDecoration:"none" }}>
-          📅 Book a Free Counselling Session
+        {/* Trust badges */}
+        <div style={{ display:"flex", gap:8, justifyContent:"center", flexWrap:"wrap", marginBottom:20 }}>
+          {[
+            { bg:"rgba(74,222,128,0.12)", border:"rgba(74,222,128,0.3)", color:"#4ADE80", txt:"✓ Instant Access" },
+            { bg:"rgba(212,175,55,0.12)", border:"rgba(212,175,55,0.3)", color:C.gold, txt:"✓ COEP Alumni Mentors" },
+            { bg:"rgba(147,197,253,0.12)", border:"rgba(147,197,253,0.3)", color:"#93C5FD", txt:"✓ Full Season Support" },
+          ].map(b => (
+            <div key={b.txt} style={{ background:b.bg, border:`0.5px solid ${b.border}`,
+                                      color:b.color, fontSize:11, padding:"5px 12px", borderRadius:20 }}>
+              {b.txt}
+            </div>
+          ))}
+        </div>
+
+        {/* Services grid */}
+        <div style={{ background:"rgba(255,255,255,0.06)", border:"0.5px solid rgba(212,175,55,0.25)",
+                      borderRadius:10, padding:"14px 16px", marginBottom:20 }}>
+          <div style={{ color:C.gold, fontSize:12, fontWeight:700, marginBottom:12,
+                        letterSpacing:"0.05em" }}>EVERYTHING INCLUDED IN ₹1,500</div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"4px 12px" }}>
+            {[...col1.map((s,i) => ({ ...s, pair: col2[i] }))].map((item, i) => (
+              <React.Fragment key={i}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, padding:"4px 0" }}>
+                  <span style={{ color:"#4ADE80", fontSize:13, flexShrink:0 }}>✓</span>
+                  <span style={{ color:"#E2E8F0", fontSize:12 }}>{item.label}</span>
+                </div>
+                {item.pair && (
+                  <div style={{ display:"flex", alignItems:"center", gap:8, padding:"4px 0" }}>
+                    <span style={{ color:"#4ADE80", fontSize:13, flexShrink:0 }}>✓</span>
+                    <span style={{ color:"#E2E8F0", fontSize:12 }}>{item.pair.label}</span>
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        {/* Purchase button */}
+        <a href={PREMIUM_FORM_URL} target="_blank" rel="noopener noreferrer"
+           style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10,
+                    background:`linear-gradient(135deg, ${C.gold}, #B8972E)`,
+                    color:C.navyDeep, fontWeight:700, fontSize:15, padding:"15px 24px",
+                    borderRadius:10, textDecoration:"none", marginBottom:10 }}>
+          🛒 Purchase Premium Package — ₹1,500
         </a>
+
+        <div style={{ color:"#94A3B8", fontSize:11, textAlign:"center" }}>
+          After purchase you will receive a confirmation email on your registered email ID.
+        </div>
       </div>
     </div>
   );
@@ -978,6 +1153,15 @@ function MultiSelect({ options, selected, onChange, placeholder }) {
 // FOOTER
 // ═════════════════════════════════════════════════════════════════════════════
 function SiteFooter({ setPanel, isMobile }) {
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({ title:"Concept Delta", text:"Check out this MHT-CET College Predictor!", url:"https://www.conceptdelta.in" });
+    } else {
+      navigator.clipboard.writeText("https://www.conceptdelta.in");
+      alert("Link copied! Share it with your friends.");
+    }
+  };
+
   return (
     <footer style={{...s.footer, padding:"clamp(20px,4vw,28px) clamp(14px,3vw,24px) 0"}}>
       <div style={s.footerGrid}>
@@ -996,6 +1180,7 @@ function SiteFooter({ setPanel, isMobile }) {
             { label:"Documents Guidance", action:() => { setPanel("documents"); window.scrollTo({top:0,behavior:"smooth"}); } },
             { label:"Call Support",       action:() => { setPanel("contact");   window.scrollTo({top:0,behavior:"smooth"}); } },
             { label:"Book a Free Counselling Session", action:() => window.open(GOOGLE_FORM_URL,"_blank") },
+            { label:"Buy Our Premium Counselling Services", action:() => { setPanel("buy-premium"); window.scrollTo({top:0,behavior:"smooth"}); } },
           ].map(({label,action})=>(
             <div key={label} onClick={action}
                  style={{ ...s.footerLink, textDecoration:"underline", textDecorationColor:"rgba(255,255,255,0.2)" }}>
@@ -1006,6 +1191,10 @@ function SiteFooter({ setPanel, isMobile }) {
         <div>
           <div style={s.footerHead}>CONNECT</div>
           <a href={`tel:${BRAND.contact.replace(/ /g,"")}`} style={{ ...s.footerContact, textDecoration:"none", display:"block" }}>📞 {BRAND.contact}</a>
+          <a href="mailto:teamconceptdelta@gmail.com"
+             style={{ ...s.footerContact, textDecoration:"none", display:"block", fontSize:12, marginTop:4, color:"#94A3B8" }}>
+            ✉️ teamconceptdelta@gmail.com
+          </a>
           <div style={{ display:"flex", gap:12, marginTop:14, flexWrap:"wrap" }}>
             <a href={BRAND.social.youtube} target="_blank" rel="noopener noreferrer" style={{ ...s.footerIcon, background:"#FF0000" }} title="YouTube">
               <YTIcon size={24} color="white"/>
@@ -1024,6 +1213,13 @@ function SiteFooter({ setPanel, isMobile }) {
               </a>
             )}
           </div>
+          {/* Share button */}
+          <button onClick={handleShare}
+                  style={{ marginTop:14, background:"rgba(212,175,55,0.15)", border:"0.5px solid #D4AF37",
+                           color:"#D4AF37", fontSize:12, padding:"7px 14px", borderRadius:20,
+                           cursor:"pointer", display:"flex", alignItems:"center", gap:6 }}>
+            🔗 Share with Friends
+          </button>
         </div>
       </div>
       <div style={s.footerBottom}>
