@@ -337,11 +337,9 @@ export default function App() {
         {SIDEBAR_SERVICES.filter(sv => !sv.free).map((svc, i) => (
           <FadeIn key={svc.id} delay={i*0.03} direction="left">
             <div style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 12px",
-                          color:"#E2E8F0", fontSize:12.5, cursor:"default",
-                          borderLeft:`2px solid rgba(212,175,55,0.25)`,
-                          marginLeft:4, marginBottom:2 }}>
-              <span style={{ fontSize:14, flexShrink:0 }}>{svc.icon}</span>
-              <span style={{ lineHeight:1.4 }}>{svc.label}</span>
+                          color:"#1E293B", fontSize:13, cursor:"default" }}>
+              <span style={{ fontSize:15, flexShrink:0 }}>{svc.icon}</span>
+              <span style={{ lineHeight:1.4, fontWeight:400 }}>{svc.label}</span>
             </div>
           </FadeIn>
         ))}
