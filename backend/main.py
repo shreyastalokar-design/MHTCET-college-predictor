@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import os
 import io
+import gc
 from typing import Optional
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
@@ -27,6 +28,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Memory cleanup after every request ───────────────────────────────────────
+@app.middleware("http")
+async def cleanup_middleware(request, call_next):
+    response = await call_next(request)
+    gc.collect()
+    return response
+
+# ── Max results returned to frontend ─────────────────────────────────────────
+MAX_PREDICT_RESULTS = 300
 
 @app.get("/ping")
 def ping():
@@ -260,11 +271,17 @@ def predict(
     )
     full_form = get_category_full_form(category_codes)
 
+    total_found = len(filtered)
+
     results = filtered[[
         'Institution Code', 'College Name', 'University', 'Status',
         'District', 'Region', 'Branch', 'CAP Round', 'Category',
         'Cutoff Rank', 'Percentile', 'Total Fee', 'Admission Chance'
-    ]].fillna('N/A')
+    ]].head(MAX_PREDICT_RESULTS).fillna('N/A')
+
+    # Keep institution code as string
+    results = results.copy()
+    results['Institution Code'] = results['Institution Code'].astype(str)
 
     colleges = results.rename(columns={
         'Institution Code': 'institution_code',
@@ -282,17 +299,26 @@ def predict(
         'Admission Chance': 'admission_chance',
     }).to_dict(orient='records')
 
-    return {
+    response_data = {
         "percentile": percentile,
         "category_codes": category_codes,
         "category_full_form": full_form,
         "cap_round": cap_round,
-        "total_results": len(colleges),
+        "total_results": total_found,
+        "showing": len(colleges),
         "safe_count":     sum(1 for c in colleges if c['admission_chance'] == 'Safe'),
         "moderate_count": sum(1 for c in colleges if c['admission_chance'] == 'Moderate'),
         "reach_count":    sum(1 for c in colleges if c['admission_chance'] == 'Reach'),
         "colleges": colleges,
+        "free_tier_note": (
+            f"Showing top {MAX_PREDICT_RESULTS} colleges out of {total_found}. "
+            f"Only top {MAX_PREDICT_RESULTS} colleges are visible in the free tier. "
+            f"Avail our Premium Service to access all {total_found} results."
+        ) if total_found > MAX_PREDICT_RESULTS else None,
     }
+    del filtered, results, colleges
+    gc.collect()
+    return response_data
 
 
 _FREE_SVCS = [

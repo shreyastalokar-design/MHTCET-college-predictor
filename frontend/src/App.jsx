@@ -411,7 +411,7 @@ export default function App() {
 
       {/* ── Main panel ── */}
       <div style={s.mainWrap}>
-        {panel === "predictor"   && <PredictorPanel />}
+        {panel === "predictor"   && <PredictorPanel setPanel={setPanel} />}
         {panel === "documents"   && <DocumentsPanel />}
         {panel === "buy-premium" && <PremiumPosterPanel />}
         {panel === "paid"        && <PremiumPosterPanel />}
@@ -475,7 +475,7 @@ function BookSessionBtn() {
 // ═════════════════════════════════════════════════════════════════════════════
 // COLLEGE PREDICTOR PANEL
 // ═════════════════════════════════════════════════════════════════════════════
-function PredictorPanel() {
+function PredictorPanel({ setPanel }) {
   const [percentile, setPercentile] = useState("");
   const [gender,     setGender]     = useState("Male");
   const [caste,      setCaste]      = useState("OPEN");
@@ -735,6 +735,29 @@ function PredictorPanel() {
               </div>
             : filtered.map((c,i)=><CollegeCard key={i} c={c}/>)
           }
+
+          {/* Free tier note — shown only when results are capped */}
+          {results.free_tier_note && (
+            <div style={{ background:"#FEF3C7", border:"1.5px solid #D4AF37",
+                          borderRadius:10, padding:"16px 18px", marginTop:16,
+                          textAlign:"center" }}>
+              <div style={{ fontSize:15, fontWeight:700, color:"#92400E", marginBottom:6 }}>
+                You have {results.total_results} colleges matching your profile!
+              </div>
+              <div style={{ fontSize:13, color:"#78350F", marginBottom:12, lineHeight:1.6 }}>
+                Only top <strong>300 colleges</strong> are visible in the free tier.
+                Avail our <strong>Premium Service</strong> to unlock all <strong>{results.total_results} results</strong>.
+              </div>
+              <button
+                 onClick={() => { setPanel("buy-premium"); window.scrollTo({top:0,behavior:"smooth"}); }}
+                 style={{ background:`linear-gradient(135deg,${C.gold},#B8972E)`,
+                          color:C.navyDeep, fontWeight:700, fontSize:14,
+                          padding:"10px 24px", borderRadius:8, border:"none",
+                          cursor:"pointer", display:"inline-block" }}>
+                🛒 Get Premium — ₹1,500
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
