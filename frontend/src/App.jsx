@@ -990,12 +990,6 @@ function PremiumPosterPanel() {
       <div style={{ background:`linear-gradient(160deg, #031343 0%, #0A2060 55%, #031343 100%)`,
                     borderRadius:16, padding:"28px 24px", position:"relative", overflow:"hidden" }}>
 
-        {/* Decorative circles */}
-        <div style={{ position:"absolute", top:-40, right:-40, width:160, height:160,
-                      background:"rgba(212,175,55,0.07)", borderRadius:"50%", pointerEvents:"none" }}/>
-        <div style={{ position:"absolute", bottom:-30, left:-30, width:100, height:100,
-                      background:"rgba(212,175,55,0.05)", borderRadius:"50%", pointerEvents:"none" }}/>
-
         {/* Badge + price */}
         <div style={{ textAlign:"center", marginBottom:20 }}>
           <span style={{ background:"#DC2626", color:"#fff", fontSize:12, fontWeight:700,
