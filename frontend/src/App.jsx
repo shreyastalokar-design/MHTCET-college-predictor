@@ -334,7 +334,7 @@ export default function App() {
         <div style={{ ...s.sectionLbl, marginTop: 16 }}>
           <span style={s.tagPaid}>PREMIUM</span> SERVICES
         </div>
-        {SIDEBAR_SERVICES.filter(sv => !sv.free).map((svc, i) => (
+        {SIDEBAR_SERVICES.filter(sv => !sv.free).slice(0, 6).map((svc, i) => (
           <FadeIn key={svc.id} delay={i*0.03} direction="left">
             <div style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 12px",
                           color:"#1E293B", fontSize:13, cursor:"default" }}>
@@ -343,6 +343,9 @@ export default function App() {
             </div>
           </FadeIn>
         ))}
+        <div style={{ padding:"4px 12px 6px", color:"#64748B", fontSize:12, fontStyle:"italic" }}>
+          +{SIDEBAR_SERVICES.filter(sv => !sv.free).length - 6} more services included...
+        </div>
         {/* Buy button */}
         <FadeIn delay={0.1} direction="left">
           <div onClick={() => { setPanel("buy-premium"); setSidebarOpen(false); window.scrollTo({top:0,behavior:"smooth"}); }}
@@ -351,7 +354,7 @@ export default function App() {
             <div style={{ fontSize:11, color:C.navyDeep, textDecoration:"line-through", opacity:0.6 }}>₹3,000</div>
             <div style={{ color:C.navyDeep, fontWeight:700, fontSize:14, display:"flex",
                           alignItems:"center", justifyContent:"center", gap:6 }}>
-              🛒 Buy at ₹1,500
+              <span style={{ fontSize:16, filter:"brightness(0)" }}>🛒</span> Buy at ₹1,500
             </div>
             <div style={{ background:"#DC2626", color:"#fff", fontSize:9, fontWeight:700,
                           padding:"2px 8px", borderRadius:10, display:"inline-block", marginTop:4 }}>
