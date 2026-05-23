@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import { Analytics } from "@vercel/analytics/react";
 
 // Keep Render backend awake
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000";

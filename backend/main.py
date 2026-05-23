@@ -19,6 +19,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from datetime import datetime
 
+
 app = FastAPI(title="Concept Delta API")
 
 app.add_middleware(
