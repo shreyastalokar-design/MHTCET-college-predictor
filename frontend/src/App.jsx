@@ -238,10 +238,11 @@ function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
 // ROOT APP
 // ═════════════════════════════════════════════════════════════════════════════
 export default function App() {
-  const [panel,      setPanel]      = useState("predictor");
-  const [sidebarOpen,setSidebarOpen]= useState(false);
+  const [panel,         setPanel]        = useState("predictor");
+  const [sidebarOpen,   setSidebarOpen]  = useState(false);
+  const [showAllPremium,setShowAllPremium]= useState(false);
   const isMobile = useIsMobile();
-  const [infoMsg,    setInfoMsg]    = useState("");
+  const [infoMsg,       setInfoMsg]      = useState("");
 
   const navigate = (svc) => {
     if (svc.panel === "info") {
@@ -334,17 +335,23 @@ export default function App() {
         <div style={{ ...s.sectionLbl, marginTop: 16 }}>
           <span style={s.tagPaid}>PREMIUM</span> SERVICES
         </div>
-        {SIDEBAR_SERVICES.filter(sv => !sv.free).slice(0, 6).map((svc, i) => (
-          <FadeIn key={svc.id} delay={i*0.03} direction="left">
-            <div style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 12px",
-                          color:"#1E293B", fontSize:13, cursor:"default" }}>
-              <span style={{ fontSize:15, flexShrink:0 }}>{svc.icon}</span>
-              <span style={{ lineHeight:1.4, fontWeight:400 }}>{svc.label}</span>
-            </div>
-          </FadeIn>
-        ))}
-        <div style={{ padding:"4px 12px 6px", color:"#64748B", fontSize:12, fontStyle:"italic" }}>
-          +{SIDEBAR_SERVICES.filter(sv => !sv.free).length - 6} more services included...
+        {SIDEBAR_SERVICES.filter(sv => !sv.free)
+          .slice(0, showAllPremium ? undefined : 6)
+          .map((svc, i) => (
+            <FadeIn key={svc.id} delay={i*0.03} direction="left">
+              <div style={{ display:"flex", alignItems:"center", gap:10, padding:"7px 12px",
+                            color:"#1E293B", fontSize:13, cursor:"default" }}>
+                <span style={{ fontSize:15, flexShrink:0 }}>{svc.icon}</span>
+                <span style={{ lineHeight:1.4, fontWeight:400 }}>{svc.label}</span>
+              </div>
+            </FadeIn>
+          ))}
+        <div onClick={() => setShowAllPremium(!showAllPremium)}
+             style={{ padding:"4px 12px 6px", color:C.navy, fontSize:12,
+                      fontWeight:600, cursor:"pointer", textDecoration:"underline" }}>
+          {showAllPremium
+            ? "▲ Show less"
+            : `▼ +${SIDEBAR_SERVICES.filter(sv => !sv.free).length - 6} more services included`}
         </div>
         {/* Buy button */}
         <FadeIn delay={0.1} direction="left">
@@ -354,7 +361,7 @@ export default function App() {
             <div style={{ fontSize:11, color:C.navyDeep, textDecoration:"line-through", opacity:0.6 }}>₹3,000</div>
             <div style={{ color:C.navyDeep, fontWeight:700, fontSize:14, display:"flex",
                           alignItems:"center", justifyContent:"center", gap:6 }}>
-              <span style={{ fontSize:16, filter:"brightness(0)" }}>🛒</span> Buy at ₹1,500
+              <span style={{ fontSize:16, filter:"grayscale(1) brightness(2.5)" }}>🛒</span> Buy at ₹1,500
             </div>
             <div style={{ background:"#DC2626", color:"#fff", fontSize:9, fontWeight:700,
                           padding:"2px 8px", borderRadius:10, display:"inline-block", marginTop:4 }}>
