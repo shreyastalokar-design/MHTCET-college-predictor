@@ -19,7 +19,6 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from datetime import datetime
 
-
 app = FastAPI(title="Concept Delta API")
 
 app.add_middleware(
@@ -404,6 +403,11 @@ def add_services_page(usable_width=25.7*cm):
             f'<a href="{WHATSAPP_URL}" color="#25D366">WhatsApp us anytime!</a>',
             sub_style)],
          [Paragraph(
+            f'<a href="{PREMIUM_FORM_URL}" color="#4ADE80">'
+            f'<b>Click here to Buy our Premium Services -- Rs.1,500 only (50% OFF)</b></a>',
+            ParagraphStyle('buy', fontName='Helvetica-Bold', fontSize=11,
+                           textColor=colors.white, alignment=TA_CENTER, leading=18))],
+         [Paragraph(
             f'To know more visit  >>  '
             f'<a href="{WEBSITE_URL}" color="#D4AF37"><u>{WEBSITE_URL}</u></a>',
             ParagraphStyle('wl', fontName='Helvetica-Bold', fontSize=12,
@@ -418,8 +422,11 @@ def add_services_page(usable_width=25.7*cm):
         ('BOTTOMPADDING', (0,0), (0,0),   4),
         ('TOPPADDING',    (0,1), (0,1),   4),
         ('BOTTOMPADDING', (0,1), (0,1),   4),
-        ('TOPPADDING',    (0,2), (0,2),   4),
-        ('BOTTOMPADDING', (0,2), (0,2),   12),
+        ('BACKGROUND',    (0,2), (0,2),   colors.HexColor("#166534")),
+        ('TOPPADDING',    (0,2), (0,2),   10),
+        ('BOTTOMPADDING', (0,2), (0,2),   10),
+        ('TOPPADDING',    (0,3), (0,3),   4),
+        ('BOTTOMPADDING', (0,3), (0,3),   12),
     ]))
 
     return [
