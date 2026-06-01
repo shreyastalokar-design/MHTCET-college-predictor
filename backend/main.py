@@ -53,10 +53,11 @@ SOCIAL_LINKS = {
     "telegram": "https://t.me/Conceptdelta",
     "instagram": "https://www.instagram.com/conceptdelta2031",
 }
-WEBSITE_URL     = "https://www.conceptdelta.in"
-GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform"
-PREMIUM_FORM_URL= "https://docs.google.com/forms/d/e/1FAIpQLSfFa4T3I_lx74G93fVjL0mB6DgUwtux3VyDSFLvB1Jto4MTew/viewform"
-WHATSAPP_URL    = "https://wa.me/918983798203"
+WEBSITE_URL          = "https://www.conceptdelta.in"
+GOOGLE_FORM_URL      = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform"
+PREMIUM_FORM_URL     = "https://docs.google.com/forms/d/e/1FAIpQLSfFa4T3I_lx74G93fVjL0mB6DgUwtux3VyDSFLvB1Jto4MTew/viewform"
+WHATSAPP_URL         = "https://wa.me/918983798203"
+WHATSAPP_CHANNEL_URL = "https://whatsapp.com/channel/0029VbCTYvc7IUYZvqyVbI3L"
 NAVY = colors.HexColor("#1E3A5F")
 BLUE = colors.HexColor("#2C5282")
 GOLD = colors.HexColor("#D4AF37")
@@ -555,12 +556,13 @@ def add_pdf_header_footer(canvas, doc):
         ("youtube.png",   "@conceptdelta2026",  SOCIAL_LINKS["youtube"]),
         ("telegram.png",  "@Conceptdelta",      SOCIAL_LINKS["telegram"]),
         ("instagram.png", "@conceptdelta2031",  SOCIAL_LINKS["instagram"]),
+        ("whatsapp.png",  "WA Channel",         WHATSAPP_CHANNEL_URL),
     ]
 
-    ico_sz  = 0.65 * cm        # larger = sharper
-    gap     = 2.8 * cm
+    ico_sz  = 0.65 * cm
     n       = len(socials)
-    sx      = CX - gap          # first icon x center
+    gap     = 2.2 * cm              # tighter gap for 4 icons
+    sx      = CX - gap * (n-1) / 2  # auto-centre all icons around CX
 
     for i, (fname, handle, url) in enumerate(socials):
         cx_i    = sx + i * gap

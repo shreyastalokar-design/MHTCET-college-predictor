@@ -244,6 +244,13 @@ export default function App() {
   const isMobile = useIsMobile();
   const [infoMsg,       setInfoMsg]      = useState("");
 
+  // Handle browser back button — restore predictor panel
+  useEffect(() => {
+    const handlePop = () => setPanel("predictor");
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, []);
+
   const navigate = (svc) => {
     if (svc.panel === "info") {
       setInfoMsg(svc.info);
@@ -355,7 +362,7 @@ export default function App() {
         </div>
         {/* Buy button */}
         <FadeIn delay={0.1} direction="left">
-          <div onClick={() => { setPanel("buy-premium"); setSidebarOpen(false); window.scrollTo({top:0,behavior:"smooth"}); }}
+          <div onClick={() => { setPanel("buy-premium"); window.history.pushState({panel:"buy-premium"}, ""); setSidebarOpen(false); window.scrollTo({top:0,behavior:"smooth"}); }}
                style={{ background:C.gold, borderRadius:8, padding:"10px 8px", margin:"10px 8px 0",
                         textAlign:"center", cursor:"pointer" }}>
             <div style={{ fontSize:11, color:C.navyDeep, textDecoration:"line-through", opacity:0.6 }}>₹3,000</div>
@@ -406,7 +413,11 @@ export default function App() {
               📅 Book a Free Counselling Session
             </a>
             <button
-              onClick={() => { setPanel("buy-premium"); window.scrollTo({top:0,behavior:"smooth"}); }}
+              onClick={() => {
+                setPanel("buy-premium");
+                window.history.pushState({panel:"buy-premium"}, "");
+                window.scrollTo({top:0,behavior:"smooth"});
+              }}
               style={{ display:"inline-flex", alignItems:"center", gap:7,
                        background:C.gold, color:C.navyDeep, padding:"11px 22px",
                        borderRadius:10, fontWeight:700, fontSize:13,
