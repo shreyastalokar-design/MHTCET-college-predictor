@@ -561,7 +561,7 @@ def add_pdf_header_footer(canvas, doc):
 
     ico_sz  = 0.65 * cm
     n       = len(socials)
-    gap     = 2.2 * cm              # tighter gap for 4 icons
+    gap     = 2.5 * cm              # slightly wider spacing between icons
     sx      = CX - gap * (n-1) / 2  # auto-centre all icons around CX
 
     for i, (fname, handle, url) in enumerate(socials):
