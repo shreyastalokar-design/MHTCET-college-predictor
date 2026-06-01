@@ -412,7 +412,7 @@ export default function App() {
                        borderRadius:10, fontWeight:700, fontSize:13,
                        border:`1.5px solid ${C.gold}`, cursor:"pointer",
                        letterSpacing:"0.3px" }}>
-              ⭐ Check out our Premium Services
+              <span style={{ filter:"grayscale(1) brightness(2.5)", fontSize:14 }}>⭐</span> Check out our Premium Services
               <span style={{ background:"#DC2626", color:"#fff", fontSize:9,
                              fontWeight:700, padding:"2px 7px", borderRadius:8 }}>
                 50% OFF
