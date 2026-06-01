@@ -394,18 +394,32 @@ export default function App() {
           </div>
         </div></FadeIn>
 
-        {/* Mobile only — Book a Free Counselling Session below stats */}
-        {isMobile && (
-          <FadeIn delay={0.65}>
+        {/* Both buttons — shown on all devices below stats */}
+        <FadeIn delay={0.65}>
+          <div style={{ display:"flex", gap:12, justifyContent:"center",
+                        flexWrap:"wrap", marginTop:18 }}>
             <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer"
-               style={{ display:"inline-block", marginTop:16, background:C.gold,
-                        color:C.navyDeep, padding:"11px 24px", borderRadius:10,
-                        fontWeight:700, fontSize:13, textDecoration:"none",
-                        letterSpacing:"0.3px" }}>
+               style={{ display:"inline-flex", alignItems:"center", gap:7,
+                        background:C.gold, color:C.navyDeep, padding:"11px 22px",
+                        borderRadius:10, fontWeight:700, fontSize:13,
+                        textDecoration:"none", letterSpacing:"0.3px" }}>
               📅 Book a Free Counselling Session
             </a>
-          </FadeIn>
-        )}
+            <button
+              onClick={() => { setPanel("buy-premium"); window.scrollTo({top:0,behavior:"smooth"}); }}
+              style={{ display:"inline-flex", alignItems:"center", gap:7,
+                       background:"transparent", color:C.gold, padding:"11px 22px",
+                       borderRadius:10, fontWeight:700, fontSize:13,
+                       border:`1.5px solid ${C.gold}`, cursor:"pointer",
+                       letterSpacing:"0.3px" }}>
+              ⭐ Check out Premium Services
+              <span style={{ background:"#DC2626", color:"#fff", fontSize:9,
+                             fontWeight:700, padding:"2px 7px", borderRadius:8 }}>
+                50% OFF
+              </span>
+            </button>
+          </div>
+        </FadeIn>
       </div>
       )} {/* end hero */}
 
