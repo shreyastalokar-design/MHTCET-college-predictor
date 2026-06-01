@@ -244,22 +244,34 @@ export default function App() {
   const isMobile = useIsMobile();
   const [infoMsg,       setInfoMsg]      = useState("");
 
-  // Handle browser back button — restore predictor panel
+  // Central navigation — updates panel + pushes browser history
+  const goTo = (panelName, extra) => {
+    setPanel(panelName);
+    if (extra) setInfoMsg(extra);
+    window.history.pushState({ panel: panelName }, "");
+    setSidebarOpen(false);
+    window.scrollTo({ top:0, behavior:"smooth" });
+  };
+
+  // On mount: stamp predictor as the base history entry so back never exits
   useEffect(() => {
-    const handlePop = () => setPanel("predictor");
+    window.history.replaceState({ panel: "predictor" }, "");
+
+    const handlePop = (e) => {
+      const target = e.state?.panel || "predictor";
+      setPanel(target);
+      window.scrollTo({ top:0, behavior:"smooth" });
+    };
     window.addEventListener("popstate", handlePop);
     return () => window.removeEventListener("popstate", handlePop);
   }, []);
 
   const navigate = (svc) => {
     if (svc.panel === "info") {
-      setInfoMsg(svc.info);
-      setPanel("info");
+      goTo("info", svc.info);
     } else {
-      setPanel(svc.panel);
-      setInfoMsg("");
+      goTo(svc.panel);
     }
-    setSidebarOpen(false);
   };
 
   return (
@@ -362,7 +374,7 @@ export default function App() {
         </div>
         {/* Buy button */}
         <FadeIn delay={0.1} direction="left">
-          <div onClick={() => { setPanel("buy-premium"); window.history.pushState({panel:"buy-premium"}, ""); setSidebarOpen(false); window.scrollTo({top:0,behavior:"smooth"}); }}
+          <div onClick={() => goTo("buy-premium")}
                style={{ background:C.gold, borderRadius:8, padding:"10px 8px", margin:"10px 8px 0",
                         textAlign:"center", cursor:"pointer" }}>
             <div style={{ fontSize:11, color:C.navyDeep, textDecoration:"line-through", opacity:0.6 }}>₹3,000</div>
@@ -414,9 +426,7 @@ export default function App() {
             </a>
             <button
               onClick={() => {
-                setPanel("buy-premium");
-                window.history.pushState({panel:"buy-premium"}, "");
-                window.scrollTo({top:0,behavior:"smooth"});
+                goTo("buy-premium");
               }}
               style={{ display:"inline-flex", alignItems:"center", gap:7,
                        background:C.gold, color:C.navyDeep, padding:"11px 22px",
@@ -436,7 +446,7 @@ export default function App() {
 
       {/* ── Main panel ── */}
       <div style={s.mainWrap}>
-        {panel === "predictor"   && <PredictorPanel setPanel={setPanel} />}
+        {panel === "predictor"   && <PredictorPanel setPanel={setPanel} goTo={goTo} />}
         {panel === "documents"   && <DocumentsPanel />}
         {panel === "buy-premium" && <PremiumPosterPanel />}
         {panel === "paid"        && <PremiumPosterPanel />}
@@ -444,7 +454,7 @@ export default function App() {
         {panel === "info"        && <InfoPanel msg={infoMsg} />}
       </div>
 
-      <SiteFooter setPanel={setPanel} isMobile={window.innerWidth <= 768} />
+      <SiteFooter setPanel={setPanel} goTo={goTo} isMobile={window.innerWidth <= 768} />
 
       {/* Floating WhatsApp — bottom-right, 100px from bottom */}
       {!isMobile && (
@@ -774,7 +784,7 @@ function PredictorPanel({ setPanel }) {
                 Avail our <strong>Premium Service</strong> to unlock all <strong>{results.total_results} results</strong>.
               </div>
               <button
-                 onClick={() => { setPanel("buy-premium"); window.scrollTo({top:0,behavior:"smooth"}); }}
+                 onClick={() => { goTo("buy-premium"); }}
                  style={{ background:`linear-gradient(135deg,${C.gold},#B8972E)`,
                           color:C.navyDeep, fontWeight:700, fontSize:14,
                           padding:"10px 24px", borderRadius:8, border:"none",
@@ -1204,7 +1214,7 @@ function MultiSelect({ options, selected, onChange, placeholder }) {
 // ═════════════════════════════════════════════════════════════════════════════
 // FOOTER
 // ═════════════════════════════════════════════════════════════════════════════
-function SiteFooter({ setPanel, isMobile }) {
+function SiteFooter({ setPanel, goTo, isMobile }) {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({ title:"Concept Delta", text:"Check out this MHT-CET College Predictor!", url:"https://www.conceptdelta.in" });
@@ -1228,11 +1238,11 @@ function SiteFooter({ setPanel, isMobile }) {
         <div>
           <div style={s.footerHead}>QUICK LINKS</div>
           {[
-            { label:"College Predictor",  action:() => { setPanel("predictor"); window.scrollTo({top:0,behavior:"smooth"}); } },
-            { label:"Documents Guidance", action:() => { setPanel("documents"); window.scrollTo({top:0,behavior:"smooth"}); } },
-            { label:"Call Support",       action:() => { setPanel("contact");   window.scrollTo({top:0,behavior:"smooth"}); } },
+            { label:"College Predictor",  action:() => goTo("predictor") },
+            { label:"Documents Guidance", action:() => goTo("documents") },
+            { label:"Call Support",       action:() => goTo("contact")   },
             { label:"Book a Free Counselling Session", action:() => window.open(GOOGLE_FORM_URL,"_blank") },
-            { label:"Buy Our Premium Counselling Services", action:() => { setPanel("buy-premium"); window.scrollTo({top:0,behavior:"smooth"}); } },
+            { label:"Buy Our Premium Counselling Services", action:() => goTo("buy-premium") },
           ].map(({label,action})=>(
             <div key={label} onClick={action}
                  style={{ ...s.footerLink, textDecoration:"underline", textDecorationColor:"rgba(255,255,255,0.2)" }}>
