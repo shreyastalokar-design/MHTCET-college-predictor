@@ -55,6 +55,7 @@ SOCIAL_LINKS = {
 }
 WEBSITE_URL     = "https://www.conceptdelta.in"
 GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeQm_ZVATB-GyaQrDR4qe1AMPi0aC1Lcrimx5v4U4-vfooKtg/viewform"
+PREMIUM_FORM_URL= "https://docs.google.com/forms/d/e/1FAIpQLSfFa4T3I_lx74G93fVjL0mB6DgUwtux3VyDSFLvB1Jto4MTew/viewform"
 WHATSAPP_URL    = "https://wa.me/918983798203"
 NAVY = colors.HexColor("#1E3A5F")
 BLUE = colors.HexColor("#2C5282")
