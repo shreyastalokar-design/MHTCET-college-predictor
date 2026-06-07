@@ -332,7 +332,7 @@ _PREM_SVCS = [
     "Personalized Option Form",
     "Branch & College Guidance",
     "Option Form Filling",
-    "Complete Personalised Counselling",
+    "Complete Counselling",
     "Live Mentorship",
     "24x7 Chat Support",
     "Personal Mentor",
