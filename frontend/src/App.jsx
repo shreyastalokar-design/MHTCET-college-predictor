@@ -380,7 +380,7 @@ export default function App() {
             <div style={{ fontSize:11, color:C.navyDeep, textDecoration:"line-through", opacity:0.6 }}>₹3,000</div>
             <div style={{ color:C.navyDeep, fontWeight:700, fontSize:14, display:"flex",
                           alignItems:"center", justifyContent:"center", gap:6 }}>
-              <span style={{ fontSize:16, filter:"grayscale(1) brightness(2.5)" }}>🛒</span> Buy at ₹1,500
+              <span style={{ fontSize:16, filter:"grayscale(1) brightness(2.5)" }}>🛒</span> Buy premium at ₹1,500
             </div>
             <div style={{ background:"#DC2626", color:"#fff", fontSize:9, fontWeight:700,
                           padding:"2px 8px", borderRadius:10, display:"inline-block", marginTop:4 }}>
