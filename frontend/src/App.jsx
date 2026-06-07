@@ -629,6 +629,14 @@ function PredictorPanel({ setPanel }) {
           </Field>
         </div>
 
+        {/* JEE note */}
+        <div style={{ background:"#FEF3C7", border:"1px solid #FCD34D", borderRadius:8,
+                      padding:"8px 12px", marginBottom:12, fontSize:12,
+                      color:"#92400E", lineHeight:1.6 }}>
+          📝 <strong>JEE Mains students:</strong> Enter your JEE percentile above and select{" "}
+          <strong>"All India Quota (JEE students)"</strong> in the Special Quota field below.
+        </div>
+
         <Field label="Gender *">
           <div style={s.genderRow}>
             {["Male","Female"].map(g=>(
