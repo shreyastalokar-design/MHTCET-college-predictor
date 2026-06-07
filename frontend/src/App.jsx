@@ -109,7 +109,7 @@ const QUOTA_OPTS = [
   { value: "TFWS",   label: "TFWS – Tuition Fee Waiver" },
   { value: "MI",     label: "Minority Quota" },
   { value: "ORPHAN", label: "Orphan Category" },
-  { value: "AI",     label: "All India Quota" },
+  { value: "AI",     label: "All India Quota (JEE students)" },
 ];
 const UNI_OPTS = [
   { value: "State Level",      label: "State Level (Most Common)" },
@@ -393,7 +393,7 @@ export default function App() {
       {/* ── Hero — only on landing/predictor page ── */}
       {panel === "predictor" && (
       <div style={s.hero}>
-        <FadeIn delay={0.1} direction="none"><div style={s.heroBadge}>MHT-CET 2026 · MAHARASHTRA</div></FadeIn>
+        <FadeIn delay={0.1} direction="none"><div style={s.heroBadge}>MHT-CET / JEE 2026 · MAHARASHTRA</div></FadeIn>
         <FadeIn delay={0.2}><h1 style={s.heroTitle}>Find your perfect engineering college</h1></FadeIn>
         <FadeIn delay={0.35}><p style={s.heroSub}>Personalized predictions · Safe, Moderate & Reach picks · Download as PDF</p></FadeIn>
         <FadeIn delay={0.5}><div style={s.statsRow}>
@@ -606,7 +606,7 @@ function PredictorPanel({ setPanel }) {
       <div style={s.breadcrumb}>Free Services › <strong>College Prediction</strong></div>
       <div style={s.panelHeaderRow}>
         <div>
-          <h2 style={s.panelTitle}>MHT-CET College Predictor <span style={s.yr26}>2026</span></h2>
+          <h2 style={s.panelTitle}>MHT-CET / JEE College Predictor <span style={s.yr26}>2026</span></h2>
           <p style={s.panelSub}>Find Safe · Moderate · Reach colleges based on your profile</p>
         </div>
         <span style={s.freePill}>🎁 100% Free</span>
@@ -659,24 +659,21 @@ function PredictorPanel({ setPanel }) {
           </select>
         </Field>
 
-        {/* Optional filters */}
+        {/* Optional filters — always visible */}
         <div style={s.filterBox}>
-          <div onClick={()=>setShowFilters(!showFilters)} style={s.filterToggle}>
+          <div style={{ ...s.filterToggle, cursor:"default" }}>
             <span>🔍 Preferred branches & districts (optional)</span>
-            <span>{showFilters?"▲":"▼"}</span>
           </div>
-          {showFilters && (
-            <div style={{ marginTop:14 }}>
-              <Field label="Preferred Branches">
-                <MultiSelect options={allBranches} selected={selBranches}
-                             onChange={setSelBranches} placeholder="All branches"/>
-              </Field>
-              <Field label="Preferred Districts">
-                <MultiSelect options={allDistricts} selected={selDistricts}
-                             onChange={setSelDistricts} placeholder="All districts"/>
-              </Field>
-            </div>
-          )}
+          <div style={{ marginTop:14 }}>
+            <Field label="Preferred Branches">
+              <MultiSelect options={allBranches} selected={selBranches}
+                           onChange={setSelBranches} placeholder="All branches"/>
+            </Field>
+            <Field label="Preferred Districts">
+              <MultiSelect options={allDistricts} selected={selDistricts}
+                           onChange={setSelDistricts} placeholder="All districts"/>
+            </Field>
+          </div>
         </div>
 
         {/* Category preview */}
@@ -1083,7 +1080,7 @@ function PremiumPosterPanel() {
                     background:`linear-gradient(135deg, ${C.gold}, #B8972E)`,
                     color:C.navyDeep, fontWeight:700, fontSize:15, padding:"15px 24px",
                     borderRadius:10, textDecoration:"none", marginBottom:10 }}>
-          🛒 Purchase Premium Package — ₹1,500
+          🛒 Purchase Personalised Counselling Package — ₹1,500
         </a>
 
         <div style={{ color:"#94A3B8", fontSize:11, textAlign:"center" }}>
@@ -1242,7 +1239,7 @@ function SiteFooter({ setPanel, goTo, isMobile }) {
             { label:"Documents Guidance", action:() => goTo("documents") },
             { label:"Call Support",       action:() => goTo("contact")   },
             { label:"Book a Free Counselling Session", action:() => window.open(GOOGLE_FORM_URL,"_blank") },
-            { label:"Buy Our Premium Counselling Services", action:() => goTo("buy-premium") },
+            { label:"Buy Our Personalised Counselling Services", action:() => goTo("buy-premium") },
           ].map(({label,action})=>(
             <div key={label} onClick={action}
                  style={{ ...s.footerLink, textDecoration:"underline", textDecorationColor:"rgba(255,255,255,0.2)" }}>
@@ -1285,7 +1282,7 @@ function SiteFooter({ setPanel, goTo, isMobile }) {
         </div>
       </div>
       <div style={s.footerBottom}>
-        © 2026 Concept Delta · MHT-CET College Guidance · {BRAND.initiative}
+        © 2026 Concept Delta · MHT-CET / JEE College Guidance · {BRAND.initiative}
       </div>
     </footer>
   );
