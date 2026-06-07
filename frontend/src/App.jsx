@@ -510,7 +510,7 @@ function BookSessionBtn() {
 // ═════════════════════════════════════════════════════════════════════════════
 // COLLEGE PREDICTOR PANEL
 // ═════════════════════════════════════════════════════════════════════════════
-function PredictorPanel({ setPanel }) {
+function PredictorPanel({ setPanel, goTo }) {
   const [percentile, setPercentile] = useState("");
   const [gender,     setGender]     = useState("Male");
   const [caste,      setCaste]      = useState("OPEN");
@@ -1088,7 +1088,7 @@ function PremiumPosterPanel() {
                     background:`linear-gradient(135deg, ${C.gold}, #B8972E)`,
                     color:C.navyDeep, fontWeight:700, fontSize:15, padding:"15px 24px",
                     borderRadius:10, textDecoration:"none", marginBottom:10 }}>
-          🛒 Purchase Personalised Counselling Package — ₹1,500
+          🛒 Purchase Premium Package — ₹1,500
         </a>
 
         <div style={{ color:"#94A3B8", fontSize:11, textAlign:"center" }}>
