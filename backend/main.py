@@ -9,6 +9,9 @@ import pandas as pd
 import os
 import io
 import gc
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from typing import Optional
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
@@ -42,6 +45,111 @@ MAX_PREDICT_RESULTS = 300
 @app.get("/ping")
 def ping():
     return {"status": "ok"}
+
+# ── Email config ──────────────────────────────────────────────────────────────
+GMAIL_USER     = "teamconceptdelta@gmail.com"
+GMAIL_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
+
+def send_confirmation_email(to_email: str, student_name: str, mobile: str,
+                             exam: str, category: str, district: str):
+    """Send branded confirmation email to student after premium form submission."""
+    if not GMAIL_PASSWORD or not to_email:
+        return
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = "Concept Delta — Booking Confirmed!"
+    msg["From"]    = f"Concept Delta <{GMAIL_USER}>"
+    msg["To"]      = to_email
+
+    html = f"""
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;
+                border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+      <div style="background:#031343;padding:24px;text-align:center;">
+        <h1 style="color:#D4AF37;margin:0;font-size:24px;">Concept Delta</h1>
+        <p style="color:#CBD5E1;margin:6px 0 0;font-size:13px;">An initiative by COEP alumni</p>
+      </div>
+      <div style="background:#D4AF37;height:4px;"></div>
+      <div style="padding:28px 24px;background:#ffffff;">
+        <h2 style="color:#031343;margin:0 0 8px;">Welcome aboard, {student_name}!</h2>
+        <p style="color:#475569;font-size:15px;line-height:1.7;margin:0 0 20px;">
+          Thank you for purchasing the <strong>Concept Delta Premium Package</strong>.
+          We have received your details and our team is verifying your payment.
+        </p>
+        <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;
+                    padding:16px;margin-bottom:20px;">
+          <h3 style="color:#031343;margin:0 0 10px;font-size:15px;">Your Details</h3>
+          <table style="width:100%;font-size:14px;color:#475569;">
+            <tr><td style="padding:4px 0;"><strong>Name:</strong></td><td>{student_name}</td></tr>
+            <tr><td style="padding:4px 0;"><strong>WhatsApp:</strong></td><td>{mobile}</td></tr>
+            <tr><td style="padding:4px 0;"><strong>Exam:</strong></td><td>{exam}</td></tr>
+            <tr><td style="padding:4px 0;"><strong>Category:</strong></td><td>{category}</td></tr>
+            <tr><td style="padding:4px 0;"><strong>District:</strong></td><td>{district}</td></tr>
+            <tr><td style="padding:4px 0;"><strong>Package:</strong></td>
+                <td><strong style="color:#D4AF37;">Premium - Rs.1,500</strong></td></tr>
+          </table>
+        </div>
+        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;
+                    padding:16px;margin-bottom:20px;">
+          <h3 style="color:#166534;margin:0 0 10px;font-size:15px;">What you get</h3>
+          <ul style="color:#166534;font-size:13px;margin:0;padding-left:18px;line-height:2;">
+            <li>Personalized Option Form</li>
+            <li>Branch &amp; College Guidance</li>
+            <li>Option Form Filling Guidance</li>
+            <li>Complete Personalised Counselling</li>
+            <li>Live Mentorship</li>
+            <li>24x7 Chat Support</li>
+            <li>Personal Mentor</li>
+            <li>Admission Assistance</li>
+            <li>CAP Round Support</li>
+            <li>ILS / Spot Round Guidance</li>
+            <li>Special Guest Lecture on Each Branch</li>
+            <li>Personalized Counselling Material</li>
+            <li>Live Session Recordings</li>
+            <li>WhatsApp Group Access &amp; Guidance Material</li>
+          </ul>
+        </div>
+        <div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;
+                    padding:16px;margin-bottom:24px;">
+          <h3 style="color:#92400E;margin:0 0 8px;font-size:15px;">Next Steps</h3>
+          <p style="color:#92400E;font-size:13px;margin:0;line-height:1.8;">
+            1. Our team will verify your payment<br/>
+            2. You will be added to the <strong>Concept Delta WhatsApp Group</strong><br/>
+            3. Your personal mentor will contact you on WhatsApp shortly<br/>
+            4. Counselling sessions will be scheduled as per your convenience
+          </p>
+        </div>
+        <div style="text-align:center;margin-bottom:20px;">
+          <a href="https://wa.me/918983798203"
+             style="background:#25D366;color:#ffffff;padding:12px 28px;border-radius:8px;
+                    text-decoration:none;font-weight:700;font-size:14px;display:inline-block;">
+            WhatsApp Us
+          </a>
+        </div>
+        <p style="color:#94A3B8;font-size:12px;text-align:center;margin:0;">
+          Didn't receive WhatsApp message? Contact us at
+          <a href="https://wa.me/918983798203" style="color:#031343;font-weight:700;">
+            +91 89837 98203</a>
+        </p>
+      </div>
+      <div style="background:#031343;padding:16px;text-align:center;">
+        <p style="color:#D4AF37;margin:0;font-size:13px;font-weight:700;">Concept Delta</p>
+        <p style="color:#94A3B8;margin:4px 0;font-size:11px;">SMART GUIDANCE - BETTER FUTURES</p>
+        <a href="https://www.conceptdelta.in" style="color:#D4AF37;font-size:11px;">
+          www.conceptdelta.in</a>
+        <p style="color:#64748B;margin:8px 0 0;font-size:10px;">
+          teamconceptdelta@gmail.com | +91 89837 98203
+        </p>
+      </div>
+    </div>
+    """
+
+    msg.attach(MIMEText(html, "html"))
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(GMAIL_USER, GMAIL_PASSWORD)
+            server.sendmail(GMAIL_USER, to_email, msg.as_string())
+    except Exception as e:
+        print(f"Email send failed: {e}")
 
 # ── Brand constants ───────────────────────────────────────────────────────────
 BRAND_NAME = "Concept Delta"
@@ -218,6 +326,24 @@ def filter_colleges(percentile, gender, caste, quota, uni_type, cap_round,
 # ════════════════════════════════════════════════════════════════════════════
 # API ENDPOINTS
 # ════════════════════════════════════════════════════════════════════════════
+
+@app.post("/premium-submit")
+async def premium_submit(
+    name:     str = Query(...),
+    email:    str = Query(...),
+    mobile:   str = Query(""),
+    exam:     str = Query(""),
+    category: str = Query(""),
+    district: str = Query(""),
+):
+    """Called when a student fills the premium form. Sends confirmation email."""
+    send_confirmation_email(email, name, mobile, exam, category, district)
+    # Also notify team
+    send_confirmation_email(
+        "teamconceptdelta@gmail.com",
+        f"New Premium — {name}", mobile, exam, category, district
+    )
+    return {"status": "ok", "message": "Email sent"}
 
 @app.get("/")
 def root():
