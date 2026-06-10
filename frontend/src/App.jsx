@@ -380,7 +380,7 @@ export default function App() {
             <div style={{ fontSize:11, color:C.navyDeep, textDecoration:"line-through", opacity:0.6 }}>₹3,000</div>
             <div style={{ color:C.navyDeep, fontWeight:700, fontSize:14, display:"flex",
                           alignItems:"center", justifyContent:"center", gap:6 }}>
-              <span style={{ fontSize:16, filter:"grayscale(1) brightness(2.5)" }}>🛒</span> Buy premium at ₹1,500
+              <span style={{ fontSize:16, filter:"grayscale(1) brightness(2.5)" }}>🛒</span> Buy at ₹1,500
             </div>
             <div style={{ background:"#DC2626", color:"#fff", fontSize:9, fontWeight:700,
                           padding:"2px 8px", borderRadius:10, display:"inline-block", marginTop:4 }}>
@@ -1018,27 +1018,6 @@ const ALL_PREMIUM_SERVICES = [
 ];
 
 function PremiumPosterPanel() {
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name:"", email:"", mobile:"" });
-  const [sending,  setSending]  = useState(false);
-  const [sent,     setSent]     = useState(false);
-
-  const handlePurchase = async () => {
-    if (!formData.name || !formData.email || !formData.mobile) {
-      alert("Please fill all fields before proceeding.");
-      return;
-    }
-    setSending(true);
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000); // 5 sec max
-      await fetch(`${API_BASE}/premium-submit?name=${encodeURIComponent(formData.name)}&email=${encodeURIComponent(formData.email)}&mobile=${encodeURIComponent(formData.mobile)}`, { method:"POST", signal: controller.signal });
-      clearTimeout(timeout);
-    } catch(e) { /* silent — don't block user even if backend is slow */ }
-    setSending(false);
-    setSent(true);
-    window.open(PREMIUM_FORM_URL, "_blank");
-  };
   const half = Math.ceil(ALL_PREMIUM_SERVICES.length / 2);
   const col1 = ALL_PREMIUM_SERVICES.slice(0, half);
   const col2 = ALL_PREMIUM_SERVICES.slice(half);
@@ -1103,58 +1082,14 @@ function PremiumPosterPanel() {
           </div>
         </div>
 
-        {/* Purchase flow */}
-        {!showForm ? (
-          <button onClick={() => setShowForm(true)}
-             style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10,
-                      background:`linear-gradient(135deg, ${C.gold}, #B8972E)`,
-                      color:C.navyDeep, fontWeight:700, fontSize:15, padding:"15px 24px",
-                      borderRadius:10, border:"none", cursor:"pointer",
-                      width:"100%", marginBottom:10 }}>
-            🛒 Purchase Premium Package — ₹1,500
-          </button>
-        ) : sent ? (
-          <div style={{ background:"#F0FDF4", border:"1px solid #BBF7D0", borderRadius:10,
-                        padding:"16px", textAlign:"center", marginBottom:10 }}>
-            <div style={{ fontSize:15, fontWeight:700, color:"#166534" }}>✅ Details saved!</div>
-            <div style={{ fontSize:13, color:"#166534", marginTop:4 }}>
-              Confirmation email will be sent to <strong>{formData.email}</strong>
-            </div>
-            <div style={{ fontSize:12, color:"#64748B", marginTop:6 }}>
-              Complete your payment in the Google Form that just opened.
-            </div>
-          </div>
-        ) : (
-          <div style={{ background:"#EFF6FF", border:"1px solid #BFDBFE", borderRadius:10,
-                        padding:"16px", marginBottom:10 }}>
-            <div style={{ fontWeight:700, color:C.navyDeep, marginBottom:12, fontSize:14 }}>
-              📋 Enter your details to receive confirmation email
-            </div>
-            {[
-              { key:"name",   label:"Full Name",       placeholder:"Your full name" },
-              { key:"email",  label:"Gmail ID",         placeholder:"yourmail@gmail.com" },
-              { key:"mobile", label:"WhatsApp Number",  placeholder:"10-digit mobile number" },
-            ].map(f => (
-              <div key={f.key} style={{ marginBottom:10 }}>
-                <div style={{ fontSize:12, color:C.textMuted, marginBottom:4 }}>{f.label} *</div>
-                <input
-                  value={formData[f.key]}
-                  onChange={e => setFormData(p => ({...p, [f.key]: e.target.value}))}
-                  placeholder={f.placeholder}
-                  style={{ width:"100%", padding:"9px 12px", borderRadius:8, fontSize:13,
-                           border:`1px solid ${C.border}`, boxSizing:"border-box" }}
-                />
-              </div>
-            ))}
-            <button onClick={handlePurchase} disabled={sending}
-               style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8,
-                        background:`linear-gradient(135deg, ${C.gold}, #B8972E)`,
-                        color:C.navyDeep, fontWeight:700, fontSize:14, padding:"12px 24px",
-                        borderRadius:10, border:"none", cursor:"pointer", width:"100%" }}>
-              {sending ? "⏳ Processing..." : "🛒 Proceed to Payment — ₹1,500"}
-            </button>
-          </div>
-        )}
+        {/* Purchase button */}
+        <a href={PREMIUM_FORM_URL} target="_blank" rel="noopener noreferrer"
+           style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10,
+                    background:`linear-gradient(135deg, ${C.gold}, #B8972E)`,
+                    color:C.navyDeep, fontWeight:700, fontSize:15, padding:"15px 24px",
+                    borderRadius:10, textDecoration:"none", marginBottom:10 }}>
+          🛒 Purchase Premium Package — ₹1,500
+        </a>
 
         <div style={{ color:"#94A3B8", fontSize:11, textAlign:"center" }}>
           After purchase you will receive a confirmation email on your registered email ID.
