@@ -1030,8 +1030,11 @@ function PremiumPosterPanel() {
     }
     setSending(true);
     try {
-      await fetch(`${API_BASE}/premium-submit?name=${encodeURIComponent(formData.name)}&email=${encodeURIComponent(formData.email)}&mobile=${encodeURIComponent(formData.mobile)}`, { method:"POST" });
-    } catch(e) { /* silent */ }
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000); // 5 sec max
+      await fetch(`${API_BASE}/premium-submit?name=${encodeURIComponent(formData.name)}&email=${encodeURIComponent(formData.email)}&mobile=${encodeURIComponent(formData.mobile)}`, { method:"POST", signal: controller.signal });
+      clearTimeout(timeout);
+    } catch(e) { /* silent — don't block user even if backend is slow */ }
     setSending(false);
     setSent(true);
     window.open(PREMIUM_FORM_URL, "_blank");
