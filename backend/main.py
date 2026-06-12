@@ -90,7 +90,7 @@ def send_confirmation_email(to_email: str, student_name: str, mobile: str,
             <li>Personalized Option Form</li>
             <li>Branch &amp; College Guidance</li>
             <li>Option Form Filling Guidance</li>
-            <li>Complete Personalised Counselling</li>
+            <li>Complete Counselling</li>
             <li>Live Mentorship</li>
             <li>24x7 Chat Support</li>
             <li>Personal Mentor</li>
@@ -126,12 +126,32 @@ def send_confirmation_email(to_email: str, student_name: str, mobile: str,
             +91 89837 98203</a>
         </p>
       </div>
-      <div style="background:#031343;padding:16px;text-align:center;">
-        <p style="color:#D4AF37;margin:0;font-size:13px;font-weight:700;">Concept Delta</p>
-        <p style="color:#94A3B8;margin:4px 0;font-size:11px;">SMART GUIDANCE - BETTER FUTURES</p>
-        <a href="https://www.conceptdelta.in" style="color:#D4AF37;font-size:11px;">
-          www.conceptdelta.in</a>
-        <p style="color:#64748B;margin:8px 0 0;font-size:10px;">
+      <div style="background:#031343;padding:20px 16px;text-align:center;">
+        <p style="color:#D4AF37;margin:0 0 4px;font-size:14px;font-weight:700;">Concept Delta</p>
+        <p style="color:#94A3B8;margin:0 0 12px;font-size:11px;">SMART GUIDANCE - BETTER FUTURES</p>
+
+        <div style="margin-bottom:12px;">
+          <a href="https://youtube.com/@conceptdelta2026"
+             style="color:#FF0000;font-size:12px;font-weight:700;text-decoration:none;margin:0 10px;">
+            YouTube
+          </a>
+          <span style="color:#64748B;">|</span>
+          <a href="https://www.instagram.com/conceptdelta2031"
+             style="color:#E1306C;font-size:12px;font-weight:700;text-decoration:none;margin:0 10px;">
+            Instagram
+          </a>
+          <span style="color:#64748B;">|</span>
+          <a href="https://t.me/Conceptdelta"
+             style="color:#0088CC;font-size:12px;font-weight:700;text-decoration:none;margin:0 10px;">
+            Telegram
+          </a>
+        </div>
+
+        <a href="https://www.conceptdelta.in"
+           style="color:#D4AF37;font-size:12px;text-decoration:none;display:block;margin-bottom:8px;">
+          www.conceptdelta.in
+        </a>
+        <p style="color:#64748B;margin:0;font-size:11px;">
           teamconceptdelta@gmail.com | +91 89837 98203
         </p>
       </div>
@@ -148,13 +168,46 @@ def send_confirmation_email(to_email: str, student_name: str, mobile: str,
             json={
                 "from": FROM_EMAIL,
                 "to": [to_email],
-                "subject": "Concept Delta - Booking Confirmed!",
+                "subject": "Concept Delta - Premium Package Confirmed!",
                 "html": html,
             },
             timeout=10,
         )
     except Exception as e:
         print(f"Resend email failed: {e}")
+
+
+def send_team_notification(student_name: str, mobile: str, student_email: str,
+                            exam: str, category: str, district: str):
+    """Send plain-text notification to team — matches original Apps Script format."""
+    if not RESEND_API_KEY:
+        return
+    text = (
+        f"Name: {student_name}\n"
+        f"WhatsApp: {mobile}\n"
+        f"Gmail: {student_email}\n"
+        f"Exam: {exam}\n"
+        f"Category: {category}\n"
+        f"District: {district}\n\n"
+        f"Verify payment and add to WhatsApp group!"
+    )
+    try:
+        requests.post(
+            RESEND_API_URL,
+            headers={
+                "Authorization": f"Bearer {RESEND_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": FROM_EMAIL,
+                "to": [TEAM_EMAIL],
+                "subject": f"New Premium Purchase - {student_name}",
+                "text": text,
+            },
+            timeout=10,
+        )
+    except Exception as e:
+        print(f"Resend team notification failed: {e}")
 
 
 @app.post("/notify-premium-purchase")
@@ -167,10 +220,9 @@ async def notify_premium_purchase(
     district: str = Query(""),
 ):
     """Called by Google Apps Script trigger when premium form is submitted.
-    Sends confirmation email to student + notification to team."""
+    Sends confirmation email to student + plain-text notification to team."""
     send_confirmation_email(email, name, mobile, exam, category, district)
-    send_confirmation_email(TEAM_EMAIL, f"New Premium Purchase - {name}",
-                             mobile, exam, category, district)
+    send_team_notification(name, mobile, email, exam, category, district)
     return {"status": "ok"}
 
 # ── Brand constants ───────────────────────────────────────────────────────────
