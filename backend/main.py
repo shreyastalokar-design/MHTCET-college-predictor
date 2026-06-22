@@ -924,7 +924,7 @@ def predict_pdf(
     if total_found > PDF_LIMIT:
         story.append(Paragraph(
             f"<b>Note:</b> Only the top {PDF_LIMIT} colleges are shown in this PDF. "
-            f"Your full result of <b>{total_found} colleges</b> is available on the website.",
+            f"To see full list of your <b>{total_found} colleges</b> purchase our premium counselling service.",
             ParagraphStyle('note100', fontSize=9, textColor=colors.HexColor("#854D0E"),
                            backColor=colors.HexColor("#FEF3C7"), borderPadding=8,
                            alignment=TA_LEFT, leading=14)
