@@ -624,20 +624,8 @@ function PredictorPanel({ setPanel, goTo }) {
           </Field>
           <Field label="CAP Round *">
             <select value={capRound} onChange={e=>setCapRound(e.target.value)} style={s.select}>
-              {CAP_ROUNDS.map(r=>(
-                <option key={r} value={r}>
-                  {r.replace("CAP ","")}
-                  {(r==="CAP Round 3"||r==="CAP Round 4") ? " 🔒 Premium" : ""}
-                </option>
-              ))}
+              {CAP_ROUNDS.map(r=><option key={r} value={r}>{r.replace("CAP ","")}</option>)}
             </select>
-            {(capRound==="CAP Round 3"||capRound==="CAP Round 4") && (
-              <div style={{ fontSize:11, color:"#92400E", background:"#FEF3C7",
-                            border:"1px solid #FCD34D", borderRadius:6,
-                            padding:"5px 8px", marginTop:5 }}>
-                🔒 Round 3 & 4 results are available in <strong>Premium</strong> only
-              </div>
-            )}
           </Field>
         </div>
 
@@ -721,221 +709,93 @@ function PredictorPanel({ setPanel, goTo }) {
       {/* ── Results ── */}
       {results && (
         <div ref={resultsRef} style={{ marginTop:24 }}>
-
-          {/* ── LOCKED ROUND — Round 3 & 4 ── */}
-          {results.is_locked_round ? (
+          <div style={s.resultsHeader}>
             <div>
-              {/* Header still shows */}
-              <div style={s.resultsHeader}>
-                <div>
-                  <h3 style={s.resultsTitle}>
-                    <span style={{ color:C.navy }}>{results.total_results}</span> colleges found
-                  </h3>
-                  <div style={s.resultsMeta}>
-                    Category: <strong>{results.category_codes?.join(", ")}</strong>
-                    {" · "}<strong>{results.cap_round}</strong>
-                    {" · "}Percentile <strong>{results.percentile}</strong>
-                  </div>
-                </div>
+              <h3 style={s.resultsTitle}>
+                <span style={{ color:C.navy }}>{results.total_results}</span> colleges found
+              </h3>
+              <div style={s.resultsMeta}>
+                Category: <strong>{results.category_codes?.join(", ")}</strong>
+                {" · "}<strong>{results.cap_round}</strong>
+                {" · "}Percentile <strong>{results.percentile}</strong>
               </div>
-
-              {/* 3 blurred preview cards */}
-              <div style={{ position:"relative" }}>
-                {[...Array(3)].map((_,i)=>(
-                  <div key={i} style={{
-                    filter:"blur(4px)", pointerEvents:"none",
-                    userSelect:"none", opacity: 1 - i*0.2,
-                  }}>
-                    <div style={{ ...s.collegeCard, borderLeft:`4px solid #16A34A` }}>
-                      <div style={s.ccTop}>
-                        <div>
-                          <div style={s.ccCode}>Code: ████</div>
-                          <div style={s.ccName}>██████████ College of Engineering, ██████</div>
-                          <div style={s.ccSub}>📍 ████████ · Govt/Auto</div>
-                        </div>
-                        <span style={{ ...s.chancePill, background:"#DCFCE7", color:"#166534" }}>
-                          🟢 SAFE
-                        </span>
-                      </div>
-                      <div style={s.ccMeta}>
-                        <div><div style={s.ccMetaLbl}>BRANCH</div><div style={s.ccMetaVal}>Computer Science and Engineering</div></div>
-                        <div><div style={s.ccMetaLbl}>CUTOFF %ILE</div><div style={s.ccMetaVal}>██.██ile</div></div>
-                        <div><div style={s.ccMetaLbl}>CUTOFF RANK</div><div style={s.ccMetaVal}>█████</div></div>
-                        <div><div style={s.ccMetaLbl}>CATEGORY</div><div style={s.ccMetaVal}>GOPENS</div></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Lock overlay */}
-                <div style={{
-                  position:"absolute", top:0, left:0, right:0, bottom:0,
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  background:"rgba(255,255,255,0.6)", borderRadius:12,
-                }}>
-                  <div style={{
-                    background:C.navyDeep, borderRadius:16, padding:"28px 32px",
-                    textAlign:"center", maxWidth:380, boxShadow:"0 8px 32px rgba(3,19,67,0.25)",
-                  }}>
-                    <div style={{ fontSize:40, marginBottom:10 }}>🔒</div>
-                    <div style={{ color:C.gold, fontSize:18, fontWeight:700, marginBottom:6 }}>
-                      {results.cap_round} is Premium Only
-                    </div>
-                    <div style={{ color:"#CBD5E1", fontSize:13, lineHeight:1.7, marginBottom:16 }}>
-                      CAP Round 3 & 4 results are available exclusively for Premium members.
-                      Unlock <strong style={{ color:C.gold }}>{results.total_results} colleges</strong> with full cutoff data.
-                    </div>
-                    <a href={PREMIUM_FORM_URL} target="_blank" rel="noreferrer"
-                       style={{
-                         display:"block", background:`linear-gradient(135deg,${C.gold},#B8972E)`,
-                         color:C.navyDeep, fontWeight:700, fontSize:15,
-                         padding:"12px 28px", borderRadius:8, textDecoration:"none",
-                         marginBottom:8,
-                       }}>
-                      🛒 Get Premium — ₹1,500
-                    </a>
-                    <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer"
-                       style={{ color:"#25D366", fontSize:13, textDecoration:"none" }}>
-                      💬 WhatsApp us for details
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          ) : (
-            /* ── FREE ROUNDS — Round 1 & 2 ── */
-            <div>
-              <div style={s.resultsHeader}>
-                <div>
-                  <h3 style={s.resultsTitle}>
-                    <span style={{ color:C.navy }}>{results.total_results}</span> colleges found
-                  </h3>
-                  <div style={s.resultsMeta}>
-                    Category: <strong>{results.category_codes?.join(", ")}</strong>
-                    {" · "}<strong>{results.cap_round}</strong>
-                    {" · "}Percentile <strong>{results.percentile}</strong>
-                  </div>
-                  {results.category_codes?.includes("AI") && (
-                    <div style={s.aiWarning}>
-                      ⚠️ <strong>AI Quota Note:</strong> Cutoff percentiles shown are <strong>JEE Main percentiles</strong>, not MHT-CET. Use your JEE score to evaluate these results.
-                    </div>
-                  )}
-                </div>
-                <button onClick={downloadPDF} style={s.dlBtn}>📥 Download PDF</button>
-              </div>
-
-              {/* Tab pills */}
-              <div style={s.tabs}>
-                {[
-                  { key:"All",      label:"All",         n:results.total_results },
-                  { key:"Safe",     label:"🟢 Safe",     n:results.safe_count },
-                  { key:"Moderate", label:"🟡 Moderate", n:results.moderate_count },
-                  { key:"Reach",    label:"🔴 Reach",    n:results.reach_count },
-                ].map(t=>(
-                  <button key={t.key} onClick={()=>setActiveTab(t.key)}
-                          style={activeTab===t.key ? s.tabActive : s.tab}>
-                    {t.label} <span style={s.tabBadge}>{t.n}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Search bar */}
-              <div style={s.searchWrap}>
-                <div style={s.searchIcon}>🔍</div>
-                <input
-                  type="text"
-                  placeholder="Search by college name, branch, district or code..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  style={s.searchInput}
-                />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery("")} style={s.searchClear}>✕</button>
-                )}
-              </div>
-              {searchQuery && (
-                <div style={s.searchCount}>
-                  Showing <strong>{filtered.length}</strong> of {results.total_results} colleges
-                  {activeTab !== "All" ? ` (${activeTab})` : ""}
-                  {" "}matching "<strong>{searchQuery}</strong>"
+              {results.category_codes?.includes("AI") && (
+                <div style={s.aiWarning}>
+                  ⚠️ <strong>AI Quota Note:</strong> Cutoff percentiles shown are <strong>JEE Main percentiles</strong>, not MHT-CET. Use your JEE score to evaluate these results.
                 </div>
               )}
+            </div>
+            <button onClick={downloadPDF} style={s.dlBtn}>📥 Download PDF</button>
+          </div>
 
-              {/* College cards — top 25 */}
-              {filtered.length===0
-                ? <div style={s.noResults}>
-                    {searchQuery
-                      ? `No colleges found for "${searchQuery}". Try a different search.`
-                      : "No colleges for this filter. Try another tab."
-                    }
-                  </div>
-                : filtered.map((c,i)=><CollegeCard key={i} c={c}/>)
-              }
+          {/* Tab pills */}
+          <div style={s.tabs}>
+            {[
+              { key:"All",      label:"All",         n:results.total_results },
+              { key:"Safe",     label:"🟢 Safe",     n:results.safe_count },
+              { key:"Moderate", label:"🟡 Moderate", n:results.moderate_count },
+              { key:"Reach",    label:"🔴 Reach",    n:results.reach_count },
+            ].map(t=>(
+              <button key={t.key} onClick={()=>setActiveTab(t.key)}
+                      style={activeTab===t.key ? s.tabActive : s.tab}>
+                {t.label} <span style={s.tabBadge}>{t.n}</span>
+              </button>
+            ))}
+          </div>
 
-              {/* ── UPSELL BANNER ── */}
-              <div style={{
-                background:`linear-gradient(135deg, ${C.navyDeep} 0%, #0A2880 100%)`,
-                borderRadius:14, padding:"28px 24px", marginTop:24,
-                textAlign:"center", boxShadow:"0 8px 32px rgba(3,19,67,0.2)",
-                border:`1.5px solid ${C.gold}`,
-              }}>
-                <div style={{ fontSize:28, marginBottom:8 }}>🔒</div>
-                <div style={{ color:C.gold, fontSize:20, fontWeight:700, marginBottom:6 }}>
-                  {results.free_tier_note
-                    ? `See all ${results.total_results} colleges + CAP Round 3 & 4`
-                    : "Unlock CAP Round 3 & 4 Results"
-                  }
-                </div>
-                <div style={{ color:"#CBD5E1", fontSize:14, lineHeight:1.8,
-                              marginBottom:20, maxWidth:480, margin:"0 auto 20px" }}>
-                  {results.free_tier_note
-                    ? <>You're seeing <strong style={{ color:C.gold }}>top 25 of {results.total_results}</strong> colleges for free.<br/></>
-                    : null
-                  }
-                  Upgrade to Premium and get <strong style={{ color:"#86EFAC" }}>complete CAP Round 3 & 4 data</strong>,
-                  personalised option form, branch guidance, mentor support and much more.
-                </div>
+          {/* Search bar */}
+          <div style={s.searchWrap}>
+            <div style={s.searchIcon}>🔍</div>
+            <input
+              type="text"
+              placeholder="Search by college name, branch, district or code..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={s.searchInput}
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} style={s.searchClear}>✕</button>
+            )}
+          </div>
+          {searchQuery && (
+            <div style={s.searchCount}>
+              Showing <strong>{filtered.length}</strong> of {results.total_results} colleges
+              {activeTab !== "All" ? ` (${activeTab})` : ""}
+              {" "}matching "<strong>{searchQuery}</strong>"
+            </div>
+          )}
 
-                {/* Feature pills */}
-                <div style={{ display:"flex", flexWrap:"wrap", gap:8,
-                              justifyContent:"center", marginBottom:20 }}>
-                  {["✅ All CAP Rounds", "✅ Full College List", "✅ Personalised Option Form",
-                    "✅ Branch Guidance", "✅ Personal Mentor", "✅ 24×7 Support"].map(f=>(
-                    <span key={f} style={{
-                      background:"rgba(255,255,255,0.1)", color:"#E2E8F0",
-                      fontSize:12, padding:"5px 12px", borderRadius:20,
-                      border:"1px solid rgba(255,255,255,0.15)",
-                    }}>{f}</span>
-                  ))}
-                </div>
-
-                <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
-                  <a href={PREMIUM_FORM_URL} target="_blank" rel="noreferrer"
-                     style={{
-                       background:`linear-gradient(135deg,${C.gold},#B8972E)`,
-                       color:C.navyDeep, fontWeight:700, fontSize:15,
-                       padding:"12px 28px", borderRadius:8, textDecoration:"none",
-                       display:"inline-block",
-                     }}>
-                    🛒 Get Premium — ₹1,500 only
-                  </a>
-                  <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I want to know more about Concept Delta Premium")}`}
-                     target="_blank" rel="noreferrer"
-                     style={{
-                       background:"#25D366", color:"#fff", fontWeight:700,
-                       fontSize:15, padding:"12px 28px", borderRadius:8,
-                       textDecoration:"none", display:"inline-block",
-                     }}>
-                    💬 WhatsApp Us
-                  </a>
-                </div>
-
-                <div style={{ color:"#64748B", fontSize:12, marginTop:12 }}>
-                  50% OFF · Limited time · ₹1,500 only (original ₹3,000)
-                </div>
+          {/* College cards */}
+          {filtered.length===0
+            ? <div style={s.noResults}>
+                {searchQuery
+                  ? `No colleges found for "${searchQuery}". Try a different search.`
+                  : "No colleges for this filter. Try another tab."
+                }
               </div>
+            : filtered.map((c,i)=><CollegeCard key={i} c={c}/>)
+          }
 
+          {/* Free tier note — shown only when results are capped */}
+          {results.free_tier_note && (
+            <div style={{ background:"#FEF3C7", border:"1.5px solid #D4AF37",
+                          borderRadius:10, padding:"16px 18px", marginTop:16,
+                          textAlign:"center" }}>
+              <div style={{ fontSize:15, fontWeight:700, color:"#92400E", marginBottom:6 }}>
+                You have {results.total_results} colleges matching your profile!
+              </div>
+              <div style={{ fontSize:13, color:"#78350F", marginBottom:12, lineHeight:1.6 }}>
+                Only top <strong>300 colleges</strong> are visible in the free tier.
+                Avail our <strong>Premium Service</strong> to unlock all <strong>{results.total_results} results</strong>.
+              </div>
+              <button
+                 onClick={() => { goTo("buy-premium"); }}
+                 style={{ background:`linear-gradient(135deg,${C.gold},#B8972E)`,
+                          color:C.navyDeep, fontWeight:700, fontSize:14,
+                          padding:"10px 24px", borderRadius:8, border:"none",
+                          cursor:"pointer", display:"inline-block" }}>
+                🛒 Get Premium — ₹1,500
+              </button>
             </div>
           )}
         </div>

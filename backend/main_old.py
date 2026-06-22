@@ -38,7 +38,7 @@ async def cleanup_middleware(request, call_next):
     return response
 
 # ── Max results returned to frontend ─────────────────────────────────────────
-MAX_PREDICT_RESULTS = 25
+MAX_PREDICT_RESULTS = 300
 
 @app.get("/ping")
 def ping():
@@ -494,10 +494,10 @@ def predict(
         "moderate_count": sum(1 for c in colleges if c['admission_chance'] == 'Moderate'),
         "reach_count":    sum(1 for c in colleges if c['admission_chance'] == 'Reach'),
         "colleges": colleges,
-        "is_locked_round": cap_round in ("CAP Round 3", "CAP Round 4"),
         "free_tier_note": (
-            f"Showing top {MAX_PREDICT_RESULTS} of {total_found} colleges. "
-            f"Upgrade to Premium to unlock all {total_found} results."
+            f"Showing top {MAX_PREDICT_RESULTS} colleges out of {total_found}. "
+            f"Only top {MAX_PREDICT_RESULTS} colleges are visible in the free tier. "
+            f"Avail our Premium Service to access all {total_found} results."
         ) if total_found > MAX_PREDICT_RESULTS else None,
     }
     del filtered, results, colleges
