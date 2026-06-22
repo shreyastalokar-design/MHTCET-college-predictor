@@ -514,6 +514,7 @@ function BookSessionBtn() {
 // COLLEGE PREDICTOR PANEL
 // ═════════════════════════════════════════════════════════════════════════════
 function PredictorPanel({ setPanel, goTo }) {
+  const isMobile = useIsMobile();
   const [percentile, setPercentile] = useState("");
   const [gender,     setGender]     = useState("Male");
   const [caste,      setCaste]      = useState("OPEN");
@@ -608,7 +609,8 @@ function PredictorPanel({ setPanel, goTo }) {
       {/* ── Breadcrumb ── */}
       <div style={s.breadcrumb}>Free Services › <strong>College Prediction</strong></div>
 
-      {/* ── WhatsApp Help Bar ── */}
+      {/* ── WhatsApp Help Bar — mobile only (desktop has floating button) ── */}
+      {isMobile && (
       <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi Concept Delta! I need help with college admission 2026.")}`}
          target="_blank" rel="noreferrer"
          style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
@@ -626,6 +628,7 @@ function PredictorPanel({ setPanel, goTo }) {
         </div>
         <div style={{ color:"#fff", fontSize:20 }}>›</div>
       </a>
+      )}
 
       <div style={s.panelHeaderRow}>
         <div>
@@ -921,16 +924,30 @@ function PredictorPanel({ setPanel, goTo }) {
                   personalised option form, branch guidance, mentor support and much more.
                 </div>
 
-                {/* Feature pills */}
+                {/* Feature pills — all premium services */}
                 <div style={{ display:"flex", flexWrap:"wrap", gap:8,
                               justifyContent:"center", marginBottom:20 }}>
-                  {["✅ All CAP Rounds", "✅ Full College List", "✅ Personalised Option Form",
-                    "✅ Branch Guidance", "✅ Personal Mentor", "✅ 24×7 Support"].map(f=>(
+                  {[
+                    "Full College Predictor List",
+                    "Personalised Option Form",
+                    "Branch & College Guidance",
+                    "Option Form Filling",
+                    "Complete Counselling",
+                    "Live Mentorship",
+                    "24×7 Chat Support",
+                    "Personal Mentor",
+                    "Admission Assistance",
+                    "CAP Round Support",
+                    "ILS / Spot Round Guidance",
+                    "Guest Lecture on Each Branch",
+                    "Personalised Branch List",
+                    "WhatsApp Group Access",
+                  ].map(f=>(
                     <span key={f} style={{
                       background:"rgba(255,255,255,0.1)", color:"#E2E8F0",
                       fontSize:12, padding:"5px 12px", borderRadius:20,
                       border:"1px solid rgba(255,255,255,0.15)",
-                    }}>{f}</span>
+                    }}>✅ {f}</span>
                   ))}
                 </div>
 
