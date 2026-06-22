@@ -146,6 +146,7 @@ const SIDEBAR_SERVICES = [
   { id:"mentorship",    label:"Live Mentorship",                           icon:"⭐", free:false, panel:"buy-premium" },
   { id:"chat24",        label:"24×7 Chat Support",                         icon:"💬", free:false, panel:"buy-premium" },
   { id:"mentor",        label:"Personal Mentor",                           icon:"👨‍🏫",free:false, panel:"buy-premium" },
+  { id:"branch-list",   label:"Personalised Branch Specific List",                      icon:"📄", free:false, panel:"buy-premium" },
   { id:"admission",     label:"Admission Assistance",                      icon:"🏛️", free:false, panel:"buy-premium" },
   { id:"cap-round",     label:"CAP Round Support",                         icon:"🔄", free:false, panel:"buy-premium" },
   { id:"ils",           label:"ILS / Spot Round Guidance",                 icon:"🔦", free:false, panel:"buy-premium" },
@@ -1157,6 +1158,7 @@ const ALL_PREMIUM_SERVICES = [
   { icon:"🎤", label:"Special Guest Lecture on Each Branch" },
   { icon:"📚", label:"Personalized Counselling Material" },
   { icon:"🎥", label:"Live Session Recordings" },
+  { icon:"📄", label:"Personalised Branch Specific List" },
   { icon:"💼", label:"WhatsApp Group Access & Guidance Material" },
 ];
 
