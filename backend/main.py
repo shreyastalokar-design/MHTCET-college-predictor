@@ -857,8 +857,8 @@ def predict_pdf(
         story.append(ai_box)
         story.append(Spacer(1, 0.25*cm))
 
-    # ── Limit to 100 rows ─────────────────────────────────────────────────────
-    PDF_LIMIT   = 100
+    # ── Limit to 25 rows ─────────────────────────────────────────────────────
+    PDF_LIMIT   = 25
     total_found = len(filtered)
     filtered    = filtered.head(PDF_LIMIT)
 
