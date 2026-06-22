@@ -137,6 +137,8 @@ const SIDEBAR_SERVICES = [
   { id:"call",       label:"Call Support",                        icon:"📞", free:true,  panel:"contact" },
   { id:"documents",  label:"Document Support",                    icon:"📄", free:true,  panel:"documents" },
   // PAID — all open the same poster page "buy-premium"
+  
+  { id:"college-list",  label:"Full College Predictor List",               icon:"📄", free:false, panel:"buy-premium" },
   { id:"option-form",   label:"Personalized Option Form",                  icon:"✏️", free:false, panel:"buy-premium" },
   { id:"branch",        label:"Branch & College Guidance",                 icon:"🎓", free:false, panel:"buy-premium" },
   { id:"filling",       label:"Option Form Filling Guidance",              icon:"📝", free:false, panel:"buy-premium" },
@@ -1141,6 +1143,7 @@ const PREMIUM_DETAILS = {
 // PREMIUM POSTER PANEL
 // ═════════════════════════════════════════════════════════════════════════════
 const ALL_PREMIUM_SERVICES = [
+  { icon:"📄", label:"Full College Predictor List" },
   { icon:"✏️", label:"Personalized Option Form" },
   { icon:"🎓", label:"Branch & College Guidance" },
   { icon:"📝", label:"Option Form Filling Guidance" },

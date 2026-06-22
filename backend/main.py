@@ -87,6 +87,7 @@ def send_confirmation_email(to_email: str, student_name: str, mobile: str,
                     padding:16px;margin-bottom:20px;">
           <h3 style="color:#166534;margin:0 0 10px;font-size:15px;">What you get</h3>
           <ul style="color:#166534;font-size:13px;margin:0;padding-left:18px;line-height:2;">
+            <li>Full Personalized College Predictor List</li>
             <li>Personalized Option Form</li>
             <li>Branch &amp; College Guidance</li>
             <li>Option Form Filling Guidance</li>
