@@ -622,7 +622,7 @@ function PredictorPanel({ setPanel, goTo }) {
           <div>
             <div style={{ color:"#fff", fontWeight:700, fontSize:14 }}>Chat with us on WhatsApp</div>
             <div style={{ color:"#A7F3D0", fontSize:12 }}>
-              Get free guidance · Response within 30 mins
+              Get free guidance 
             </div>
           </div>
         </div>
