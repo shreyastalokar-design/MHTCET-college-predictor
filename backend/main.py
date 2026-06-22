@@ -38,7 +38,7 @@ async def cleanup_middleware(request, call_next):
     return response
 
 # ── Max results returned to frontend ─────────────────────────────────────────
-MAX_PREDICT_RESULTS = 25
+MAX_PREDICT_RESULTS = 20
 
 @app.get("/ping")
 def ping():

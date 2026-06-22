@@ -607,6 +607,26 @@ function PredictorPanel({ setPanel, goTo }) {
     <div>
       {/* ── Breadcrumb ── */}
       <div style={s.breadcrumb}>Free Services › <strong>College Prediction</strong></div>
+
+      {/* ── WhatsApp Help Bar ── */}
+      <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi Concept Delta! I need help with college admission 2026.")}`}
+         target="_blank" rel="noreferrer"
+         style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
+                  background:"linear-gradient(135deg,#075E54,#128C7E)",
+                  borderRadius:10, padding:"11px 16px", marginBottom:16,
+                  textDecoration:"none", gap:12 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <WAIcon size={28}/>
+          <div>
+            <div style={{ color:"#fff", fontWeight:700, fontSize:14 }}>Chat with us on WhatsApp</div>
+            <div style={{ color:"#A7F3D0", fontSize:12 }}>
+              Get free guidance · Response within 30 mins
+            </div>
+          </div>
+        </div>
+        <div style={{ color:"#fff", fontSize:20 }}>›</div>
+      </a>
+
       <div style={s.panelHeaderRow}>
         <div>
           <h2 style={s.panelTitle}>MHT-CET / JEE College Predictor <span style={s.yr26}>2026</span></h2>
@@ -788,15 +808,16 @@ function PredictorPanel({ setPanel, goTo }) {
                       CAP Round 3 & 4 results are available exclusively for Premium members.
                       Unlock <strong style={{ color:C.gold }}>{results.total_results} colleges</strong> with full cutoff data.
                     </div>
-                    <a href={PREMIUM_FORM_URL} target="_blank" rel="noreferrer"
+                    <button onClick={() => goTo("buy-premium")}
                        style={{
-                         display:"block", background:`linear-gradient(135deg,${C.gold},#B8972E)`,
+                         display:"block", width:"100%",
+                         background:`linear-gradient(135deg,${C.gold},#B8972E)`,
                          color:C.navyDeep, fontWeight:700, fontSize:15,
-                         padding:"12px 28px", borderRadius:8, textDecoration:"none",
-                         marginBottom:8,
+                         padding:"12px 28px", borderRadius:8, border:"none",
+                         cursor:"pointer", marginBottom:8,
                        }}>
                       🛒 Get Premium — ₹1,500
-                    </a>
+                    </button>
                     <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer"
                        style={{ color:"#25D366", fontSize:13, textDecoration:"none" }}>
                       💬 WhatsApp us for details
@@ -893,7 +914,7 @@ function PredictorPanel({ setPanel, goTo }) {
                 <div style={{ color:"#CBD5E1", fontSize:14, lineHeight:1.8,
                               marginBottom:20, maxWidth:480, margin:"0 auto 20px" }}>
                   {results.free_tier_note
-                    ? <>You're seeing <strong style={{ color:C.gold }}>top 25 of {results.total_results}</strong> colleges for free.<br/></>
+                    ? <>You're seeing <strong style={{ color:C.gold }}>top 20 of {results.total_results}</strong> colleges for free.<br/></>
                     : null
                   }
                   Upgrade to Premium and get <strong style={{ color:"#86EFAC" }}>complete CAP Round 3 & 4 data</strong>,
@@ -914,15 +935,15 @@ function PredictorPanel({ setPanel, goTo }) {
                 </div>
 
                 <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
-                  <a href={PREMIUM_FORM_URL} target="_blank" rel="noreferrer"
+                  <button onClick={() => goTo("buy-premium")}
                      style={{
                        background:`linear-gradient(135deg,${C.gold},#B8972E)`,
                        color:C.navyDeep, fontWeight:700, fontSize:15,
-                       padding:"12px 28px", borderRadius:8, textDecoration:"none",
-                       display:"inline-block",
+                       padding:"12px 28px", borderRadius:8, border:"none",
+                       cursor:"pointer", display:"inline-block",
                      }}>
                     🛒 Get Premium — ₹1,500 only
-                  </a>
+                  </button>
                   <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I want to know more about Concept Delta Premium")}`}
                      target="_blank" rel="noreferrer"
                      style={{
