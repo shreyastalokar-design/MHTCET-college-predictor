@@ -73,11 +73,11 @@ function CountdownBadge({ large = false }) {
   const colonSz  = large ? 26  : 20;
   const gap      = large ? 10  : 7;
   const isMob    = window.innerWidth <= 480;
-  const bPad     = isMob ? (large ? "10px 10px" : "6px 8px") : (large ? "12px 16px" : "8px 12px");
-  const bMin     = isMob ? (large ? 44 : 36) : boxSize;
-  const nSize    = isMob ? (large ? 24 : 18) : numSize;
-  const cSize    = isMob ? (large ? 20 : 16) : colonSz;
-  const gSize    = isMob ? 6 : gap;
+  const bPad     = isMob ? (large ? "8px 10px" : "6px 8px") : (large ? "12px 16px" : "8px 12px");
+  const bMin     = isMob ? (large ? 40 : 36) : boxSize;
+  const nSize    = isMob ? (large ? 20 : 18) : numSize;
+  const cSize    = isMob ? (large ? 18 : 16) : colonSz;
+  const gSize    = isMob ? 8 : gap;
 
   const Box = ({ val, label, red }) => (
     <div style={{ textAlign:"center" }}>
