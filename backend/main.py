@@ -80,7 +80,7 @@ def send_confirmation_email(to_email: str, student_name: str, mobile: str,
             <tr><td style="padding:4px 0;"><strong>Category:</strong></td><td>{category}</td></tr>
             <tr><td style="padding:4px 0;"><strong>District:</strong></td><td>{district}</td></tr>
             <tr><td style="padding:4px 0;"><strong>Package:</strong></td>
-                <td><strong style="color:#D4AF37;">Premium - Rs.1,500</strong></td></tr>
+                <td><strong style="color:#D4AF37;">Premium - Rs.1,799</strong></td></tr>
           </table>
         </div>
         <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;
@@ -590,7 +590,7 @@ def add_services_page(usable_width=25.7*cm):
             sub_style)],
          [Paragraph(
             f'<a href="{PREMIUM_FORM_URL}" color="#4ADE80">'
-            f'<b>Click here to Buy our Premium Services -- Rs.1,500 only (50% OFF)</b></a>',
+            f'<b>Click here to Buy our Premium Services -- Rs.1,799 only (Limited Offer)</b></a>',
             ParagraphStyle('buy', fontName='Helvetica-Bold', fontSize=11,
                            textColor=colors.white, alignment=TA_CENTER, leading=18))],
          [Paragraph(
