@@ -87,16 +87,18 @@ function CountdownBadge({ large = false }) {
           fontVariantNumeric:"tabular-nums",
         }}>{val}</div>
       </div>
-      <div style={{ color:"#64748B", fontSize:lblSize, marginTop:4,
-                    letterSpacing:".06em" }}>{label}</div>
+      <div style={{ color:"#CBD5E1", fontSize:lblSize, marginTop:4,
+                    letterSpacing:".08em", fontWeight:600 }}>{label}</div>
     </div>
   );
 
   return (
     <div style={{ textAlign:"center" }}>
-      <div style={{ fontSize:11, color:"#94A3B8", letterSpacing:".08em",
-                    marginBottom:large?14:10 }}>
-        LIMITED OFFER — ENDS IN
+      <div style={{ marginBottom:large?14:10 }}>
+        <span style={{ background:"#DC2626", color:"#fff", fontSize:11, fontWeight:700,
+                       padding:"4px 14px", borderRadius:20, letterSpacing:".06em" }}>
+          LIMITED OFFER — ENDS IN
+        </span>
       </div>
       <div style={{ display:"flex", gap:gap, justifyContent:"center",
                     alignItems:"flex-end" }}>
