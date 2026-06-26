@@ -20,6 +20,53 @@ function useIsMobile() {
   return isMobile;
 }
 
+// ── 7-day countdown hook ──────────────────────────────────────────────────────
+function useCountdown() {
+  const DEADLINE_KEY = "cd_premium_deadline";
+  const getDeadline = () => {
+    let d = localStorage.getItem(DEADLINE_KEY);
+    if (!d) {
+      d = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      localStorage.setItem(DEADLINE_KEY, String(d));
+    }
+    return Number(d);
+  };
+  const [timeLeft, setTimeLeft] = useState(() => Math.max(0, getDeadline() - Date.now()));
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTimeLeft(Math.max(0, getDeadline() - Date.now()));
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+  if (timeLeft <= 0) return "OFFER EXPIRED";
+  const sec = Math.floor(timeLeft / 1000);
+  const min = Math.floor(sec / 60);
+  const hr  = Math.floor(min / 60);
+  const day = Math.floor(hr / 24);
+  const pad = n => String(n).padStart(2, "0");
+  return day + "d " + pad(hr % 24) + "h " + pad(min % 60) + "m " + pad(sec % 60) + "s";
+}
+
+function CountdownBadge({ large = false }) {
+  const t = useCountdown();
+  const expired = t === "OFFER EXPIRED";
+  return (
+    <div style={{ textAlign:"center" }}>
+      <span style={{ background:"#DC2626", color:"#fff", fontSize:11, fontWeight:700,
+                     padding:"4px 14px", borderRadius:20, letterSpacing:".05em" }}>
+        {expired ? "OFFER EXPIRED" : "LIMITED OFFER — ENDS IN"}
+      </span>
+      {!expired && (
+        <div style={{ color:"#D4AF37", fontSize: large ? 32 : 16, fontWeight:700,
+                      letterSpacing:".06em", margin:"8px 0 2px",
+                      fontVariantNumeric:"tabular-nums" }}>
+          {t}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Animation Hook ───────────────────────────────────────────────────────────
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
@@ -383,11 +430,11 @@ export default function App() {
             <div style={{ fontSize:11, color:C.navyDeep, textDecoration:"line-through", opacity:0.6 }}>₹3,000</div>
             <div style={{ color:C.navyDeep, fontWeight:700, fontSize:14, display:"flex",
                           alignItems:"center", justifyContent:"center", gap:6 }}>
-              <span style={{ fontSize:16, filter:"grayscale(1) brightness(2.5)" }}>🛒</span> Buy at ₹1,500
+              <span style={{ fontSize:16, filter:"grayscale(1) brightness(2.5)" }}>🛒</span> Buy at ₹1,799
             </div>
             <div style={{ background:"#DC2626", color:"#fff", fontSize:9, fontWeight:700,
                           padding:"2px 8px", borderRadius:10, display:"inline-block", marginTop:4 }}>
-              50% OFF
+              LIMITED OFFER
             </div>
           </div>
         </FadeIn>
@@ -420,13 +467,6 @@ export default function App() {
         <FadeIn delay={0.65}>
           <div style={{ display:"flex", gap:12, justifyContent:"center",
                         flexWrap:"wrap", marginTop:18 }}>
-            <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer"
-               style={{ display:"inline-flex", alignItems:"center", gap:7,
-                        background:C.gold, color:C.navyDeep, padding:"11px 22px",
-                        borderRadius:10, fontWeight:700, fontSize:13,
-                        textDecoration:"none", letterSpacing:"0.3px" }}>
-              📅 Book a Free Counselling Session
-            </a>
             <button
               onClick={() => {
                 goTo("buy-premium");
@@ -439,7 +479,7 @@ export default function App() {
               <span style={{ filter:"grayscale(1) brightness(2.5)", fontSize:14 }}>⭐</span> Check out our Premium Services
               <span style={{ background:"#DC2626", color:"#fff", fontSize:9,
                              fontWeight:700, padding:"2px 7px", borderRadius:8 }}>
-                50% OFF
+                LIMITED OFFER
               </span>
             </button>
           </div>
@@ -495,20 +535,7 @@ function SidebarItem({ svc, active, onClick }) {
   );
 }
 
-// ── Book Session Button ───────────────────────────────────────────────────────
-function BookSessionBtn() {
-  const isMob = window.innerWidth <= 768;
-  return (
-    <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer"
-       style={{ ...s.bookBtn,
-         fontSize: isMob ? 10 : 13,
-         padding: isMob ? "7px 10px" : "9px 16px",
-         whiteSpace: "nowrap"
-       }}>
-      📅 {isMob ? "Free Counselling" : "Book a Free Counselling Session"}
-    </a>
-  );
-}
+// BookSessionBtn removed — free counselling discontinued
 
 // ═════════════════════════════════════════════════════════════════════════════
 // COLLEGE PREDICTOR PANEL
@@ -804,7 +831,8 @@ function PredictorPanel({ setPanel, goTo }) {
                     textAlign:"center", maxWidth:380, boxShadow:"0 8px 32px rgba(3,19,67,0.25)",
                   }}>
                     <div style={{ fontSize:40, marginBottom:10 }}>🔒</div>
-                    <div style={{ color:C.gold, fontSize:18, fontWeight:700, marginBottom:6 }}>
+                    <CountdownBadge/>
+                    <div style={{ color:C.gold, fontSize:18, fontWeight:700, marginBottom:6, marginTop:10 }}>
                       {results.cap_round} is Premium Only
                     </div>
                     <div style={{ color:"#CBD5E1", fontSize:13, lineHeight:1.7, marginBottom:16 }}>
@@ -819,7 +847,7 @@ function PredictorPanel({ setPanel, goTo }) {
                          padding:"12px 28px", borderRadius:8, border:"none",
                          cursor:"pointer", marginBottom:8,
                        }}>
-                      🛒 Get Premium — ₹1,500
+                      🛒 Get Premium — ₹1,799
                     </button>
                     <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer"
                        style={{ color:"#25D366", fontSize:13, textDecoration:"none" }}>
@@ -908,7 +936,8 @@ function PredictorPanel({ setPanel, goTo }) {
                 border:`1.5px solid ${C.gold}`,
               }}>
                 <div style={{ fontSize:28, marginBottom:8 }}>🔒</div>
-                <div style={{ color:C.gold, fontSize:20, fontWeight:700, marginBottom:6 }}>
+                <CountdownBadge/>
+                <div style={{ color:C.gold, fontSize:20, fontWeight:700, marginBottom:6, marginTop:10 }}>
                   {results.free_tier_note
                     ? `See all ${results.total_results} colleges + CAP Round 3 & 4`
                     : "Unlock CAP Round 3 & 4 Results"
@@ -959,7 +988,7 @@ function PredictorPanel({ setPanel, goTo }) {
                        padding:"12px 28px", borderRadius:8, border:"none",
                        cursor:"pointer", display:"inline-block",
                      }}>
-                    🛒 Get Premium — ₹1,500 only
+                    🛒 Get Premium — ₹1,799 only
                   </button>
                   <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I want to know more about Concept Delta Premium")}`}
                      target="_blank" rel="noreferrer"
@@ -973,7 +1002,7 @@ function PredictorPanel({ setPanel, goTo }) {
                 </div>
 
                 <div style={{ color:"#64748B", fontSize:12, marginTop:12 }}>
-                  50% OFF · Limited time · ₹1,500 only (original ₹3,000)
+                  LIMITED OFFER · Limited time · ₹1,799 only (original ₹3,000)
                 </div>
               </div>
 
@@ -1213,16 +1242,13 @@ function PremiumPosterPanel() {
       <div style={{ background:`linear-gradient(160deg, #031343 0%, #0A2060 55%, #031343 100%)`,
                     borderRadius:16, padding:"28px 24px", position:"relative", overflow:"hidden" }}>
 
-        {/* Badge + price */}
+        {/* Badge + countdown + price */}
         <div style={{ textAlign:"center", marginBottom:20 }}>
-          <span style={{ background:"#DC2626", color:"#fff", fontSize:12, fontWeight:700,
-                         padding:"5px 16px", borderRadius:20, letterSpacing:"0.05em" }}>
-            LIMITED TIME — 50% OFF
-          </span>
-          <div style={{ color:"#94A3B8", fontSize:13, marginTop:12,
+          <CountdownBadge large={true}/>
+          <div style={{ color:"#94A3B8", fontSize:13, marginTop:14,
                         textDecoration:"line-through" }}>Regular price ₹3,000</div>
           <div style={{ color:C.gold, fontSize:44, fontWeight:700, lineHeight:1.1,
-                        margin:"4px 0" }}>₹1,500</div>
+                        margin:"4px 0" }}>₹1,799</div>
           <div style={{ color:"#CBD5E1", fontSize:12 }}>
             One-time payment · Entire CAP 2026 season covered
           </div>
@@ -1246,7 +1272,7 @@ function PremiumPosterPanel() {
         <div style={{ background:"rgba(255,255,255,0.06)", border:"0.5px solid rgba(212,175,55,0.25)",
                       borderRadius:10, padding:"14px 16px", marginBottom:20 }}>
           <div style={{ color:C.gold, fontSize:12, fontWeight:700, marginBottom:12,
-                        letterSpacing:"0.05em" }}>EVERYTHING INCLUDED IN ₹1,500</div>
+                        letterSpacing:"0.05em" }}>EVERYTHING INCLUDED IN ₹1,799</div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"4px 12px" }}>
             {[...col1.map((s,i) => ({ ...s, pair: col2[i] }))].map((item, i) => (
               <React.Fragment key={i}>
@@ -1271,7 +1297,7 @@ function PremiumPosterPanel() {
                     background:`linear-gradient(135deg, ${C.gold}, #B8972E)`,
                     color:C.navyDeep, fontWeight:700, fontSize:15, padding:"15px 24px",
                     borderRadius:10, textDecoration:"none", marginBottom:10 }}>
-          🛒 Purchase Premium Package — ₹1,500
+          🛒 Purchase Premium Package — ₹1,799
         </a>
 
         <div style={{ color:"#94A3B8", fontSize:11, textAlign:"center" }}>
@@ -1429,7 +1455,7 @@ function SiteFooter({ setPanel, goTo, isMobile }) {
             { label:"College Predictor",  action:() => goTo("predictor") },
             { label:"Documents Guidance", action:() => goTo("documents") },
             { label:"Call Support",       action:() => goTo("contact")   },
-            { label:"Book a Free Counselling Session", action:() => window.open(GOOGLE_FORM_URL,"_blank") },
+
             { label:"Buy Our Personalised Counselling Services", action:() => goTo("buy-premium") },
           ].map(({label,action})=>(
             <div key={label} onClick={action}
