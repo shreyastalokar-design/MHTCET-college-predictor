@@ -48,21 +48,69 @@ function useCountdown() {
 }
 
 function CountdownBadge({ large = false }) {
-  const t = useCountdown();
-  const expired = t === "OFFER EXPIRED";
-  return (
+  const raw = useCountdown();
+  const expired = raw === "OFFER EXPIRED";
+
+  // Parse into parts for segmented display
+  let d="00",h="00",m="00",s="00";
+  if (!expired) {
+    const match = raw.match(/(\d+)d (\d+)h (\d+)m (\d+)s/);
+    if (match) { d=match[1]; h=match[2]; m=match[3]; s=match[4]; }
+  }
+
+  if (expired) return (
     <div style={{ textAlign:"center" }}>
       <span style={{ background:"#DC2626", color:"#fff", fontSize:11, fontWeight:700,
                      padding:"4px 14px", borderRadius:20, letterSpacing:".05em" }}>
-        {expired ? "OFFER EXPIRED" : "LIMITED OFFER — ENDS IN"}
+        OFFER EXPIRED
       </span>
-      {!expired && (
-        <div style={{ color:"#D4AF37", fontSize: large ? 32 : 16, fontWeight:700,
-                      letterSpacing:".06em", margin:"8px 0 2px",
-                      fontVariantNumeric:"tabular-nums" }}>
-          {t}
-        </div>
-      )}
+    </div>
+  );
+
+  const boxSize  = large ? 58  : 46;
+  const numSize  = large ? 30  : 22;
+  const lblSize  = large ? 10  : 9;
+  const colonSz  = large ? 26  : 20;
+  const gap      = large ? 10  : 7;
+
+  const Box = ({ val, label, red }) => (
+    <div style={{ textAlign:"center" }}>
+      <div style={{
+        background:"#0A2060",
+        border: `1.5px solid ${red ? "#DC2626" : "#D4AF37"}`,
+        borderRadius:10, padding:`${large?12:8}px ${large?16:12}px`,
+        minWidth:boxSize,
+      }}>
+        <div style={{
+          color: red ? "#DC2626" : "#D4AF37",
+          fontSize:numSize, fontWeight:700, lineHeight:1,
+          fontVariantNumeric:"tabular-nums",
+        }}>{val}</div>
+      </div>
+      <div style={{ color:"#64748B", fontSize:lblSize, marginTop:4,
+                    letterSpacing:".06em" }}>{label}</div>
+    </div>
+  );
+
+  return (
+    <div style={{ textAlign:"center" }}>
+      <div style={{ fontSize:11, color:"#94A3B8", letterSpacing:".08em",
+                    marginBottom:large?14:10 }}>
+        LIMITED OFFER — ENDS IN
+      </div>
+      <div style={{ display:"flex", gap:gap, justifyContent:"center",
+                    alignItems:"flex-end" }}>
+        <Box val={d} label="DAYS"/>
+        <div style={{ color:"#D4AF37", fontSize:colonSz, fontWeight:700,
+                      marginBottom:large?18:14 }}>:</div>
+        <Box val={h} label="HOURS"/>
+        <div style={{ color:"#D4AF37", fontSize:colonSz, fontWeight:700,
+                      marginBottom:large?18:14 }}>:</div>
+        <Box val={m} label="MINS"/>
+        <div style={{ color:"#D4AF37", fontSize:colonSz, fontWeight:700,
+                      marginBottom:large?18:14 }}>:</div>
+        <Box val={s} label="SECS" red={true}/>
+      </div>
     </div>
   );
 }
