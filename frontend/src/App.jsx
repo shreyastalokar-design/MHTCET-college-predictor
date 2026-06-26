@@ -72,18 +72,24 @@ function CountdownBadge({ large = false }) {
   const lblSize  = large ? 10  : 9;
   const colonSz  = large ? 26  : 20;
   const gap      = large ? 10  : 7;
+  const isMob    = window.innerWidth <= 480;
+  const bPad     = isMob ? (large ? "10px 10px" : "6px 8px") : (large ? "12px 16px" : "8px 12px");
+  const bMin     = isMob ? (large ? 44 : 36) : boxSize;
+  const nSize    = isMob ? (large ? 24 : 18) : numSize;
+  const cSize    = isMob ? (large ? 20 : 16) : colonSz;
+  const gSize    = isMob ? 6 : gap;
 
   const Box = ({ val, label, red }) => (
     <div style={{ textAlign:"center" }}>
       <div style={{
         background:"#0A2060",
         border: `1.5px solid ${red ? "#DC2626" : "#D4AF37"}`,
-        borderRadius:10, padding:`${large?12:8}px ${large?16:12}px`,
-        minWidth:boxSize,
+        borderRadius:10, padding:bPad,
+        minWidth:bMin,
       }}>
         <div style={{
           color: red ? "#DC2626" : "#D4AF37",
-          fontSize:numSize, fontWeight:700, lineHeight:1,
+          fontSize:nSize, fontWeight:700, lineHeight:1,
           fontVariantNumeric:"tabular-nums",
         }}>{val}</div>
       </div>
@@ -100,16 +106,16 @@ function CountdownBadge({ large = false }) {
           LIMITED OFFER — ENDS IN
         </span>
       </div>
-      <div style={{ display:"flex", gap:gap, justifyContent:"center",
+      <div style={{ display:"flex", gap:gSize, justifyContent:"center",
                     alignItems:"flex-end" }}>
         <Box val={d} label="DAYS"/>
-        <div style={{ color:"#D4AF37", fontSize:colonSz, fontWeight:700,
+        <div style={{ color:"#D4AF37", fontSize:cSize, fontWeight:700,
                       marginBottom:large?18:14 }}>:</div>
         <Box val={h} label="HOURS"/>
-        <div style={{ color:"#D4AF37", fontSize:colonSz, fontWeight:700,
+        <div style={{ color:"#D4AF37", fontSize:cSize, fontWeight:700,
                       marginBottom:large?18:14 }}>:</div>
         <Box val={m} label="MINS"/>
-        <div style={{ color:"#D4AF37", fontSize:colonSz, fontWeight:700,
+        <div style={{ color:"#D4AF37", fontSize:cSize, fontWeight:700,
                       marginBottom:large?18:14 }}>:</div>
         <Box val={s} label="SECS" red={true}/>
       </div>
