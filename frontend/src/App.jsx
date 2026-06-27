@@ -20,56 +20,88 @@ function useIsMobile() {
   return isMobile;
 }
 
-
-// ── 7-day countdown — FIXED deadline (same for ALL visitors/browsers) ─────────
-// July 4 2026 23:59:59 IST — change this timestamp to reset/extend the offer
-const OFFER_DEADLINE_MS = 1783189799000;
-
+// ── 7-day countdown hook ──────────────────────────────────────────────────────
 function useCountdown() {
-  const [timeLeft, setTimeLeft] = useState(() => Math.max(0, OFFER_DEADLINE_MS - Date.now()));
+  const DEADLINE_KEY = "cd_premium_deadline";
+  const getDeadline = () => {
+    let d = localStorage.getItem(DEADLINE_KEY);
+    if (!d) {
+      d = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      localStorage.setItem(DEADLINE_KEY, String(d));
+    }
+    return Number(d);
+  };
+  const [timeLeft, setTimeLeft] = useState(() => Math.max(0, getDeadline() - Date.now()));
   useEffect(() => {
-    const id = setInterval(() => setTimeLeft(Math.max(0, OFFER_DEADLINE_MS - Date.now())), 1000);
+    const id = setInterval(() => {
+      setTimeLeft(Math.max(0, getDeadline() - Date.now()));
+    }, 1000);
     return () => clearInterval(id);
   }, []);
   if (timeLeft <= 0) return "OFFER EXPIRED";
-  const sec = Math.floor(timeLeft / 1000), min = Math.floor(sec / 60),
-        hr  = Math.floor(min / 60),        day = Math.floor(hr / 24);
+  const sec = Math.floor(timeLeft / 1000);
+  const min = Math.floor(sec / 60);
+  const hr  = Math.floor(min / 60);
+  const day = Math.floor(hr / 24);
   const pad = n => String(n).padStart(2, "0");
-  return day + "d " + pad(hr%24) + "h " + pad(min%60) + "m " + pad(sec%60) + "s";
+  return day + "d " + pad(hr % 24) + "h " + pad(min % 60) + "m " + pad(sec % 60) + "s";
 }
 
 function CountdownBadge({ large = false }) {
   const raw = useCountdown();
   const expired = raw === "OFFER EXPIRED";
-  let d="00", h="00", m="00", s="00";
+
+  // Parse into parts for segmented display
+  let d="00",h="00",m="00",s="00";
   if (!expired) {
     const match = raw.match(/(\d+)d (\d+)h (\d+)m (\d+)s/);
     if (match) { d=match[1]; h=match[2]; m=match[3]; s=match[4]; }
   }
+
   if (expired) return (
     <div style={{ textAlign:"center" }}>
       <span style={{ background:"#DC2626", color:"#fff", fontSize:11, fontWeight:700,
-                     padding:"4px 14px", borderRadius:20 }}>OFFER EXPIRED</span>
+                     padding:"4px 14px", borderRadius:20, letterSpacing:".05em" }}>
+        OFFER EXPIRED
+      </span>
     </div>
   );
-  const isMob  = window.innerWidth <= 480;
-  const numSz  = isMob ? (large?20:16) : (large?30:22);
-  const colSz  = isMob ? (large?18:14) : (large?26:20);
-  const bPad   = isMob ? (large?"8px 10px":"5px 8px") : (large?"12px 16px":"8px 12px");
-  const bMin   = isMob ? (large?40:32) : (large?58:46);
-  const gSz    = isMob ? 4 : (large?10:7);
-  const lblSz  = large?10:9;
+
+  const boxSize  = large ? 58  : 46;
+  const numSize  = large ? 30  : 22;
+  const lblSize  = large ? 10  : 9;
+  const colonSz  = large ? 26  : 20;
+  const gap      = large ? 10  : 7;
+  const isMob    = window.innerWidth <= 480;
+  // Reduced padding for a tighter box
+  const bPad     = isMob ? (large ? "6px 8px" : "4px 6px") : (large ? "12px 16px" : "8px 12px");
+  // Significantly reduced minimum width so they don't spread out
+  const bMin     = isMob ? (large ? 34 : 30) : boxSize;
+  // Slightly smaller numbers
+  const nSize    = isMob ? (large ? 18 : 16) : numSize;
+  // Smaller colons
+  const cSize    = isMob ? (large ? 16 : 14) : colonSz;
+  // Cut the gap in half to bring everything closer together
+  const gSize    = isMob ? 4 : gap;
   const Box = ({ val, label, red }) => (
     <div style={{ textAlign:"center" }}>
-      <div style={{ background:"#0A2060", border:`1.5px solid ${red?"#DC2626":"#D4AF37"}`,
-                    borderRadius:10, padding:bPad, minWidth:bMin }}>
-        <div style={{ color:red?"#DC2626":"#D4AF37", fontSize:numSz, fontWeight:700,
-                      lineHeight:1, fontVariantNumeric:"tabular-nums" }}>{val}</div>
+      <div style={{
+        background:"#0A2060",
+        border: `1.5px solid ${red ? "#DC2626" : "#D4AF37"}`,
+        borderRadius:10, padding:bPad,
+        minWidth:bMin,
+      }}>
+        <div style={{
+          color: red ? "#DC2626" : "#D4AF37",
+          fontSize:nSize, fontWeight:700, lineHeight:1,
+          fontVariantNumeric:"tabular-nums",
+        }}>{val}</div>
       </div>
-      <div style={{ color:"#CBD5E1", fontSize:lblSz, marginTop:4,
+      <div style={{ color:"#CBD5E1", fontSize:lblSize, marginTop:4,
                     letterSpacing:".08em", fontWeight:600 }}>{label}</div>
     </div>
   );
+
   return (
     <div style={{ textAlign:"center" }}>
       <div style={{ marginBottom:large?14:10 }}>
@@ -78,13 +110,17 @@ function CountdownBadge({ large = false }) {
           LIMITED OFFER — ENDS IN
         </span>
       </div>
-      <div style={{ display:"flex", gap:gSz, justifyContent:"center", alignItems:"flex-end" }}>
+      <div style={{ display:"flex", gap:gSize, justifyContent:"center",
+                    alignItems:"flex-end" }}>
         <Box val={d} label="DAYS"/>
-        <div style={{ color:"#D4AF37", fontSize:colSz, fontWeight:700, marginBottom:large?18:14 }}>:</div>
+        <div style={{ color:"#D4AF37", fontSize:cSize, fontWeight:700,
+                      marginBottom:large?18:14 }}>:</div>
         <Box val={h} label="HOURS"/>
-        <div style={{ color:"#D4AF37", fontSize:colSz, fontWeight:700, marginBottom:large?18:14 }}>:</div>
+        <div style={{ color:"#D4AF37", fontSize:cSize, fontWeight:700,
+                      marginBottom:large?18:14 }}>:</div>
         <Box val={m} label="MINS"/>
-        <div style={{ color:"#D4AF37", fontSize:colSz, fontWeight:700, marginBottom:large?18:14 }}>:</div>
+        <div style={{ color:"#D4AF37", fontSize:cSize, fontWeight:700,
+                      marginBottom:large?18:14 }}>:</div>
         <Box val={s} label="SECS" red={true}/>
       </div>
     </div>
@@ -491,13 +527,6 @@ export default function App() {
         <FadeIn delay={0.65}>
           <div style={{ display:"flex", gap:12, justifyContent:"center",
                         flexWrap:"wrap", marginTop:18 }}>
-            <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer"
-               style={{ display:"inline-flex", alignItems:"center", gap:7,
-                        background:C.gold, color:C.navyDeep, padding:"11px 22px",
-                        borderRadius:10, fontWeight:700, fontSize:13,
-                        textDecoration:"none", letterSpacing:"0.3px" }}>
-              📅 Book a Free Counselling Session
-            </a>
             <button
               onClick={() => {
                 goTo("buy-premium");
@@ -566,9 +595,7 @@ function SidebarItem({ svc, active, onClick }) {
   );
 }
 
-// ── Book Session Button ───────────────────────────────────────────────────────
 // BookSessionBtn removed — free counselling discontinued
-
 
 // ═════════════════════════════════════════════════════════════════════════════
 // COLLEGE PREDICTOR PANEL
@@ -864,7 +891,8 @@ function PredictorPanel({ setPanel, goTo }) {
                     textAlign:"center", maxWidth:380, boxShadow:"0 8px 32px rgba(3,19,67,0.25)",
                   }}>
                     <div style={{ fontSize:40, marginBottom:10 }}>🔒</div>
-                    <div style={{ color:C.gold, fontSize:18, fontWeight:700, marginBottom:6 }}>
+                    <CountdownBadge/>
+                    <div style={{ color:C.gold, fontSize:18, fontWeight:700, marginBottom:6, marginTop:10 }}>
                       {results.cap_round} is Premium Only
                     </div>
                     <div style={{ color:"#CBD5E1", fontSize:13, lineHeight:1.7, marginBottom:16 }}>
@@ -968,7 +996,8 @@ function PredictorPanel({ setPanel, goTo }) {
                 border:`1.5px solid ${C.gold}`,
               }}>
                 <div style={{ fontSize:28, marginBottom:8 }}>🔒</div>
-                <div style={{ color:C.gold, fontSize:20, fontWeight:700, marginBottom:6 }}>
+                <CountdownBadge/>
+                <div style={{ color:C.gold, fontSize:20, fontWeight:700, marginBottom:6, marginTop:10 }}>
                   {results.free_tier_note
                     ? `See all ${results.total_results} colleges + CAP Round 3 & 4`
                     : "Unlock CAP Round 3 & 4 Results"
@@ -1285,7 +1314,7 @@ function PremiumPosterPanel() {
           </div>
         </div>
 
-                {/* Trust badges */}
+        {/* Trust badges */}
         <div style={{ display:"flex", gap:8, justifyContent:"center", flexWrap:"wrap", marginBottom:20 }}>
           {[
             { bg:"rgba(74,222,128,0.12)", border:"rgba(74,222,128,0.3)", color:"#4ADE80", txt:"✓ Instant Access" },
@@ -1486,7 +1515,7 @@ function SiteFooter({ setPanel, goTo, isMobile }) {
             { label:"College Predictor",  action:() => goTo("predictor") },
             { label:"Documents Guidance", action:() => goTo("documents") },
             { label:"Call Support",       action:() => goTo("contact")   },
-            { label:"Book a Free Counselling Session", action:() => window.open(GOOGLE_FORM_URL,"_blank") },
+
             { label:"Buy Our Personalised Counselling Services", action:() => goTo("buy-premium") },
           ].map(({label,action})=>(
             <div key={label} onClick={action}
