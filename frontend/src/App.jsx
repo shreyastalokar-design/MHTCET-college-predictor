@@ -20,21 +20,14 @@ function useIsMobile() {
   return isMobile;
 }
 
-// ── 7-day countdown hook ──────────────────────────────────────────────────────
+// ── Countdown — fixed deadline: July 3 2026 23:59:59 IST (same for ALL browsers/sources) ──
+const OFFER_DEADLINE_MS = 1783103399000;
+
 function useCountdown() {
-  const DEADLINE_KEY = "cd_premium_deadline";
-  const getDeadline = () => {
-    let d = localStorage.getItem(DEADLINE_KEY);
-    if (!d) {
-      d = Date.now() + 7 * 24 * 60 * 60 * 1000;
-      localStorage.setItem(DEADLINE_KEY, String(d));
-    }
-    return Number(d);
-  };
-  const [timeLeft, setTimeLeft] = useState(() => Math.max(0, getDeadline() - Date.now()));
+  const [timeLeft, setTimeLeft] = useState(() => Math.max(0, OFFER_DEADLINE_MS - Date.now()));
   useEffect(() => {
     const id = setInterval(() => {
-      setTimeLeft(Math.max(0, getDeadline() - Date.now()));
+      setTimeLeft(Math.max(0, OFFER_DEADLINE_MS - Date.now()));
     }, 1000);
     return () => clearInterval(id);
   }, []);
