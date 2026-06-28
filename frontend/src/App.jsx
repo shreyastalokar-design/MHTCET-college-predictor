@@ -501,7 +501,7 @@ export default function App() {
         <FadeIn delay={0.35}><p style={s.heroSub}>Personalized predictions · Safe, Moderate & Reach picks · Download as PDF</p></FadeIn>
         <FadeIn delay={0.5}><div style={s.statsRow}>
           <div style={s.statItem}>
-            <div style={s.statNum}><AnimatedCounter target={275} suffix="+" duration={2000}/></div>
+            <div style={s.statNum}><AnimatedCounter target={350} suffix="+" duration={2000}/></div>
             <div style={s.statLbl}>COLLEGES</div>
           </div>
           <div style={s.statDivider}/>
