@@ -31,7 +31,7 @@ function useCountdown() {
     }, 1000);
     return () => clearInterval(id);
   }, []);
-  if (timeLeft <= 0) return "OFFER EXPIRED";
+  if (timeLeft <= 0) return "LIMITED OFFER";
   const sec = Math.floor(timeLeft / 1000);
   const min = Math.floor(sec / 60);
   const hr  = Math.floor(min / 60);
@@ -42,7 +42,7 @@ function useCountdown() {
 
 function CountdownBadge({ large = false }) {
   const raw = useCountdown();
-  const expired = raw === "OFFER EXPIRED";
+  const expired = raw === "LIMITED OFFER";
 
   // Parse into parts for segmented display
   let d="00",h="00",m="00",s="00";
@@ -55,7 +55,7 @@ function CountdownBadge({ large = false }) {
     <div style={{ textAlign:"center" }}>
       <span style={{ background:"#DC2626", color:"#fff", fontSize:11, fontWeight:700,
                      padding:"4px 14px", borderRadius:20, letterSpacing:".05em" }}>
-        OFFER EXPIRED
+        LIMITED OFFER
       </span>
     </div>
   );
